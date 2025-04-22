@@ -33,10 +33,10 @@ A rede neural se expande seguindo uma abordagem **construtivista**, adicionando 
 
 Instale as dependências utilizando pip:
 ```bash
-pip install -r environments/requirements.txt
+pip install -r env/requirements.txt
 ```
 
 Ou conda:
 ```bash
-conda env create -f environment.yml
+conda env create -f env/environment.yml
 ```
