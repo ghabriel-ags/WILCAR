@@ -27,7 +27,7 @@ A rede neural se expande seguindo uma abordagem **construtivista**, adicionando 
 - **notebooks/**: Jupyter notebooks para exploração e experimentação.
 - **src/**: Código fonte do projeto.
 - **tests/**: Testes unitários e de integração.
-- **environments/**: Arquivos de configuração de ambientes (requirements.txt, environment.yml).
+- **env/**: Arquivos de configuração de ambientes (requirements.txt, environment.yml).
 
 ## Instalação
 
