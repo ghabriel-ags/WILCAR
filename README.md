@@ -5,7 +5,7 @@
 **Discente:** Ghabriel Anton Gomes de Sá  
 **Orientadores:** Marcelo Embiruçu & Cristiano Fontes  
 
-<center><h1>UMA ABORDAGEM COMBINANDO UMA ESTIMATIVA DE PESOS INICIAIS BASEADA EM LINEARIZAÇÃO E ALGORITMO CONSTRUTIVISTA PARA A CRIAÇÃO DE REDES NEURAIS DE PROPAGAÇÃO DIRETA COM UMA ÚNICA CAMADA OCULTA APLICADAS À IDENTIFIÇÃO DE MODELOS COM MÚLTIPLAS ENTRADAS E ÚNICA SAÍDA EM PROBLEMAS DE REGRESSÃO COM POSSIBILIDADE DE RESTRIÇÕES NOS SINAIS DOS GANHOS</center></h1>
+<h2 align="center">UMA ABORDAGEM COMBINANDO UMA ESTIMATIVA DE PESOS INICIAIS BASEADA EM LINEARIZAÇÃO E ALGORITMO CONSTRUTIVISTA PARA A CRIAÇÃO DE REDES NEURAIS DE PROPAGAÇÃO DIRETA COM UMA ÚNICA CAMADA OCULTA APLICADAS À IDENTIFIÇÃO DE MODELOS COM MÚLTIPLAS ENTRADAS E ÚNICA SAÍDA EM PROBLEMAS DE REGRESSÃO COM POSSIBILIDADE DE RESTRIÇÕES NOS SINAIS DOS GANHOS</h2>
 
 Este projeto implementa um método sistemático que visa a identificação de modelos de redes neurais de propagação direta com uma única camada oculta com múltiplas entradas e única saída em problemas de regressão (ou classificação binária) com possibilidade de restrições nos sinais dos ganhos.
 
