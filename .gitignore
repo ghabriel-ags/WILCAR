@@ -1,7 +1,3 @@
-# Ambiente virtual
-venv/
-.env/
-
 # Dados
 data/
 
