@@ -1,16 +1,15 @@
-## Universidade Federal da Bahia
+# Universidade Federal da Bahia
 ## Escola Politécnica
-## Programa de Pós-Graduação em Engenharia Industrial
-## Mestrado em Engenharia Industrial
+### Programa de Pós-Graduação em Engenharia Industrial
 
 **Discente:** Ghabriel Anton Gomes de Sá  
 **Orientadores:** Marcelo Embiruçu & Cristiano Fontes  
 
-<h2 align="center"> Uma Abordagem Combinando uma Estimativa de Pesos Iniciais Baseada em Linearização e Algoritmo Construtivista <h2>
+<center><h1>UMA ABORDAGEM COMBINANDO UMA ESTIMATIVA DE PESOS INICIAIS BASEADA EM LINEARIZAÇÃO E ALGORITMO CONSTRUTIVISTA PARA A CRIAÇÃO DE REDES NEURAIS DE PROPAGAÇÃO DIRETA COM UMA ÚNICA CAMADA OCULTA APLICADAS À IDENTIFIÇÃO DE MODELOS COM MÚLTIPLAS ENTRADAS E ÚNICA SAÍDA EM PROBLEMAS DE REGRESSÃO COM POSSIBILIDADE DE RESTRIÇÕES NOS SINAIS DOS GANHOS</center></h1>
 
 Este projeto implementa um método sistemático que visa a identificação de modelos de redes neurais de propagação direta com uma única camada oculta com múltiplas entradas e única saída em problemas de regressão (ou classificação binária) com possibilidade de restrições nos sinais dos ganhos.
 
-### Método Proposto
+## Método Proposto
 
 #### Inicialização dos Pesos
 O método para a obtenção dos pesos iniciais propõe que:
