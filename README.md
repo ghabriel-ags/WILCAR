@@ -1,6 +1,6 @@
-# Universidade Federal da Bahia
-## Escola Politécnica
-### Programa de Pós-Graduação em Engenharia Industrial
+## UNIVERSIDADE FEDERAL DA BAHIA
+## ESCOLA POLITÉCNICA
+## PROGRAMA DE PÓS-GRADUAÇÃO EM ENGENHERIA INDUSTRIAL
 
 **Discente:** Ghabriel Anton Gomes de Sá  
 **Orientadores:** Marcelo Embiruçu & Cristiano Fontes  
