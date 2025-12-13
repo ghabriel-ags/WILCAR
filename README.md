@@ -133,7 +133,7 @@ thesis/
 micromamba create -f environment.yml
 
 # Activate environment
-micromamba activate mestrado_ghabriel_pei
+micromamba activate wilcar
 
 # Verify installation
 python -c "import numpy; import scipy; print('OK')"
@@ -143,7 +143,7 @@ python -c "import numpy; import scipy; print('OK')"
 
 ```bash
 conda env create -f environment.yml
-conda activate mestrado_ghabriel_pei
+conda activate wilcar
 ```
 
 ### Via pip
@@ -425,7 +425,7 @@ This software is proprietary and may be subject to patent protection. See [LICEN
 ```bash
 # Clone repository (if applicable)
 git clone https://github.com/ghabriel-ags/WILCAR
-cd mestrado-neural-networks
+cd WILCAR
 
 # Or initialize new repository
 git init

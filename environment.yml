@@ -6,7 +6,7 @@
 #
 # Installation:
 #   micromamba create -f environment.yml
-#   micromamba activate mestrado_ghabriel_pei
+#   micromamba activate wilcar
 #
 # Update:
 #   micromamba update -f environment.yml
@@ -15,7 +15,7 @@
 #   pip install torch
 # =============================================================================
 
-name: mestrado_ghabriel_pei
+name: wilcar
 
 channels:
   - conda-forge
