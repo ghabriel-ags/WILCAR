@@ -1,12 +1,153 @@
-# MESTRADO GHABRIEL ANTON (PEI-UFBA) - .gitignore
+# =============================================================================
+# .gitignore - MSc Neural Networks Project
+# =============================================================================
 
-# Resultados
-results/
-
-# Notebooks temporários
-.ipynb_checkpoints/
-
-# Arquivos compilados
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# -----------------------------------------------------------------------------
+# Jupyter Notebook
+# -----------------------------------------------------------------------------
 .ipynb_checkpoints/
+*.ipynb_checkpoints/
+
+# -----------------------------------------------------------------------------
+# Virtual Environments
+# -----------------------------------------------------------------------------
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.conda/
+
+# -----------------------------------------------------------------------------
+# IDEs and Editors
+# -----------------------------------------------------------------------------
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+
+# -----------------------------------------------------------------------------
+# Operating System
+# -----------------------------------------------------------------------------
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# -----------------------------------------------------------------------------
+# Data (processed data can be regenerated)
+# -----------------------------------------------------------------------------
+data/processed/
+data/external/
+
+# -----------------------------------------------------------------------------
+# Results and Figures (can be regenerated)
+# -----------------------------------------------------------------------------
+results/*
+figures/*
+
+# Keep directories with .gitkeep
+!results/.gitkeep
+!figures/.gitkeep
+
+# -----------------------------------------------------------------------------
+# Temporary Files and Cache
+# -----------------------------------------------------------------------------
+*.log
+*.tmp
+*.temp
+*.bak
+*.cache
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# -----------------------------------------------------------------------------
+# Documentation (build)
+# -----------------------------------------------------------------------------
+docs/_build/
+site/
+
+# -----------------------------------------------------------------------------
+# Sensitive Files
+# -----------------------------------------------------------------------------
+*.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+secrets.yaml
+credentials.json
+
+# -----------------------------------------------------------------------------
+# Large Files (use LFS or ignore)
+# -----------------------------------------------------------------------------
+*.zip
+*.tar.gz
+*.rar
+*.7z

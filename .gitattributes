@@ -1,0 +1,73 @@
+# =============================================================================
+# .gitattributes - Git Attributes Configuration
+# =============================================================================
+# Important for consistency between WSL and Windows
+# =============================================================================
+
+# Auto-detect text files and normalize line endings to LF
+* text=auto eol=lf
+
+# Source Code - Force LF
+*.py text eol=lf
+*.pyx text eol=lf
+*.pxd text eol=lf
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Configuration Files - Force LF
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.cfg text eol=lf
+.editorconfig text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+
+# Documentation - Force LF
+*.md text eol=lf
+*.txt text eol=lf
+*.rst text eol=lf
+*.tex text eol=lf
+LICENSE text eol=lf
+README text eol=lf
+
+# Jupyter Notebooks - Force LF
+*.ipynb text eol=lf
+
+# Data Files - Force LF (text-based)
+*.csv text eol=lf
+*.tsv text eol=lf
+
+# Vector Graphics - Force LF (XML-based)
+*.svg text eol=lf
+
+# Binary Files - No text conversion
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.pkl binary
+*.pickle binary
+*.joblib binary
+*.npy binary
+*.npz binary
+*.h5 binary
+*.hdf5 binary
+*.pt binary
+*.pth binary
+
+# Diff Settings
+*.ipynb diff=jupyternotebook
+*.py diff=python
+
+# Export Ignore (exclude from git archive)
+.gitattributes export-ignore
+.gitignore export-ignore
+tests export-ignore

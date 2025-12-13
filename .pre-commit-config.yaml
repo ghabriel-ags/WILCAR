@@ -1,0 +1,105 @@
+# =============================================================================
+# .pre-commit-config.yaml - Pre-commit Hooks Configuration
+# =============================================================================
+# Installation:
+#   pip install pre-commit
+#   pre-commit install
+#
+# Manual execution:
+#   pre-commit run --all-files
+#
+# Update hooks:
+#   pre-commit autoupdate
+# =============================================================================
+
+repos:
+  # ---------------------------------------------------------------------------
+  # General Hooks
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # Prevent commits to protected branches
+      - id: no-commit-to-branch
+        args: [--branch, main, --branch, master]
+
+      # Validate YAML/TOML files
+      - id: check-yaml
+      - id: check-toml
+
+      # Validate JSON files
+      - id: check-json
+        exclude: \.ipynb$
+
+      # Detect large files
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+
+      # Fix end of files
+      - id: end-of-file-fixer
+        exclude: \.ipynb$
+
+      # Remove trailing whitespace
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        exclude: \.ipynb$
+
+      # Check for unresolved merge conflicts
+      - id: check-merge-conflict
+
+      # Check for broken symlinks
+      - id: check-symlinks
+
+      # Detect private keys
+      - id: detect-private-key
+
+      # Mixed line endings
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+      # Sort requirements.txt
+      - id: requirements-txt-fixer
+
+  # ---------------------------------------------------------------------------
+  # Ruff - Fast Linter and Formatter
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.3
+    hooks:
+      # Linter
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      # Formatter
+      - id: ruff-format
+
+  # ---------------------------------------------------------------------------
+  # isort - Import Sorter
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: [--profile, black]
+
+  # ---------------------------------------------------------------------------
+  # Jupyter Notebooks
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.8.1
+    hooks:
+      # Remove outputs from notebooks before commit
+      - id: nbstripout
+        args: [--extra-keys, "metadata.kernelspec metadata.language_info"]
+
+# =============================================================================
+# CI Configuration
+# =============================================================================
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit hooks
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false
