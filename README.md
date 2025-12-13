@@ -5,7 +5,7 @@
 **Student:** Ghabriel Anton Gomes de Sá  
 **Advisors:** Marcelo Embiruçu & Cristiano Fontes  
 
-<h2 align="center">AN APPROACH COMBINING INITIAL WEIGHT ESTIMATION BASED ON LINEARIZATION AND CONSTRUCTIVE ALGORITHM FOR CREATING FEEDFORWARD NEURAL NETWORKS WITH A SINGLE HIDDEN LAYER APPLIED TO MULTIPLE INPUT SINGLE OUTPUT MODEL IDENTIFICATION IN REGRESSION PROBLEMS WITH GAIN SIGN CONSTRAINTS</h2>
+<h2 align="center">Constructive Neural Networks for Regression with Gain Sign Constraints</h2>
 
 ---
 
@@ -424,7 +424,7 @@ This software is proprietary and may be subject to patent protection. See [LICEN
 
 ```bash
 # Clone repository (if applicable)
-git clone https://github.com/ghabriel-ags/Mestrado-Ghabriel-PEI
+git clone https://github.com/ghabriel-ags/WILCAR
 cd mestrado-neural-networks
 
 # Or initialize new repository
@@ -482,5 +482,5 @@ make clean         # Remove temporary files
 ## Contact
 
 - **Author:** Ghabriel Anton Gomes de Sá
-- **Program:** MSc in Industrial Engineering - UFBA
+- **Program:** Graduate in Industrial Engineering - Universidade Federal da Bahia
 - **Advisors:** Prof. Marcelo Embiruçu & Prof. Cristiano Fontes
