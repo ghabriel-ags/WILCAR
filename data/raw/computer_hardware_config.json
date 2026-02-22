@@ -1,0 +1,15 @@
+{
+  "expected_signals": [-1, 1, 1, 1, 1, 1],
+  "variable_names": [
+    "MYCT (machine cycle time)",
+    "MMIN (minimum main memory)",
+    "MMAX (maximum main memory)",
+    "CACH (cache memory)",
+    "CHMIN (minimum channels)",
+    "CHMAX (maximum channels)"
+  ],
+  "output_name": "PRP (published relative performance)",
+  "notes": "Signals based on computer architecture domain knowledge. MYCT has negative gain (higher cycle time = slower = lower performance). All other variables have positive gain (more memory/cache/channels = better performance).",
+  "source": "UCI Machine Learning Repository",
+  "reference": "https://archive.ics.uci.edu/ml/datasets/Computer+Hardware"
+}

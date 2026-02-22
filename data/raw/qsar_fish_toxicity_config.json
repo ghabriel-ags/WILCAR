@@ -1,0 +1,15 @@
+{
+  "expected_signals": [-1, 1, -1, 1, 1, 1],
+  "variable_names": [
+    "CIC0 (information indices)",
+    "SM1_Dz(Z) (2D matrix-based descriptors)",
+    "GATS1i (2D autocorrelations)",
+    "NdsCH (atom-type counts)",
+    "NdssC (atom-type counts)",
+    "MLOGP (molecular properties)"
+  ],
+  "output_name": "LC50 (concentration causing 50% fathead minnow mortality)",
+  "notes": "Signals based on QSAR domain knowledge for molecular descriptor relationships with aquatic toxicity (Pimephales promelas).",
+  "source": "UCI Machine Learning Repository",
+  "reference": "https://archive.ics.uci.edu/ml/datasets/QSAR+fish+toxicity"
+}

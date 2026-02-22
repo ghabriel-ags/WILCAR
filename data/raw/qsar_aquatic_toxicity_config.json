@@ -1,0 +1,17 @@
+{
+  "expected_signals": [1, -1, 1, 1, 1, -1, 1, 1],
+  "variable_names": [
+    "TPSA(Tot) (topological polar surface area)",
+    "SAacc (surface area of acceptor atoms)",
+    "H-050 (H attached to heteroatom)",
+    "MLOGP (molecular properties)",
+    "RDCHI (reciprocal distance Randic-type index)",
+    "GATS1p (2D autocorrelations)",
+    "nN (number of nitrogen atoms)",
+    "C-040 (C(sp3) bonded to heteroatom)"
+  ],
+  "output_name": "LC50 (concentration causing 50% Daphnia Magna mortality)",
+  "notes": "Signals based on QSAR domain knowledge for molecular descriptor relationships with aquatic toxicity (Daphnia Magna).",
+  "source": "UCI Machine Learning Repository",
+  "reference": "https://archive.ics.uci.edu/ml/datasets/QSAR+aquatic+toxicity"
+}
