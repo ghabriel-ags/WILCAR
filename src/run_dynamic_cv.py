@@ -461,6 +461,7 @@ class VCDResults:
 
     # Per-fold details at optimal n*
     fold_metrics_at_optimal: List[Dict] = field(default_factory=list)
+    fold_conformity_details: List[List[Dict]] = field(default_factory=list)
 
     # Final model (retrained with all data)
     final_n_neurons: int = 0
@@ -615,6 +616,7 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
             'fold_r2_train': [],
             'fold_scr': [],
             'fold_times': [],
+            'fold_conformity_details': [],
         }
 
         all_folds_ok = True
@@ -646,6 +648,7 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
                 step_metrics['fold_r2_test'].append(result['r2_test'])
                 step_metrics['fold_r2_train'].append(result['r2_train'])
                 step_metrics['fold_scr'].append(result['scr'])
+                step_metrics['fold_conformity_details'].append(result.get('conformity_details', []))
                 step_metrics['fold_times'].append(result['training_time'])
 
         else:
@@ -668,6 +671,7 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
                 step_metrics['fold_r2_test'].append(result['r2_test'])
                 step_metrics['fold_r2_train'].append(result['r2_train'])
                 step_metrics['fold_scr'].append(result['scr'])
+                step_metrics['fold_conformity_details'].append(result.get('conformity_details', []))
                 step_metrics['fold_times'].append(result['training_time'])
 
         step_time = time.time() - step_start
@@ -795,8 +799,13 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
             'fold': k,
             'mse_test': optimal_step['fold_mse_test'][k],
             'r2_test': optimal_step['fold_r2_test'][k],
+            'r2_train': optimal_step['fold_r2_train'][k],
             'scr': optimal_step['fold_scr'][k],
         } for k in range(vcd_config.n_folds)],
+        fold_conformity_details=[
+            optimal_step['fold_conformity_details'][k]
+            for k in range(vcd_config.n_folds)
+        ],
         final_n_neurons=final_n_neurons,
         final_train_r2=final_train_r2,
         final_train_mse=final_train_mse,
@@ -849,6 +858,24 @@ def _save_vcd_results(results: VCDResults, output_dir: Path,
     pd.DataFrame(results.fold_metrics_at_optimal).to_csv(
         method_dir / "fold_details_at_optimal.csv", index=False
     )
+
+    # Conformity details at optimal (per variable, per fold)
+    if results.fold_conformity_details:
+        conf_rows = []
+        for k, fold_details in enumerate(results.fold_conformity_details):
+            for var_detail in fold_details:
+                conf_rows.append({
+                    'fold': k,
+                    'variable': var_detail['variable'],
+                    'calculated_gain': var_detail['calculated_gain'],
+                    'calculated_signal': var_detail['calculated_signal'],
+                    'expected_signal': var_detail['expected_signal'],
+                    'conformity': var_detail['conformity'],
+                })
+        if conf_rows:
+            pd.DataFrame(conf_rows).to_csv(
+                method_dir / "conformity_details_at_optimal.csv", index=False
+            )
 
     # Summary JSON
     summary = {
@@ -994,6 +1021,8 @@ def main():
                         help="Run folds sequentially instead of in parallel (for debugging)")
     parser.add_argument('--retrain', action='store_true', default=False,
                         help="Retrain final model with all data using n* (slower)")
+    parser.add_argument('-y', '--yes', action='store_true', default=False,
+                        help="Skip confirmation prompt for long runs")
 
     args = parser.parse_args()
 
@@ -1042,9 +1071,12 @@ def main():
         return
 
     # Confirm for long runs
-    if total_est > 3600:
+    if total_est > 3600 and not args.yes:
         print(f"\n⚠️  Estimated time: {total_est/3600:.1f} hours.")
-        response = input("Continue? [y/N]: ").strip().lower()
+        try:
+            response = input("Continue? [y/N]: ").strip().lower()
+        except EOFError:
+            response = 'y'  # Auto-continue when stdin is not available (piped)
         if response != 'y':
             print("Aborted.")
             return
