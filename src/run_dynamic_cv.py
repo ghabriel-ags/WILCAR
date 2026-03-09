@@ -88,6 +88,22 @@ setup_paths()
 # CONFIGURATION
 # =============================================================================
 
+# All datasets (order matches Appendix A)
+ALL_DATASETS = [
+    'airfoil_self_noise',       # A.1
+    'computer_hardware',        # A.2
+    'energy_heating',           # A.3a
+    'energy_cooling',           # A.3b
+    'lavender_friction',        # A.4
+    'optical_network',          # A.5
+    'aquatic_toxicity',         # A.6
+    'fish_toxicity',            # A.7
+    'real_estate',              # A.8
+    'synchronous_machine',      # A.9
+    'yacht_hydrodynamics',      # A.10
+]
+
+
 @dataclass
 class VCDMethodConfig:
     """Configuration for a specific method in VCD."""
@@ -122,11 +138,7 @@ class VCDConfig:
     methods: List[int] = field(default_factory=lambda: [1, 2])
 
     # Datasets to run
-    datasets: List[str] = field(default_factory=lambda: [
-        'computer_hardware',
-        'fish_toxicity',
-        'aquatic_toxicity'
-    ])
+    datasets: List[str] = field(default_factory=lambda: ALL_DATASETS.copy())
 
 
 # =============================================================================
@@ -135,7 +147,7 @@ class VCDConfig:
 # Reuse same configs as static CV for consistency
 
 VCD_METHOD_CONFIGS = {
-    'computer_hardware': {
+    'computer_hardware': {  # n=209, p=6
         1: VCDMethodConfig(max_neurons=750, patience=150),
         2: VCDMethodConfig(max_neurons=200, patience=20),
         3: VCDMethodConfig(max_neurons=750, patience=150),
@@ -143,7 +155,7 @@ VCD_METHOD_CONFIGS = {
         5: VCDMethodConfig(max_neurons=750, patience=150),
         6: VCDMethodConfig(max_neurons=150, patience=15),
     },
-    'fish_toxicity': {
+    'fish_toxicity': {  # n=908, p=6
         1: VCDMethodConfig(max_neurons=750, patience=150),
         2: VCDMethodConfig(max_neurons=200, patience=20),
         3: VCDMethodConfig(max_neurons=750, patience=150),
@@ -151,14 +163,78 @@ VCD_METHOD_CONFIGS = {
         5: VCDMethodConfig(max_neurons=750, patience=150),
         6: VCDMethodConfig(max_neurons=150, patience=15),
     },
-    'aquatic_toxicity': {
+    'aquatic_toxicity': {  # n=546, p=8
         1: VCDMethodConfig(max_neurons=750, patience=150),
         2: VCDMethodConfig(max_neurons=200, patience=20),
         3: VCDMethodConfig(max_neurons=750, patience=150),
         4: VCDMethodConfig(max_neurons=200, patience=20),
         5: VCDMethodConfig(max_neurons=750, patience=150),
         6: VCDMethodConfig(max_neurons=150, patience=15),
-    }
+    },
+    'airfoil_self_noise': {  # n=1503, p=5
+        1: VCDMethodConfig(max_neurons=750, patience=150),
+        2: VCDMethodConfig(max_neurons=200, patience=20),
+        3: VCDMethodConfig(max_neurons=750, patience=150),
+        4: VCDMethodConfig(max_neurons=200, patience=20),
+        5: VCDMethodConfig(max_neurons=750, patience=150),
+        6: VCDMethodConfig(max_neurons=150, patience=15),
+    },
+    'energy_heating': {  # n=768, p=8
+        1: VCDMethodConfig(max_neurons=750, patience=150),
+        2: VCDMethodConfig(max_neurons=200, patience=20),
+        3: VCDMethodConfig(max_neurons=750, patience=150),
+        4: VCDMethodConfig(max_neurons=200, patience=20),
+        5: VCDMethodConfig(max_neurons=750, patience=150),
+        6: VCDMethodConfig(max_neurons=150, patience=15),
+    },
+    'energy_cooling': {  # n=768, p=8
+        1: VCDMethodConfig(max_neurons=750, patience=150),
+        2: VCDMethodConfig(max_neurons=200, patience=20),
+        3: VCDMethodConfig(max_neurons=750, patience=150),
+        4: VCDMethodConfig(max_neurons=200, patience=20),
+        5: VCDMethodConfig(max_neurons=750, patience=150),
+        6: VCDMethodConfig(max_neurons=150, patience=15),
+    },
+    'lavender_friction': {  # n=625, p=3
+        1: VCDMethodConfig(max_neurons=500, patience=100),
+        2: VCDMethodConfig(max_neurons=200, patience=20),
+        3: VCDMethodConfig(max_neurons=500, patience=100),
+        4: VCDMethodConfig(max_neurons=200, patience=20),
+        5: VCDMethodConfig(max_neurons=500, patience=150),
+        6: VCDMethodConfig(max_neurons=150, patience=15),
+    },
+    'optical_network': {  # n=630, p=3
+        1: VCDMethodConfig(max_neurons=500, patience=100),
+        2: VCDMethodConfig(max_neurons=200, patience=20),
+        3: VCDMethodConfig(max_neurons=500, patience=100),
+        4: VCDMethodConfig(max_neurons=200, patience=20),
+        5: VCDMethodConfig(max_neurons=500, patience=150),
+        6: VCDMethodConfig(max_neurons=150, patience=15),
+    },
+    'real_estate': {  # n=414, p=3
+        1: VCDMethodConfig(max_neurons=500, patience=100),
+        2: VCDMethodConfig(max_neurons=200, patience=20),
+        3: VCDMethodConfig(max_neurons=500, patience=100),
+        4: VCDMethodConfig(max_neurons=200, patience=20),
+        5: VCDMethodConfig(max_neurons=500, patience=150),
+        6: VCDMethodConfig(max_neurons=150, patience=15),
+    },
+    'synchronous_machine': {  # n=557, p=4
+        1: VCDMethodConfig(max_neurons=500, patience=100),
+        2: VCDMethodConfig(max_neurons=200, patience=20),
+        3: VCDMethodConfig(max_neurons=500, patience=100),
+        4: VCDMethodConfig(max_neurons=200, patience=20),
+        5: VCDMethodConfig(max_neurons=500, patience=150),
+        6: VCDMethodConfig(max_neurons=150, patience=15),
+    },
+    'yacht_hydrodynamics': {  # n=308, p=6
+        1: VCDMethodConfig(max_neurons=300, patience=100),
+        2: VCDMethodConfig(max_neurons=200, patience=20),
+        3: VCDMethodConfig(max_neurons=300, patience=100),
+        4: VCDMethodConfig(max_neurons=200, patience=20),
+        5: VCDMethodConfig(max_neurons=300, patience=150),
+        6: VCDMethodConfig(max_neurons=150, patience=15),
+    },
 }
 
 
@@ -169,17 +245,33 @@ def get_vcd_method_config(dataset: str, method_id: int) -> VCDMethodConfig:
     return VCDMethodConfig()
 
 
-# Dataset files and signals
+# Dataset files: key → CSV filename (without .csv extension)
 DATASET_FILES = {
     'computer_hardware': 'computer_hardware',
     'fish_toxicity': 'qsar_fish_toxicity',
-    'aquatic_toxicity': 'qsar_aquatic_toxicity'
+    'aquatic_toxicity': 'qsar_aquatic_toxicity',
+    'airfoil_self_noise': 'airfoil_self_noise',
+    'energy_heating': 'ENB2012_Y1',
+    'energy_cooling': 'ENB2012_Y2',
+    'lavender_friction': 'lavender_friction_DFC',
+    'optical_network': 'optical_interconnection_network',
+    'real_estate': 'Real_estate_valuation',
+    'synchronous_machine': 'synchronous machine',
+    'yacht_hydrodynamics': 'yacht hydrodynamics',
 }
 
 EXPECTED_SIGNALS = {
     'computer_hardware': [-1, 1, 1, 1, 1, 1],
     'fish_toxicity': [-1, 1, -1, 1, 1, 1],
-    'aquatic_toxicity': [1, -1, 1, 1, 1, -1, 1, 1]
+    'aquatic_toxicity': [1, -1, 1, 1, 1, -1, 1, 1],
+    'airfoil_self_noise': [-1, 0, -1, 1, -1],
+    'energy_heating': [1, -1, 1, -1, 1, 0, 1, 0],
+    'energy_cooling': [1, -1, 1, -1, 1, 0, 1, 0],
+    'lavender_friction': [0, 1, 1],
+    'optical_network': [-1, 0, 1],
+    'real_estate': [-1, -1, 1],
+    'synchronous_machine': [1, -1, 1, 1],
+    'yacht_hydrodynamics': [0, 0, 0, 0, 0, 1],
 }
 
 METHOD_NAMES = {
@@ -205,6 +297,7 @@ def load_raw_data(dataset_name: str, base_dir: str = ".") -> Tuple[np.ndarray, n
         raise FileNotFoundError(f"Dataset not found: {data_path}")
 
     data = pd.read_csv(data_path, header=None, sep=';')
+    data = data.dropna(axis=1, how='all')  # Remove empty columns from trailing semicolons
     data = data.dropna()
 
     inputs = data.iloc[:, :-1].values
@@ -398,7 +491,8 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
                        expected_signals: List[int], vcd_config: VCDConfig,
                        method_config: VCDMethodConfig,
                        dataset_name: str, output_dir: Path,
-                       parallel: bool = True, base_dir: str = ".") -> VCDResults:
+                       parallel: bool = True, skip_retrain: bool = True,
+                       base_dir: str = ".") -> VCDResults:
     """
     Execute Dynamic Cross-Validation for a single method on a single dataset.
 
@@ -630,47 +724,60 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
     optimal_step = next(h for h in history if h['n'] == best_n)
 
     # =========================================================
-    # STEP 3: Retrain final model with ALL data
+    # STEP 3: Retrain final model with ALL data (optional)
     # =========================================================
-    print(f"\n  🔄 Retraining final model with n*={best_n} using all data...")
+    retrain_time = 0.0
+    final_n_neurons = 0
+    final_train_r2 = 0.0
+    final_train_mse = 0.0
+    final_scr = 0.0
 
-    retrain_start = time.time()
+    if not skip_retrain:
+        print(f"\n  🔄 Retraining final model with n*={best_n} using all data...")
 
-    # Normalize all data
-    scaler_X = MinMaxScaler()
-    scaler_y = MinMaxScaler()
-    X_all_norm = scaler_X.fit_transform(inputs)
-    y_all_norm = scaler_y.fit_transform(targets.reshape(-1, 1)).ravel()
+        retrain_start = time.time()
 
-    # Create final model
-    final_config = create_training_config(vcd_config, method_config)
-    final_config.max_neurons = best_n
-    final_config.patience_constructive = best_n + 10  # Don't stop before n*
-    final_config.verbose = 0
-    final_config.seed = vcd_config.seed
+        # Normalize all data
+        scaler_X = MinMaxScaler()
+        scaler_y = MinMaxScaler()
+        X_all_norm = scaler_X.fit_transform(inputs)
+        y_all_norm = scaler_y.fit_transform(targets.reshape(-1, 1)).ravel()
 
-    import io
-    import contextlib
+        # Create final model
+        final_config = create_training_config(vcd_config, method_config)
+        final_config.max_neurons = best_n
+        final_config.patience_constructive = best_n + 10  # Don't stop before n*
+        final_config.verbose = 0
+        final_config.seed = vcd_config.seed
 
-    with contextlib.redirect_stdout(io.StringIO()):
-        final_model = create_model(
-            method_id=method_id,
-            train_inputs=X_all_norm,
-            train_targets=y_all_norm,
-            test_inputs=X_all_norm,     # Same data (no separate test)
-            test_targets=y_all_norm,
-            expected_signals=expected_signals,
-            config=final_config,
-            dataset_name=dataset_name
-        )
-        final_results = final_model.train()
+        import io
+        import contextlib
 
-    retrain_time = time.time() - retrain_start
+        with contextlib.redirect_stdout(io.StringIO()):
+            final_model = create_model(
+                method_id=method_id,
+                train_inputs=X_all_norm,
+                train_targets=y_all_norm,
+                test_inputs=X_all_norm,     # Same data (no separate test)
+                test_targets=y_all_norm,
+                expected_signals=expected_signals,
+                config=final_config,
+                dataset_name=dataset_name
+            )
+            final_results = final_model.train()
 
-    print(f"  ✅ Final model: n={final_results.best_neurons} | "
-          f"R²(train)={final_results.best_train_r2:.4f} | "
-          f"SCR={final_results.best_conformity:.1%} | "
-          f"Time={retrain_time:.1f}s")
+        retrain_time = time.time() - retrain_start
+        final_n_neurons = final_results.best_neurons
+        final_train_r2 = final_results.best_train_r2
+        final_train_mse = final_results.best_train_mse
+        final_scr = final_results.best_conformity
+
+        print(f"  ✅ Final model: n={final_n_neurons} | "
+              f"R²(train)={final_train_r2:.4f} | "
+              f"SCR={final_scr:.1%} | "
+              f"Time={retrain_time:.1f}s")
+    else:
+        print(f"\n  ⏭️  Skipping retrain (use --retrain to enable)")
 
     # =========================================================
     # STEP 4: Compile results
@@ -690,10 +797,10 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
             'r2_test': optimal_step['fold_r2_test'][k],
             'scr': optimal_step['fold_scr'][k],
         } for k in range(vcd_config.n_folds)],
-        final_n_neurons=final_results.best_neurons,
-        final_train_r2=final_results.best_train_r2,
-        final_train_mse=final_results.best_train_mse,
-        final_scr=final_results.best_conformity,
+        final_n_neurons=final_n_neurons,
+        final_train_r2=final_train_r2,
+        final_train_mse=final_train_mse,
+        final_scr=final_scr,
         cv_mean_r2_test=optimal_step['mean_r2_test'],
         cv_std_r2_test=optimal_step['std_r2_test'],
         cv_mean_scr=optimal_step['mean_scr'],
@@ -810,9 +917,17 @@ def generate_consolidated_results(all_results: Dict[str, Dict[int, VCDResults]],
 # Rough estimates: seconds per constructive step (1 neuron) per fold
 # Based on existing CV timings divided by avg neurons found
 ESTIMATED_TIME_PER_STEP = {
-    'computer_hardware': {1: 0.5, 2: 3.0, 3: 0.5, 4: 3.0, 5: 0.01, 6: 0.5},
-    'fish_toxicity': {1: 1.0, 2: 8.0, 3: 1.0, 4: 8.0, 5: 0.02, 6: 2.0},
-    'aquatic_toxicity': {1: 0.8, 2: 6.0, 3: 0.8, 4: 6.0, 5: 0.01, 6: 1.5},
+    'computer_hardware':    {1: 0.5, 2: 3.0, 3: 0.5, 4: 3.0, 5: 0.01, 6: 0.5},
+    'fish_toxicity':        {1: 1.0, 2: 8.0, 3: 1.0, 4: 8.0, 5: 0.02, 6: 2.0},
+    'aquatic_toxicity':     {1: 0.8, 2: 6.0, 3: 0.8, 4: 6.0, 5: 0.01, 6: 1.5},
+    'airfoil_self_noise':   {1: 1.5, 2: 10.0, 3: 1.5, 4: 10.0, 5: 0.03, 6: 3.0},
+    'energy_heating':       {1: 1.2, 2: 8.0, 3: 1.2, 4: 8.0, 5: 0.02, 6: 2.5},
+    'energy_cooling':       {1: 1.2, 2: 8.0, 3: 1.2, 4: 8.0, 5: 0.02, 6: 2.5},
+    'lavender_friction':    {1: 0.4, 2: 2.0, 3: 0.4, 4: 2.0, 5: 0.01, 6: 0.3},
+    'optical_network':      {1: 0.4, 2: 2.0, 3: 0.4, 4: 2.0, 5: 0.01, 6: 0.3},
+    'real_estate':          {1: 0.3, 2: 1.5, 3: 0.3, 4: 1.5, 5: 0.01, 6: 0.3},
+    'synchronous_machine':  {1: 0.4, 2: 2.5, 3: 0.4, 4: 2.5, 5: 0.01, 6: 0.4},
+    'yacht_hydrodynamics':  {1: 0.3, 2: 2.0, 3: 0.3, 4: 2.0, 5: 0.01, 6: 0.3},
 }
 
 
@@ -863,7 +978,7 @@ def main():
         description="Dynamic Cross-Validation (VCD) for Constructive Neural Networks"
     )
     parser.add_argument('--dataset', type=str, default=None,
-                        choices=list(DATASET_FILES.keys()),
+                        choices=ALL_DATASETS,
                         help="Run specific dataset (default: all)")
     parser.add_argument('--methods', type=int, nargs='+', default=[1, 2, 3, 4, 5, 6],
                         help="Methods to run (1=WILCAR, 2=WILCAR+R, 3=RIXM, 4=RIXM+R, 5=ELM, 6=ELM+R)")
@@ -877,6 +992,8 @@ def main():
                         help="Only estimate time, don't run")
     parser.add_argument('--no-parallel', action='store_true', default=False,
                         help="Run folds sequentially instead of in parallel (for debugging)")
+    parser.add_argument('--retrain', action='store_true', default=False,
+                        help="Retrain final model with all data using n* (slower)")
 
     args = parser.parse_args()
 
@@ -968,6 +1085,7 @@ def main():
                     dataset_name=dataset_name,
                     output_dir=output_dir,
                     parallel=not args.no_parallel,
+                    skip_retrain=not args.retrain,
                     base_dir=args.base_dir
                 )
 

@@ -1,8 +1,0 @@
-COMPUTER_HARDWARE:
-
---method wilcar_unconstrained --max-neurons 750 --patience 150
---method wilcar_constrained --max-neurons 300 --patience 100
---method rixm --max-neurons 750 --patience 150
---method rixm_constrained --max-neurons 100 --patience 50
---method elm --dataset computer_hardware -n 125
---method elm_constrained -n 150 --patience 50
