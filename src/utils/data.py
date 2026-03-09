@@ -29,6 +29,41 @@ from typing import Tuple, Optional, Dict, Any, List, Union
 
 
 # =============================================================================
+# KNOWN DATASET CONFIGURATIONS
+# =============================================================================
+
+# Maps CSV file stem → expected gain signals (+1, -1, 0)
+EXPECTED_SIGNALS_THEORY: Dict[str, List[int]] = {
+    'computer_hardware':    [-1, 1, 1, 1, 1, 1],
+    'qsar_fish_toxicity':   [-1, 1, -1, 1, 1, 1],
+    'qsar_aquatic_toxicity': [1, -1, 1, 1, 1, -1, 1, 1],
+}
+
+# Maps short dataset name → CSV file stem
+DATASET_MAPPING: Dict[str, str] = {
+    'computer_hardware': 'computer_hardware',
+    'fish_toxicity':     'qsar_fish_toxicity',
+    'aquatic_toxicity':  'qsar_aquatic_toxicity',
+}
+
+
+def detect_dataset_name(filename: str) -> str:
+    """
+    Detect standardized dataset name from filename or path.
+
+    Args:
+        filename: Dataset filename (with or without .csv, with or without path)
+
+    Returns:
+        Standardized dataset name (file stem, lowercase, no extension)
+    """
+    stem = Path(filename).stem.lower()
+    # Return the reverse mapping if known, otherwise return stem as-is
+    reverse = {v: k for k, v in DATASET_MAPPING.items()}
+    return reverse.get(stem, stem)
+
+
+# =============================================================================
 # EXPECTED SIGNALS VALIDATION AND UTILITIES
 # =============================================================================
 

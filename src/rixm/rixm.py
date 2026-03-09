@@ -262,6 +262,57 @@ class RIXMNumpy(BaseNeuralNetwork):
         
         return results
 
+    # =========================================================================
+    # VCD SUPPORT
+    # =========================================================================
+
+    def constructive_step(self, n: int, x_train: np.ndarray, y_train: np.ndarray,
+                          x_test: np.ndarray, y_test: np.ndarray) -> Dict:
+        """
+        Execute ONE constructive step (no weight reuse - from scratch).
+
+        Args:
+            n: Number of neurons
+            x_train: (n_features, n_samples) - transposed
+            y_train: (1, n_samples)
+            x_test: (n_features, n_samples) - transposed
+            y_test: (1, n_samples)
+        """
+        iter_start = time.time()
+
+        # Always from scratch (RIXM has NO weight reuse)
+        self.param = self._initialize_parameters(n)
+        self.n_neurons = n
+
+        # Train via backpropagation
+        mse_train, rmse_train, r2_train = self._train_single_model(x_train, y_train)
+
+        # Test metrics
+        y_pred_test = self.predict(x_test)
+        mse_test, rmse_test, r2_test = calculate_all_metrics(
+            y_test.flatten(), y_pred_test.flatten()
+        )
+
+        # Conformity
+        scr, conf_details = self.calculate_conformity(self.predict)
+
+        return {
+            'n_neurons': n,
+            'mse_train': mse_train, 'rmse_train': rmse_train, 'r2_train': r2_train,
+            'mse_test': mse_test, 'rmse_test': rmse_test, 'r2_test': r2_test,
+            'scr': scr, 'conformity_details': conf_details,
+            'training_time': time.time() - iter_start
+        }
+
+    def get_params(self) -> Optional[Dict]:
+        if self.param is None:
+            return None
+        return {k: v.copy() for k, v in self.param.items()}
+
+    def set_params(self, param: Dict):
+        self.param = {k: v.copy() for k, v in param.items()}
+        self.n_neurons = param['W1'].shape[0]
+
 
 # =============================================================================
 # FACTORY FUNCTION

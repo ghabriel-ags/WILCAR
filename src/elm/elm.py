@@ -274,6 +274,75 @@ class ELMNumpy(BaseNeuralNetwork):
         
         return results
 
+    # =========================================================================
+    # VCD SUPPORT
+    # =========================================================================
+
+    def constructive_step(self, n: int, x_train: np.ndarray, y_train: np.ndarray,
+                          x_test: np.ndarray, y_test: np.ndarray) -> Dict:
+        """
+        Execute ONE constructive step for ELM (no weight reuse).
+
+        Receives data in TRANSPOSED format (n_features, n_samples) for interface
+        consistency, but converts internally to ELM's native (n_samples, n_features).
+
+        Args:
+            n: Number of neurons
+            x_train: (n_features, n_samples) - transposed
+            y_train: (1, n_samples)
+            x_test: (n_features, n_samples) - transposed
+            y_test: (1, n_samples)
+        """
+        iter_start = time.time()
+
+        # Convert to ELM's native format
+        X_train = x_train.T   # (n_samples, n_features)
+        Y_train = y_train.flatten()  # (n_samples,)
+        X_test = x_test.T
+        Y_test = y_test.flatten()
+
+        # Initialize from scratch
+        self.param = self._initialize_parameters(n)
+        self.n_neurons = n
+
+        # Train via pseudo-inverse (single-pass)
+        mse_train, rmse_train, r2_train = self._train_single_model(X_train, Y_train)
+
+        # Test metrics
+        H_test = self._hidden_nodes(X_test)
+        y_pred_test = np.dot(H_test, self.param['output_weights'])
+        mse_test, rmse_test, r2_test = calculate_all_metrics(Y_test, y_pred_test)
+
+        # Conformity (uses predict() which handles transposed format)
+        scr, conf_details = self.calculate_conformity(self.predict)
+
+        return {
+            'n_neurons': n,
+            'mse_train': mse_train, 'rmse_train': rmse_train, 'r2_train': r2_train,
+            'mse_test': mse_test, 'rmse_test': rmse_test, 'r2_test': r2_test,
+            'scr': scr, 'conformity_details': conf_details,
+            'training_time': time.time() - iter_start
+        }
+
+    def get_params(self) -> Optional[Dict]:
+        if self.param is None:
+            return None
+        return {
+            'input_weights': self.param['input_weights'].copy(),
+            'biases': self.param['biases'].copy(),
+            'output_weights': self.param['output_weights'].copy()
+                if self.param['output_weights'] is not None else None
+        }
+
+    def set_params(self, param: Dict):
+        self.param = {
+            'input_weights': param['input_weights'].copy(),
+            'biases': param['biases'].copy(),
+            'output_weights': param['output_weights'].copy()
+                if param['output_weights'] is not None else None
+        }
+        self.n_neurons = param['input_weights'].shape[1]
+
 
 # =============================================================================
 # FACTORY FUNCTION
