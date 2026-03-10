@@ -146,94 +146,100 @@ class VCDConfig:
 # =============================================================================
 # Reuse same configs as static CV for consistency
 
+# Constrained methods (M2/M4/M6) use SLSQP whose cost ∝ n_samples × n_features × n²
+# and converge at low n* (typically <30). Tiered by SLSQP difficulty (n×p):
+#   Tier 1 (n×p>5000): airfoil, fish, energy  → max=50, pat=10
+#   Tier 2 (n×p 2000-5000): aquatic, sync     → max=80, pat=15
+#   Tier 3 (n×p<2000): hw, estate, lav, opt, yacht → max=100, pat=20
+# Unconstrained (M1/M3/M5) keep generous search since cost/step is low.
 VCD_METHOD_CONFIGS = {
-    'computer_hardware': {  # n=209, p=6
-        1: VCDMethodConfig(max_neurons=750, patience=150),
-        2: VCDMethodConfig(max_neurons=200, patience=20),
+    'airfoil_self_noise': {  # n=1503, p=5, n×p=7515 — Tier 1
+        1: VCDMethodConfig(max_neurons=500, patience=50),
+        2: VCDMethodConfig(max_neurons=50, patience=10),
         3: VCDMethodConfig(max_neurons=750, patience=150),
-        4: VCDMethodConfig(max_neurons=200, patience=20),
+        4: VCDMethodConfig(max_neurons=50, patience=10),
         5: VCDMethodConfig(max_neurons=750, patience=150),
-        6: VCDMethodConfig(max_neurons=150, patience=15),
+        6: VCDMethodConfig(max_neurons=50, patience=10),
     },
-    'fish_toxicity': {  # n=908, p=6
-        1: VCDMethodConfig(max_neurons=750, patience=150),
-        2: VCDMethodConfig(max_neurons=200, patience=20),
+    'fish_toxicity': {  # n=908, p=6, n×p=5448 — Tier 1
+        1: VCDMethodConfig(max_neurons=500, patience=50),
+        2: VCDMethodConfig(max_neurons=50, patience=10),
         3: VCDMethodConfig(max_neurons=750, patience=150),
-        4: VCDMethodConfig(max_neurons=200, patience=20),
+        4: VCDMethodConfig(max_neurons=50, patience=10),
         5: VCDMethodConfig(max_neurons=750, patience=150),
-        6: VCDMethodConfig(max_neurons=150, patience=15),
+        6: VCDMethodConfig(max_neurons=50, patience=10),
     },
-    'aquatic_toxicity': {  # n=546, p=8
-        1: VCDMethodConfig(max_neurons=750, patience=150),
-        2: VCDMethodConfig(max_neurons=200, patience=20),
+    'energy_heating': {  # n=768, p=8, n×p=6144 — Tier 1
+        1: VCDMethodConfig(max_neurons=500, patience=50),
+        2: VCDMethodConfig(max_neurons=50, patience=10),
         3: VCDMethodConfig(max_neurons=750, patience=150),
-        4: VCDMethodConfig(max_neurons=200, patience=20),
+        4: VCDMethodConfig(max_neurons=50, patience=10),
         5: VCDMethodConfig(max_neurons=750, patience=150),
-        6: VCDMethodConfig(max_neurons=150, patience=15),
+        6: VCDMethodConfig(max_neurons=50, patience=10),
     },
-    'airfoil_self_noise': {  # n=1503, p=5
-        1: VCDMethodConfig(max_neurons=750, patience=150),
-        2: VCDMethodConfig(max_neurons=200, patience=20),
+    'energy_cooling': {  # n=768, p=8, n×p=6144 — Tier 1
+        1: VCDMethodConfig(max_neurons=500, patience=50),
+        2: VCDMethodConfig(max_neurons=50, patience=10),
         3: VCDMethodConfig(max_neurons=750, patience=150),
-        4: VCDMethodConfig(max_neurons=200, patience=20),
+        4: VCDMethodConfig(max_neurons=50, patience=10),
         5: VCDMethodConfig(max_neurons=750, patience=150),
-        6: VCDMethodConfig(max_neurons=150, patience=15),
+        6: VCDMethodConfig(max_neurons=50, patience=10),
     },
-    'energy_heating': {  # n=768, p=8
-        1: VCDMethodConfig(max_neurons=750, patience=150),
-        2: VCDMethodConfig(max_neurons=200, patience=20),
+    'aquatic_toxicity': {  # n=546, p=8, n×p=4368 — Tier 2
+        1: VCDMethodConfig(max_neurons=500, patience=50),
+        2: VCDMethodConfig(max_neurons=80, patience=15),
         3: VCDMethodConfig(max_neurons=750, patience=150),
-        4: VCDMethodConfig(max_neurons=200, patience=20),
+        4: VCDMethodConfig(max_neurons=80, patience=15),
         5: VCDMethodConfig(max_neurons=750, patience=150),
-        6: VCDMethodConfig(max_neurons=150, patience=15),
+        6: VCDMethodConfig(max_neurons=80, patience=15),
     },
-    'energy_cooling': {  # n=768, p=8
-        1: VCDMethodConfig(max_neurons=750, patience=150),
-        2: VCDMethodConfig(max_neurons=200, patience=20),
-        3: VCDMethodConfig(max_neurons=750, patience=150),
-        4: VCDMethodConfig(max_neurons=200, patience=20),
-        5: VCDMethodConfig(max_neurons=750, patience=150),
-        6: VCDMethodConfig(max_neurons=150, patience=15),
-    },
-    'lavender_friction': {  # n=625, p=3
-        1: VCDMethodConfig(max_neurons=500, patience=100),
-        2: VCDMethodConfig(max_neurons=200, patience=20),
+    'synchronous_machine': {  # n=557, p=4, n×p=2228 — Tier 2
+        1: VCDMethodConfig(max_neurons=500, patience=50),
+        2: VCDMethodConfig(max_neurons=80, patience=15),
         3: VCDMethodConfig(max_neurons=500, patience=100),
-        4: VCDMethodConfig(max_neurons=200, patience=20),
+        4: VCDMethodConfig(max_neurons=80, patience=15),
         5: VCDMethodConfig(max_neurons=500, patience=150),
-        6: VCDMethodConfig(max_neurons=150, patience=15),
+        6: VCDMethodConfig(max_neurons=80, patience=15),
     },
-    'optical_network': {  # n=630, p=3
-        1: VCDMethodConfig(max_neurons=500, patience=100),
-        2: VCDMethodConfig(max_neurons=200, patience=20),
+    'computer_hardware': {  # n=209, p=6, n×p=1254 — Tier 3
+        1: VCDMethodConfig(max_neurons=750, patience=50),
+        2: VCDMethodConfig(max_neurons=100, patience=20),
+        3: VCDMethodConfig(max_neurons=750, patience=150),
+        4: VCDMethodConfig(max_neurons=100, patience=20),
+        5: VCDMethodConfig(max_neurons=750, patience=150),
+        6: VCDMethodConfig(max_neurons=100, patience=15),
+    },
+    'real_estate': {  # n=414, p=3, n×p=1242 — Tier 3
+        1: VCDMethodConfig(max_neurons=500, patience=50),
+        2: VCDMethodConfig(max_neurons=100, patience=20),
         3: VCDMethodConfig(max_neurons=500, patience=100),
-        4: VCDMethodConfig(max_neurons=200, patience=20),
+        4: VCDMethodConfig(max_neurons=100, patience=20),
         5: VCDMethodConfig(max_neurons=500, patience=150),
-        6: VCDMethodConfig(max_neurons=150, patience=15),
+        6: VCDMethodConfig(max_neurons=100, patience=15),
     },
-    'real_estate': {  # n=414, p=3
-        1: VCDMethodConfig(max_neurons=500, patience=100),
-        2: VCDMethodConfig(max_neurons=200, patience=20),
+    'lavender_friction': {  # n=625, p=3, n×p=1875 — Tier 3
+        1: VCDMethodConfig(max_neurons=500, patience=50),
+        2: VCDMethodConfig(max_neurons=100, patience=20),
         3: VCDMethodConfig(max_neurons=500, patience=100),
-        4: VCDMethodConfig(max_neurons=200, patience=20),
+        4: VCDMethodConfig(max_neurons=100, patience=20),
         5: VCDMethodConfig(max_neurons=500, patience=150),
-        6: VCDMethodConfig(max_neurons=150, patience=15),
+        6: VCDMethodConfig(max_neurons=100, patience=15),
     },
-    'synchronous_machine': {  # n=557, p=4
-        1: VCDMethodConfig(max_neurons=500, patience=100),
-        2: VCDMethodConfig(max_neurons=200, patience=20),
+    'optical_network': {  # n=630, p=3, n×p=1890 — Tier 3
+        1: VCDMethodConfig(max_neurons=500, patience=50),
+        2: VCDMethodConfig(max_neurons=100, patience=20),
         3: VCDMethodConfig(max_neurons=500, patience=100),
-        4: VCDMethodConfig(max_neurons=200, patience=20),
+        4: VCDMethodConfig(max_neurons=100, patience=20),
         5: VCDMethodConfig(max_neurons=500, patience=150),
-        6: VCDMethodConfig(max_neurons=150, patience=15),
+        6: VCDMethodConfig(max_neurons=100, patience=15),
     },
-    'yacht_hydrodynamics': {  # n=308, p=6
-        1: VCDMethodConfig(max_neurons=300, patience=100),
-        2: VCDMethodConfig(max_neurons=200, patience=20),
+    'yacht_hydrodynamics': {  # n=308, p=6, n×p=1848 — Tier 3
+        1: VCDMethodConfig(max_neurons=300, patience=50),
+        2: VCDMethodConfig(max_neurons=100, patience=20),
         3: VCDMethodConfig(max_neurons=300, patience=100),
-        4: VCDMethodConfig(max_neurons=200, patience=20),
+        4: VCDMethodConfig(max_neurons=100, patience=20),
         5: VCDMethodConfig(max_neurons=300, patience=150),
-        6: VCDMethodConfig(max_neurons=150, patience=15),
+        6: VCDMethodConfig(max_neurons=100, patience=15),
     },
 }
 
@@ -943,18 +949,22 @@ def generate_consolidated_results(all_results: Dict[str, Dict[int, VCDResults]],
 
 # Rough estimates: seconds per constructive step (1 neuron) per fold
 # Based on existing CV timings divided by avg neurons found
+# Calibrated from actual VCD runs (seconds per step, wall-clock with parallel folds)
+# M1/M3: backprop ~1-10s/step depending on dataset size
+# M2/M4/M6: SLSQP 10-300s/step on large datasets, 2-30s on small
+# M5: pseudo-inverse, near-instant
 ESTIMATED_TIME_PER_STEP = {
-    'computer_hardware':    {1: 0.5, 2: 3.0, 3: 0.5, 4: 3.0, 5: 0.01, 6: 0.5},
-    'fish_toxicity':        {1: 1.0, 2: 8.0, 3: 1.0, 4: 8.0, 5: 0.02, 6: 2.0},
-    'aquatic_toxicity':     {1: 0.8, 2: 6.0, 3: 0.8, 4: 6.0, 5: 0.01, 6: 1.5},
-    'airfoil_self_noise':   {1: 1.5, 2: 10.0, 3: 1.5, 4: 10.0, 5: 0.03, 6: 3.0},
-    'energy_heating':       {1: 1.2, 2: 8.0, 3: 1.2, 4: 8.0, 5: 0.02, 6: 2.5},
-    'energy_cooling':       {1: 1.2, 2: 8.0, 3: 1.2, 4: 8.0, 5: 0.02, 6: 2.5},
-    'lavender_friction':    {1: 0.4, 2: 2.0, 3: 0.4, 4: 2.0, 5: 0.01, 6: 0.3},
-    'optical_network':      {1: 0.4, 2: 2.0, 3: 0.4, 4: 2.0, 5: 0.01, 6: 0.3},
-    'real_estate':          {1: 0.3, 2: 1.5, 3: 0.3, 4: 1.5, 5: 0.01, 6: 0.3},
-    'synchronous_machine':  {1: 0.4, 2: 2.5, 3: 0.4, 4: 2.5, 5: 0.01, 6: 0.4},
-    'yacht_hydrodynamics':  {1: 0.3, 2: 2.0, 3: 0.3, 4: 2.0, 5: 0.01, 6: 0.3},
+    'airfoil_self_noise':   {1: 10.0, 2: 120.0, 3: 14.0, 4: 150.0, 5: 0.05, 6: 100.0},
+    'fish_toxicity':        {1: 8.0,  2: 80.0,  3: 10.0, 4: 100.0, 5: 0.03, 6: 60.0},
+    'energy_heating':       {1: 6.0,  2: 60.0,  3: 8.0,  4: 80.0,  5: 0.03, 6: 50.0},
+    'energy_cooling':       {1: 6.0,  2: 60.0,  3: 8.0,  4: 80.0,  5: 0.03, 6: 50.0},
+    'aquatic_toxicity':     {1: 4.0,  2: 40.0,  3: 5.0,  4: 50.0,  5: 0.02, 6: 30.0},
+    'synchronous_machine':  {1: 3.0,  2: 20.0,  3: 4.0,  4: 25.0,  5: 0.02, 6: 15.0},
+    'lavender_friction':    {1: 2.0,  2: 10.0,  3: 3.0,  4: 15.0,  5: 0.01, 6: 8.0},
+    'optical_network':      {1: 2.0,  2: 10.0,  3: 3.0,  4: 15.0,  5: 0.01, 6: 8.0},
+    'computer_hardware':    {1: 1.0,  2: 5.0,   3: 1.5,  4: 8.0,   5: 0.01, 6: 3.0},
+    'real_estate':          {1: 1.0,  2: 5.0,   3: 1.5,  4: 8.0,   5: 0.01, 6: 3.0},
+    'yacht_hydrodynamics':  {1: 0.8,  2: 5.0,   3: 1.0,  4: 8.0,   5: 0.01, 6: 3.0},
 }
 
 
@@ -966,7 +976,7 @@ def estimate_vcd_time(vcd_config: VCDConfig) -> float:
             mc = get_vcd_method_config(dataset, method_id)
             time_per_step = ESTIMATED_TIME_PER_STEP.get(dataset, {}).get(method_id, 2.0)
             # Each step runs K folds
-            dataset_method_time = mc.max_neurons * vcd_config.n_folds * time_per_step
+            dataset_method_time = mc.max_neurons * time_per_step
             total += dataset_method_time
     return total
 
@@ -983,7 +993,7 @@ def print_time_estimate(vcd_config: VCDConfig):
         for method_id in vcd_config.methods:
             mc = get_vcd_method_config(dataset, method_id)
             time_per_step = ESTIMATED_TIME_PER_STEP.get(dataset, {}).get(method_id, 2.0)
-            est_time = mc.max_neurons * vcd_config.n_folds * time_per_step
+            est_time = mc.max_neurons * time_per_step
             total += est_time
             print(f"    {METHOD_NAMES[method_id]:15s} "
                   f"(n≤{mc.max_neurons}, p={mc.patience}) "

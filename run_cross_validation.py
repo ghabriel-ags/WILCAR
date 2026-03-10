@@ -118,72 +118,77 @@ class CVConfig:
     methods: List[int] = field(default_factory=lambda: [1, 2, 3, 4, 5, 6])
     
     # Datasets to run
-    datasets: List[str] = field(default_factory=lambda: [
-        'computer_hardware', 
-        'fish_toxicity', 
-        'aquatic_toxicity'
-    ])
+    datasets: List[str] = field(default_factory=lambda: ALL_DATASETS.copy())
+
+
+# All datasets (order matches Appendix A)
+ALL_DATASETS = [
+    'airfoil_self_noise',       # A.1
+    'computer_hardware',        # A.2
+    'energy_heating',           # A.3a
+    'energy_cooling',           # A.3b
+    'lavender_friction',        # A.4
+    'optical_network',          # A.5
+    'aquatic_toxicity',         # A.6
+    'fish_toxicity',            # A.7
+    'real_estate',              # A.8
+    'synchronous_machine',      # A.9
+    'yacht_hydrodynamics',      # A.10
+]
 
 
 # =============================================================================
 # DATASET-SPECIFIC METHOD CONFIGURATIONS
 # =============================================================================
-# These match the parameters used in the single-run experiments
 
-METHOD_CONFIGS = {
-    'computer_hardware': {
-        1: MethodConfig(max_neurons=750, patience=150),   # WILCAR - default
+# Default config factory per method type
+def _default_configs():
+    return {
+        1: MethodConfig(max_neurons=750, patience=150),   # WILCAR
         2: MethodConfig(max_neurons=200, patience=20),    # WILCAR+R
-        3: MethodConfig(max_neurons=750, patience=150),   # RIXM - default
+        3: MethodConfig(max_neurons=750, patience=150),   # RIXM
         4: MethodConfig(max_neurons=200, patience=20),    # RIXM+R
-        5: MethodConfig(max_neurons=750, patience=150),   # ELM - default
-        6: MethodConfig(max_neurons=150, patience=15),    # ELM+R
-    },
-    'fish_toxicity': {
-        1: MethodConfig(max_neurons=750, patience=150),   # WILCAR - default
-        2: MethodConfig(max_neurons=200, patience=20),    # WILCAR+R
-        3: MethodConfig(max_neurons=750, patience=150),   # RIXM - default
-        4: MethodConfig(max_neurons=200, patience=20),    # RIXM+R
-        5: MethodConfig(max_neurons=750, patience=150),   # ELM - default
-        6: MethodConfig(max_neurons=150, patience=15),    # ELM+R - REDUCED (was 750/150)
-    },
-    'aquatic_toxicity': {
-        1: MethodConfig(max_neurons=750, patience=150),   # WILCAR - default
-        2: MethodConfig(max_neurons=200, patience=20),    # WILCAR+R
-        3: MethodConfig(max_neurons=750, patience=150),   # RIXM - default
-        4: MethodConfig(max_neurons=200, patience=20),    # RIXM+R
-        5: MethodConfig(max_neurons=750, patience=150),   # ELM - default
+        5: MethodConfig(max_neurons=750, patience=150),   # ELM
         6: MethodConfig(max_neurons=150, patience=15),    # ELM+R
     }
-}
+
+METHOD_CONFIGS = {ds: _default_configs() for ds in ALL_DATASETS}
 
 
 def get_method_config(dataset: str, method_id: int) -> MethodConfig:
     """Get the configuration for a specific dataset/method combination."""
     if dataset in METHOD_CONFIGS and method_id in METHOD_CONFIGS[dataset]:
         return METHOD_CONFIGS[dataset][method_id]
-    # Fallback to default
     return MethodConfig()
-    
-    # Datasets to run
-    datasets: List[str] = field(default_factory=lambda: [
-        'computer_hardware', 
-        'fish_toxicity', 
-        'aquatic_toxicity'
-    ])
 
 
-# Dataset configurations
+# Dataset files: key → CSV filename (without .csv extension)
 DATASET_FILES = {
     'computer_hardware': 'computer_hardware',
     'fish_toxicity': 'qsar_fish_toxicity',
-    'aquatic_toxicity': 'qsar_aquatic_toxicity'
+    'aquatic_toxicity': 'qsar_aquatic_toxicity',
+    'airfoil_self_noise': 'airfoil_self_noise',
+    'energy_heating': 'ENB2012_Y1',
+    'energy_cooling': 'ENB2012_Y2',
+    'lavender_friction': 'lavender_friction_DFC',
+    'optical_network': 'optical_interconnection_network',
+    'real_estate': 'Real_estate_valuation',
+    'synchronous_machine': 'synchronous machine',
+    'yacht_hydrodynamics': 'yacht hydrodynamics',
 }
 
 EXPECTED_SIGNALS = {
     'computer_hardware': [-1, 1, 1, 1, 1, 1],
     'fish_toxicity': [-1, 1, -1, 1, 1, 1],
-    'aquatic_toxicity': [1, -1, 1, 1, 1, -1, 1, 1]
+    'aquatic_toxicity': [1, -1, 1, 1, 1, -1, 1, 1],
+    'airfoil_self_noise': [-1, 0, -1, 1, -1],
+    'energy_heating': [1, -1, 1, -1, 1, 0, 1, 0],
+    'energy_cooling': [1, -1, 1, -1, 1, 0, 1, 0],
+    'lavender_friction': [0, 1, 1],
+    'optical_network': [-1, 0, 1],
+    'real_estate': [-1, -1, 1],
+    'synchronous_machine': [1, -1, 1, 1],
+    'yacht_hydrodynamics': [0, 0, 0, 0, 0, 1],
 }
 
 METHOD_NAMES = {
@@ -214,6 +219,7 @@ def load_raw_data(dataset_name: str, base_dir: str = ".") -> Tuple[np.ndarray, n
         raise FileNotFoundError(f"Dataset not found: {data_path}")
     
     data = pd.read_csv(data_path, header=None, sep=';')
+    data = data.dropna(axis=1, how='all')  # Remove empty columns from trailing semicolons
     data = data.dropna()
     
     inputs = data.iloc[:, :-1].values
@@ -368,6 +374,7 @@ def run_method(method_id: int,
         'train_r2': results.best_train_r2,
         'train_mse': results.best_train_mse,
         'scr': results.best_conformity,
+        'conformity_details': results.conformity_details,
         'training_time': training_time,
         'overfitting': results.best_train_r2 - results.best_test_r2
     }
@@ -491,12 +498,42 @@ def run_cv_for_dataset(dataset_name: str, cv_config: CVConfig,
                     'overfitting': np.nan
                 })
     
+    # Save conformity_details_at_optimal.csv (per variable, per fold)
+    conf_rows = []
+    for result in all_results:
+        if 'error' in result:
+            continue
+        fold_idx = result['fold']
+        method_id = result['method_id']
+        details = result.get('conformity_details', [])
+        if details:
+            for var_detail in details:
+                conf_rows.append({
+                    'fold': fold_idx,
+                    'method_id': method_id,
+                    'method_name': result['method_name'],
+                    'variable': var_detail['variable'],
+                    'calculated_gain': var_detail['calculated_gain'],
+                    'calculated_signal': var_detail['calculated_signal'],
+                    'expected_signal': var_detail['expected_signal'],
+                    'conformity': var_detail['conformity'],
+                })
+    if conf_rows:
+        pd.DataFrame(conf_rows).to_csv(
+            dataset_dir / "conformity_details.csv", index=False
+        )
+        print(f"\n   Conformity details saved: {dataset_dir / 'conformity_details.csv'}")
+
+    # Remove conformity_details from results before DataFrame (not serializable as column)
+    for result in all_results:
+        result.pop('conformity_details', None)
+
     # Create DataFrame
     df_results = pd.DataFrame(all_results)
-    
+
     # Save fold results
     df_results.to_csv(dataset_dir / "fold_results.csv", index=False)
-    print(f"\n💾 Fold results saved: {dataset_dir / 'fold_results.csv'}")
+    print(f"\n   Fold results saved: {dataset_dir / 'fold_results.csv'}")
     
     # Calculate summary statistics
     summary = calculate_summary_stats(df_results)
@@ -737,7 +774,7 @@ def main():
         description="5-Fold Cross-Validation for Neural Network Methods"
     )
     parser.add_argument('--dataset', type=str, default=None,
-                        choices=['computer_hardware', 'fish_toxicity', 'aquatic_toxicity'],
+                        choices=ALL_DATASETS,
                         help="Run specific dataset (default: all)")
     parser.add_argument('--methods', type=int, nargs='+', default=[1, 2, 3, 4, 5, 6],
                         help="Methods to run (1-6)")
@@ -753,6 +790,8 @@ def main():
                         help="Resume from previous run directory")
     parser.add_argument('--skip-existing', action='store_true',
                         help="Skip methods/folds that already have results")
+    parser.add_argument('-y', '--yes', action='store_true',
+                        help="Skip confirmation prompt")
     
     args = parser.parse_args()
     
@@ -791,9 +830,12 @@ def main():
     
     # Confirm before running long jobs
     total_seconds, _ = estimate_total_time(cv_config)
-    if total_seconds > 3600:  # > 1 hour
-        print(f"\n⚠️  This will take approximately {total_seconds/3600:.1f} hours.")
-        response = input("Continue? [y/N]: ").strip().lower()
+    if total_seconds > 3600 and not args.yes:  # > 1 hour
+        print(f"\n   This will take approximately {total_seconds/3600:.1f} hours.")
+        try:
+            response = input("Continue? [y/N]: ").strip().lower()
+        except EOFError:
+            response = 'y'
         if response != 'y':
             print("Aborted.")
             return
