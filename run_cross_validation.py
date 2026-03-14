@@ -145,11 +145,11 @@ ALL_DATASETS = [
 def _default_configs():
     return {
         1: MethodConfig(max_neurons=750, patience=150),   # WILCAR
-        2: MethodConfig(max_neurons=200, patience=20),    # WILCAR+R
-        3: MethodConfig(max_neurons=750, patience=150),   # RIXM
-        4: MethodConfig(max_neurons=200, patience=20),    # RIXM+R
+        2: MethodConfig(max_neurons=50, patience=15),     # WILCAR+R
+        3: MethodConfig(max_neurons=500, patience=150),   # RIXM
+        4: MethodConfig(max_neurons=50, patience=15),     # RIXM+R
         5: MethodConfig(max_neurons=750, patience=150),   # ELM
-        6: MethodConfig(max_neurons=150, patience=15),    # ELM+R
+        6: MethodConfig(max_neurons=50, patience=15),     # ELM+R
     }
 
 METHOD_CONFIGS = {ds: _default_configs() for ds in ALL_DATASETS}
