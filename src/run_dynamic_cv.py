@@ -146,102 +146,22 @@ class VCDConfig:
 # =============================================================================
 # Reuse same configs as static CV for consistency
 
-# Constrained methods (M2/M4/M6) use SLSQP whose cost ∝ n_samples × n_features × n²
-# and converge at low n* (typically <30). Tiered by SLSQP difficulty (n×p):
-#   Tier 1 (n×p>5000): airfoil, fish, energy  → max=50, pat=10
-#   Tier 2 (n×p 2000-5000): aquatic, sync     → max=80, pat=15
-#   Tier 3 (n×p<2000): hw, estate, lav, opt, yacht → max=100, pat=20
-# Unconstrained (M1/M3/M5) keep generous search since cost/step is low.
-VCD_METHOD_CONFIGS = {
-    'airfoil_self_noise': {  # n=1503, p=5, n×p=7515 — Tier 1
-        1: VCDMethodConfig(max_neurons=500, patience=50),
-        2: VCDMethodConfig(max_neurons=50, patience=10),
-        3: VCDMethodConfig(max_neurons=750, patience=150),
-        4: VCDMethodConfig(max_neurons=50, patience=10),
-        5: VCDMethodConfig(max_neurons=750, patience=150),
-        6: VCDMethodConfig(max_neurons=50, patience=10),
-    },
-    'fish_toxicity': {  # n=908, p=6, n×p=5448 — Tier 1
-        1: VCDMethodConfig(max_neurons=500, patience=50),
-        2: VCDMethodConfig(max_neurons=50, patience=10),
-        3: VCDMethodConfig(max_neurons=750, patience=150),
-        4: VCDMethodConfig(max_neurons=50, patience=10),
-        5: VCDMethodConfig(max_neurons=750, patience=150),
-        6: VCDMethodConfig(max_neurons=50, patience=10),
-    },
-    'energy_heating': {  # n=768, p=8, n×p=6144 — Tier 1
-        1: VCDMethodConfig(max_neurons=500, patience=50),
-        2: VCDMethodConfig(max_neurons=50, patience=10),
-        3: VCDMethodConfig(max_neurons=750, patience=150),
-        4: VCDMethodConfig(max_neurons=50, patience=10),
-        5: VCDMethodConfig(max_neurons=750, patience=150),
-        6: VCDMethodConfig(max_neurons=50, patience=10),
-    },
-    'energy_cooling': {  # n=768, p=8, n×p=6144 — Tier 1
-        1: VCDMethodConfig(max_neurons=500, patience=50),
-        2: VCDMethodConfig(max_neurons=50, patience=10),
-        3: VCDMethodConfig(max_neurons=750, patience=150),
-        4: VCDMethodConfig(max_neurons=50, patience=10),
-        5: VCDMethodConfig(max_neurons=750, patience=150),
-        6: VCDMethodConfig(max_neurons=50, patience=10),
-    },
-    'aquatic_toxicity': {  # n=546, p=8, n×p=4368 — Tier 2
-        1: VCDMethodConfig(max_neurons=500, patience=50),
-        2: VCDMethodConfig(max_neurons=80, patience=15),
-        3: VCDMethodConfig(max_neurons=750, patience=150),
-        4: VCDMethodConfig(max_neurons=80, patience=15),
-        5: VCDMethodConfig(max_neurons=750, patience=150),
-        6: VCDMethodConfig(max_neurons=80, patience=15),
-    },
-    'synchronous_machine': {  # n=557, p=4, n×p=2228 — Tier 2
-        1: VCDMethodConfig(max_neurons=500, patience=50),
-        2: VCDMethodConfig(max_neurons=80, patience=15),
-        3: VCDMethodConfig(max_neurons=500, patience=100),
-        4: VCDMethodConfig(max_neurons=80, patience=15),
-        5: VCDMethodConfig(max_neurons=500, patience=150),
-        6: VCDMethodConfig(max_neurons=80, patience=15),
-    },
-    'computer_hardware': {  # n=209, p=6, n×p=1254 — Tier 3
-        1: VCDMethodConfig(max_neurons=750, patience=50),
-        2: VCDMethodConfig(max_neurons=100, patience=20),
-        3: VCDMethodConfig(max_neurons=750, patience=150),
-        4: VCDMethodConfig(max_neurons=100, patience=20),
-        5: VCDMethodConfig(max_neurons=750, patience=150),
-        6: VCDMethodConfig(max_neurons=100, patience=15),
-    },
-    'real_estate': {  # n=414, p=3, n×p=1242 — Tier 3
-        1: VCDMethodConfig(max_neurons=500, patience=50),
-        2: VCDMethodConfig(max_neurons=100, patience=20),
-        3: VCDMethodConfig(max_neurons=500, patience=100),
-        4: VCDMethodConfig(max_neurons=100, patience=20),
-        5: VCDMethodConfig(max_neurons=500, patience=150),
-        6: VCDMethodConfig(max_neurons=100, patience=15),
-    },
-    'lavender_friction': {  # n=625, p=3, n×p=1875 — Tier 3
-        1: VCDMethodConfig(max_neurons=500, patience=50),
-        2: VCDMethodConfig(max_neurons=100, patience=20),
-        3: VCDMethodConfig(max_neurons=500, patience=100),
-        4: VCDMethodConfig(max_neurons=100, patience=20),
-        5: VCDMethodConfig(max_neurons=500, patience=150),
-        6: VCDMethodConfig(max_neurons=100, patience=15),
-    },
-    'optical_network': {  # n=630, p=3, n×p=1890 — Tier 3
-        1: VCDMethodConfig(max_neurons=500, patience=50),
-        2: VCDMethodConfig(max_neurons=100, patience=20),
-        3: VCDMethodConfig(max_neurons=500, patience=100),
-        4: VCDMethodConfig(max_neurons=100, patience=20),
-        5: VCDMethodConfig(max_neurons=500, patience=150),
-        6: VCDMethodConfig(max_neurons=100, patience=15),
-    },
-    'yacht_hydrodynamics': {  # n=308, p=6, n×p=1848 — Tier 3
-        1: VCDMethodConfig(max_neurons=300, patience=50),
-        2: VCDMethodConfig(max_neurons=100, patience=20),
-        3: VCDMethodConfig(max_neurons=300, patience=100),
-        4: VCDMethodConfig(max_neurons=100, patience=20),
-        5: VCDMethodConfig(max_neurons=300, patience=150),
-        6: VCDMethodConfig(max_neurons=100, patience=15),
-    },
-}
+# Standardized hyperparameters (same for all datasets):
+#   M1/M3 (unconstrained, backprop): max=750, patience=150
+#   M2/M4 (constrained, SLSQP):     max=50,  patience=15
+#   M5 (ELM unconstrained):          max=750, patience=150
+#   M6 (ELM constrained):            max=50,  patience=15
+def _default_vcd_configs():
+    return {
+        1: VCDMethodConfig(max_neurons=750, patience=150),   # WILCAR
+        2: VCDMethodConfig(max_neurons=50, patience=15),     # WILCAR+R
+        3: VCDMethodConfig(max_neurons=750, patience=150),   # RIXM
+        4: VCDMethodConfig(max_neurons=50, patience=15),     # RIXM+R
+        5: VCDMethodConfig(max_neurons=750, patience=150),   # ELM
+        6: VCDMethodConfig(max_neurons=50, patience=15),     # ELM+R
+    }
+
+VCD_METHOD_CONFIGS = {ds: _default_vcd_configs() for ds in ALL_DATASETS}
 
 
 def get_vcd_method_config(dataset: str, method_id: int) -> VCDMethodConfig:
