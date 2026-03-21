@@ -33,7 +33,7 @@ if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
 from base import BaseNeuralNetwork, TrainingConfig, TrainingResults
-from utils.metrics import calculate_all_metrics
+from utils.metrics import calculate_all_metrics, calculate_classification_metrics
 
 
 # =============================================================================
@@ -173,51 +173,54 @@ class ELMNumpy(BaseNeuralNetwork):
     def train(self) -> TrainingResults:
         """
         Execute constructive training for ELM.
-        
+
         Each model with n neurons is trained from scratch (no weight reuse).
         Training is very fast due to single-pass pseudo-inverse calculation.
+        For classification: keeps MSE pseudo-inverse (Huang et al., 2006),
+        uses MCC for constructive model selection.
         """
         results = TrainingResults()
         results.method_name = self.METHOD_NAME
         results.dataset_name = self.dataset_name
         results.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
+        is_classification = self.config.task == 'classification'
+
         # Prepare data (ELM uses row-based format)
-        X_train = self.train_inputs  # (n_samples, n_features)
-        y_train = self.train_targets  # (n_samples,)
+        X_train = self.train_inputs
+        y_train = self.train_targets
         X_test = self.test_inputs
         y_test = self.test_targets
-        
+
         # Tracking
-        best_r2_so_far = -float('inf')
+        best_metric_so_far = -float('inf')
         no_improve_count = 0
         best_model_params = None
-        
+
         start_time = time.time()
-        
+
         print("\n" + "=" * 70)
         print(f"TRAINING - {self.METHOD_NAME}")
+        if is_classification:
+            print("Task: CLASSIFICATION (MSE pseudo-inverse, MCC selection)")
         print("=" * 70)
-        
+
         for n in range(1, self.config.max_neurons + 1):
             iter_start = time.time()
-            
-            # Initialize new model from scratch (no weight reuse)
+
             self.param = self._initialize_parameters(n)
             self.n_neurons = n
-            
-            # Train (single-pass pseudo-inverse)
+
+            # Train (single-pass pseudo-inverse, always MSE)
             mse_train, rmse_train, r2_train = self._train_single_model(X_train, y_train)
-            
+
             # Test predictions
             H_test = self._hidden_nodes(X_test)
             y_pred_test = np.dot(H_test, self.param['output_weights'])
             mse_test, rmse_test, r2_test = calculate_all_metrics(y_test, y_pred_test)
-            
-            # Conformity (using transposed format for compatibility)
+
             tcs, conf_details = self.calculate_conformity(self.predict)
-            
-            # Store metrics
+
+            # Store regression metrics
             results.mse_train.append(mse_train)
             results.rmse_train.append(rmse_train)
             results.r2_train.append(r2_train)
@@ -225,12 +228,28 @@ class ELMNumpy(BaseNeuralNetwork):
             results.rmse_test.append(rmse_test)
             results.r2_test.append(r2_test)
             results.conformity_rates.append(tcs)
-            
+
             iter_time = time.time() - iter_start
             results.iteration_times.append(iter_time)
-            
+
+            # Classification metrics and selection metric
+            if is_classification:
+                H_train_out = self._hidden_nodes(X_train)
+                y_pred_train = np.dot(H_train_out, self.param['output_weights'])
+                cls_train = calculate_classification_metrics(y_train, y_pred_train)
+                cls_test = calculate_classification_metrics(y_test, y_pred_test)
+                results.accuracy_train.append(cls_train['accuracy'])
+                results.accuracy_test.append(cls_test['accuracy'])
+                results.f1_test.append(cls_test['f1'])
+                results.mcc_test.append(cls_test['mcc'])
+                results.bce_train.append(cls_train['bce'])
+                results.bce_test.append(cls_test['bce'])
+                selection_metric = cls_test['mcc']
+            else:
+                selection_metric = r2_test
+
             # Update best model
-            if r2_test > results.best_test_r2:
+            if selection_metric > (results.best_test_mcc if is_classification else results.best_test_r2):
                 results.best_test_r2 = r2_test
                 results.best_test_mse = mse_test
                 results.best_test_rmse = rmse_test
@@ -241,37 +260,49 @@ class ELMNumpy(BaseNeuralNetwork):
                 results.best_conformity = tcs
                 results.conformity_details = conf_details
                 best_model_params = copy.deepcopy(self.param)
-            
+                if is_classification:
+                    results.best_test_accuracy = cls_test['accuracy']
+                    results.best_test_f1 = cls_test['f1']
+                    results.best_test_mcc = cls_test['mcc']
+
             # Log
             if self.config.verbose >= 1:
-                print(f"n={n:3d} | Train R²={r2_train:.4f} | Test R²={r2_test:.4f} | "
-                      f"SCR={tcs:5.1%} | Time={iter_time:5.3f}s")
-            
+                if is_classification:
+                    print(f"n={n:3d} | Acc={cls_test['accuracy']:.4f} | MCC={cls_test['mcc']:.4f} | "
+                          f"SCR={tcs:5.1%} | Time={iter_time:5.3f}s")
+                else:
+                    print(f"n={n:3d} | Train R²={r2_train:.4f} | Test R²={r2_test:.4f} | "
+                          f"SCR={tcs:5.1%} | Time={iter_time:5.3f}s")
+
             # Constructive early stopping
-            if r2_test > best_r2_so_far:
-                best_r2_so_far = r2_test
+            if selection_metric > best_metric_so_far:
+                best_metric_so_far = selection_metric
                 no_improve_count = 0
             else:
                 no_improve_count += 1
-            
+
             if no_improve_count >= self.config.patience_constructive:
                 print(f"\n⏹️ Early stopping: {self.config.patience_constructive} models without improvement")
                 break
-        
+
         results.total_time = time.time() - start_time
         results.avg_time_per_model = np.mean(results.iteration_times)
-        
+
         # Restore best model
         if best_model_params is not None:
             self.param = best_model_params
             self.n_neurons = results.best_neurons
-        
+
         # Summary
         print("\n" + "=" * 70)
         print(f"✅ Training completed in {results.total_time:.1f}s")
-        print(f"🏆 Best: n={results.best_neurons} | R²={results.best_test_r2:.4f} | SCR={results.best_conformity:.1%}")
+        if is_classification:
+            print(f"🏆 Best: n={results.best_neurons} | Acc={results.best_test_accuracy:.4f} | "
+                  f"MCC={results.best_test_mcc:.4f} | SCR={results.best_conformity:.1%}")
+        else:
+            print(f"🏆 Best: n={results.best_neurons} | R²={results.best_test_r2:.4f} | SCR={results.best_conformity:.1%}")
         print("=" * 70)
-        
+
         return results
 
     # =========================================================================

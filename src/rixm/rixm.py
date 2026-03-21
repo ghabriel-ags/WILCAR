@@ -30,7 +30,7 @@ if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
 from base import BaseNeuralNetwork, TrainingConfig, TrainingResults
-from utils.metrics import calculate_all_metrics
+from utils.metrics import calculate_all_metrics, calculate_classification_metrics
 
 
 # =============================================================================
@@ -104,50 +104,54 @@ class RIXMNumpy(BaseNeuralNetwork):
         """
         lr = self.config.learning_rate
         m = x.shape[1]
-        
+        is_classification = self.config.task == 'classification'
+
         best_loss = float('inf')
         no_improve = 0
-        
+
         for epoch in range(self.config.iterations):
             # Forward
             A2, A1, Z1 = self.forward(x)
-            
-            # Loss
-            current_loss = np.mean((A2 - y) ** 2)
-            
+
+            # Loss (BCE for classification, MSE for regression)
+            if is_classification:
+                current_loss = self.bce_loss(y, A2)
+            else:
+                current_loss = np.mean((A2 - y) ** 2)
+
             # Early stopping per epoch
             if current_loss < best_loss - self.config.tolerance:
                 best_loss = current_loss
                 no_improve = 0
             else:
                 no_improve += 1
-            
+
             if no_improve >= self.config.patience_early_stopping:
                 break
-            
-            # Backward
+
+            # Backward (gradient dZ2 = A2 - y is the same for both MSE and BCE with sigmoid output)
             dZ2 = A2 - y
             dW2 = dZ2.dot(A1.T) / m
             db2 = np.sum(dZ2, axis=1, keepdims=True) / m
-            
+
             dA1 = self.param['W2'].T.dot(dZ2)
             dZ1 = dA1 * A1 * (1 - A1)
             dW1 = dZ1.dot(x.T) / m
             db1 = np.sum(dZ1, axis=1, keepdims=True) / m
-            
+
             # Update
             self.param['W1'] -= lr * dW1
             self.param['b1'] -= lr * db1
             self.param['W2'] -= lr * dW2
             self.param['b2'] -= lr * db2
-            
+
             # Learning rate decay
             lr = max(lr * self.config.lr_decay, self.config.min_lr)
-        
+
         # Final metrics
         y_pred = self.predict(x)
         mse, rmse, r2 = calculate_all_metrics(y.flatten(), y_pred.flatten())
-        
+
         return mse, rmse, r2
     
     # =========================================================================
@@ -157,7 +161,7 @@ class RIXMNumpy(BaseNeuralNetwork):
     def train(self) -> TrainingResults:
         """
         Execute constructive training.
-        
+
         Difference from WILCAR: each model with n neurons is trained FROM SCRATCH,
         without reusing weights from the previous model.
         """
@@ -165,47 +169,46 @@ class RIXMNumpy(BaseNeuralNetwork):
         results.method_name = self.METHOD_NAME
         results.dataset_name = self.dataset_name
         results.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
+        is_classification = self.config.task == 'classification'
+
         # Prepare data
         x_train = self.train_inputs.T
         y_train = self.train_targets.reshape(1, -1)
         x_test = self.test_inputs.T
         y_test = self.test_targets.reshape(1, -1)
-        
+
         # Tracking
-        best_r2_so_far = -float('inf')
+        best_metric_so_far = -float('inf')
         no_improve_count = 0
         best_model_params = None
-        
+
         start_time = time.time()
-        
+
         print("\n" + "=" * 70)
         print(f"TRAINING - {self.METHOD_NAME} (Baseline)")
+        if is_classification:
+            print("Task: CLASSIFICATION (BCE loss, MCC selection)")
         print("=" * 70)
-        
+
         for n in range(1, self.config.max_neurons + 1):
             iter_start = time.time()
-            
-            # =====================================================
-            # KEY DIFFERENCE: Always initialize from scratch!
-            # Does not reuse weights from previous model
-            # =====================================================
+
             self.param = self._initialize_parameters(n)
             self.n_neurons = n
-            
+
             # Train
             mse_train, rmse_train, r2_train = self._train_single_model(x_train, y_train)
-            
+
             # Test metrics
             y_pred_test = self.predict(x_test)
             mse_test, rmse_test, r2_test = calculate_all_metrics(
                 y_test.flatten(), y_pred_test.flatten()
             )
-            
+
             # Conformity
             tcs, conf_details = self.calculate_conformity(self.predict)
-            
-            # Store metrics
+
+            # Store regression metrics
             results.mse_train.append(mse_train)
             results.rmse_train.append(rmse_train)
             results.r2_train.append(r2_train)
@@ -213,12 +216,27 @@ class RIXMNumpy(BaseNeuralNetwork):
             results.rmse_test.append(rmse_test)
             results.r2_test.append(r2_test)
             results.conformity_rates.append(tcs)
-            
+
             iter_time = time.time() - iter_start
             results.iteration_times.append(iter_time)
-            
+
+            # Classification metrics and selection metric
+            if is_classification:
+                y_pred_train = self.predict(x_train)
+                cls_train = calculate_classification_metrics(y_train.flatten(), y_pred_train.flatten())
+                cls_test = calculate_classification_metrics(y_test.flatten(), y_pred_test.flatten())
+                results.accuracy_train.append(cls_train['accuracy'])
+                results.accuracy_test.append(cls_test['accuracy'])
+                results.f1_test.append(cls_test['f1'])
+                results.mcc_test.append(cls_test['mcc'])
+                results.bce_train.append(cls_train['bce'])
+                results.bce_test.append(cls_test['bce'])
+                selection_metric = cls_test['mcc']
+            else:
+                selection_metric = r2_test
+
             # Update best model
-            if r2_test > results.best_test_r2:
+            if selection_metric > (results.best_test_mcc if is_classification else results.best_test_r2):
                 results.best_test_r2 = r2_test
                 results.best_test_mse = mse_test
                 results.best_test_rmse = rmse_test
@@ -229,37 +247,49 @@ class RIXMNumpy(BaseNeuralNetwork):
                 results.best_conformity = tcs
                 results.conformity_details = conf_details
                 best_model_params = copy.deepcopy(self.param)
-            
+                if is_classification:
+                    results.best_test_accuracy = cls_test['accuracy']
+                    results.best_test_f1 = cls_test['f1']
+                    results.best_test_mcc = cls_test['mcc']
+
             # Log
             if self.config.verbose >= 1:
-                print(f"n={n:3d} | Train R²={r2_train:.4f} | Test R²={r2_test:.4f} | "
-                      f"SCR={tcs:5.1%} | Time={iter_time:5.1f}s")
-            
+                if is_classification:
+                    print(f"n={n:3d} | Acc={cls_test['accuracy']:.4f} | MCC={cls_test['mcc']:.4f} | "
+                          f"SCR={tcs:5.1%} | Time={iter_time:5.1f}s")
+                else:
+                    print(f"n={n:3d} | Train R²={r2_train:.4f} | Test R²={r2_test:.4f} | "
+                          f"SCR={tcs:5.1%} | Time={iter_time:5.1f}s")
+
             # Constructive early stopping
-            if r2_test > best_r2_so_far:
-                best_r2_so_far = r2_test
+            if selection_metric > best_metric_so_far:
+                best_metric_so_far = selection_metric
                 no_improve_count = 0
             else:
                 no_improve_count += 1
-            
+
             if no_improve_count >= self.config.patience_constructive:
                 print(f"\n⏹️ Early stopping: {self.config.patience_constructive} models without improvement")
                 break
-        
+
         results.total_time = time.time() - start_time
         results.avg_time_per_model = np.mean(results.iteration_times)
-        
+
         # Restore best model
         if best_model_params is not None:
             self.param = best_model_params
             self.n_neurons = results.best_neurons
-        
+
         # Summary
         print("\n" + "=" * 70)
         print(f"✅ Training completed in {results.total_time:.1f}s")
-        print(f"🏆 Best: n={results.best_neurons} | R²={results.best_test_r2:.4f} | SCR={results.best_conformity:.1%}")
+        if is_classification:
+            print(f"🏆 Best: n={results.best_neurons} | Acc={results.best_test_accuracy:.4f} | "
+                  f"MCC={results.best_test_mcc:.4f} | SCR={results.best_conformity:.1%}")
+        else:
+            print(f"🏆 Best: n={results.best_neurons} | R²={results.best_test_r2:.4f} | SCR={results.best_conformity:.1%}")
         print("=" * 70)
-        
+
         return results
 
     # =========================================================================
@@ -280,29 +310,35 @@ class RIXMNumpy(BaseNeuralNetwork):
         """
         iter_start = time.time()
 
-        # Always from scratch (RIXM has NO weight reuse)
         self.param = self._initialize_parameters(n)
         self.n_neurons = n
 
-        # Train via backpropagation
         mse_train, rmse_train, r2_train = self._train_single_model(x_train, y_train)
 
-        # Test metrics
         y_pred_test = self.predict(x_test)
         mse_test, rmse_test, r2_test = calculate_all_metrics(
             y_test.flatten(), y_pred_test.flatten()
         )
 
-        # Conformity
         scr, conf_details = self.calculate_conformity(self.predict)
 
-        return {
+        result = {
             'n_neurons': n,
             'mse_train': mse_train, 'rmse_train': rmse_train, 'r2_train': r2_train,
             'mse_test': mse_test, 'rmse_test': rmse_test, 'r2_test': r2_test,
             'scr': scr, 'conformity_details': conf_details,
             'training_time': time.time() - iter_start
         }
+
+        if self.config.task == 'classification':
+            cls_test = calculate_classification_metrics(y_test.flatten(), y_pred_test.flatten())
+            result.update({
+                'accuracy_test': cls_test['accuracy'],
+                'f1_test': cls_test['f1'],
+                'mcc_test': cls_test['mcc'],
+            })
+
+        return result
 
     def get_params(self) -> Optional[Dict]:
         if self.param is None:

@@ -30,7 +30,7 @@ if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
 from base import BaseNeuralNetwork, TrainingConfig, TrainingResults
-from utils.metrics import calculate_all_metrics
+from utils.metrics import calculate_all_metrics, calculate_classification_metrics
 
 
 # =============================================================================
@@ -342,21 +342,26 @@ class WILCARConstrainedNumpy(BaseNeuralNetwork):
     # SINGLE OPTIMIZATION ATTEMPT
     # =========================================================================
     
-    def _optimize_single_attempt(self, x: np.ndarray, y: np.ndarray, 
+    def _optimize_single_attempt(self, x: np.ndarray, y: np.ndarray,
                                   n_neurons: int) -> Tuple[bool, int]:
         """
         Single optimization attempt via SLSQP with constraints.
-        
+
         Returns:
             Tuple: (success, n_iterations)
         """
-        # Objective function: MSE
+        is_classification = self.config.task == 'classification'
+
+        # Objective function: BCE for classification, MSE for regression
         def objective(vec):
             param = self._vector_to_params(vec, n_neurons)
             Z1 = param['W1'].dot(x) + param['b1']
             A1 = self.sigmoid_safe(Z1)
             Z2 = param['W2'].dot(A1) + param['b2']
             y_pred = self.sigmoid_safe(Z2)
+            if is_classification:
+                y_pred_clipped = np.clip(y_pred, 1e-12, 1 - 1e-12)
+                return float(-np.mean(y * np.log(y_pred_clipped) + (1 - y) * np.log(1 - y_pred_clipped)))
             return np.mean((y_pred - y) ** 2)
         
         # Gain constraints
@@ -486,7 +491,7 @@ class WILCARConstrainedNumpy(BaseNeuralNetwork):
     def train(self) -> TrainingResults:
         """
         Execute full constructive training with gain constraints.
-        
+
         Key features:
         - Weight reuse from model n-1 to n
         - Reinitializes new neuron until 100% SCR achieved on test set
@@ -496,57 +501,58 @@ class WILCARConstrainedNumpy(BaseNeuralNetwork):
         results.method_name = self.METHOD_NAME
         results.dataset_name = self.dataset_name
         results.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
+        is_classification = self.config.task == 'classification'
+
         # Prepare data
         x_train = self.train_inputs.T
         y_train = self.train_targets.reshape(1, -1)
         x_test = self.test_inputs.T
         y_test = self.test_targets.reshape(1, -1)
-        
+
         # Tracking
-        best_r2_so_far = -float('inf')
+        best_metric_so_far = -float('inf')
         no_improve_count = 0
         best_model_params = None
         previous_param = None
-        
+
         start_time = time.time()
-        
+
         print("\n" + "=" * 70)
         print(f"TRAINING - {self.METHOD_NAME}")
+        if is_classification:
+            print("Task: CLASSIFICATION (BCE objective, MCC selection)")
         print("=" * 70)
-        
+
         for n in range(1, self.config.max_neurons + 1):
             iter_start = time.time()
-            
+
             # Train with reinitialization until 100% SCR
             success, n_iter, n_attempts = self._train_single_model(
                 x_train, y_train, x_test, n, previous_param
             )
-            
+
             if not success:
-                # Could not achieve 100% SCR - skip this configuration
                 scr_achieved = self._check_conformity_on_data(x_test)
                 print(f"n={n:3d} | ⚠️ Could not achieve 100% SCR after {n_attempts} attempts "
                       f"(best: {scr_achieved:.1%})")
-                # Don't update previous_param - use last successful config
                 continue
-            
+
             # Train metrics
             y_pred_train = self.predict(x_train)
             mse_train, rmse_train, r2_train = calculate_all_metrics(
                 y_train.flatten(), y_pred_train.flatten()
             )
-            
+
             # Test metrics
             y_pred_test = self.predict(x_test)
             mse_test, rmse_test, r2_test = calculate_all_metrics(
                 y_test.flatten(), y_pred_test.flatten()
             )
-            
+
             # Conformity (should be 100% by construction)
             tcs, conf_details = self.calculate_conformity(self.predict)
-            
-            # Store metrics
+
+            # Store regression metrics
             results.mse_train.append(mse_train)
             results.rmse_train.append(rmse_train)
             results.r2_train.append(r2_train)
@@ -554,12 +560,26 @@ class WILCARConstrainedNumpy(BaseNeuralNetwork):
             results.rmse_test.append(rmse_test)
             results.r2_test.append(r2_test)
             results.conformity_rates.append(tcs)
-            
+
             iter_time = time.time() - iter_start
             results.iteration_times.append(iter_time)
-            
+
+            # Classification metrics and selection metric
+            if is_classification:
+                cls_train = calculate_classification_metrics(y_train.flatten(), y_pred_train.flatten())
+                cls_test = calculate_classification_metrics(y_test.flatten(), y_pred_test.flatten())
+                results.accuracy_train.append(cls_train['accuracy'])
+                results.accuracy_test.append(cls_test['accuracy'])
+                results.f1_test.append(cls_test['f1'])
+                results.mcc_test.append(cls_test['mcc'])
+                results.bce_train.append(cls_train['bce'])
+                results.bce_test.append(cls_test['bce'])
+                selection_metric = cls_test['mcc']
+            else:
+                selection_metric = r2_test
+
             # Update best model
-            if r2_test > results.best_test_r2:
+            if selection_metric > (results.best_test_mcc if is_classification else results.best_test_r2):
                 results.best_test_r2 = r2_test
                 results.best_test_mse = mse_test
                 results.best_test_rmse = rmse_test
@@ -570,44 +590,56 @@ class WILCARConstrainedNumpy(BaseNeuralNetwork):
                 results.best_conformity = tcs
                 results.conformity_details = conf_details
                 best_model_params = copy.deepcopy(self.param)
-            
+                if is_classification:
+                    results.best_test_accuracy = cls_test['accuracy']
+                    results.best_test_f1 = cls_test['f1']
+                    results.best_test_mcc = cls_test['mcc']
+
             # Log
             if self.config.verbose >= 1:
                 attempts_str = f"({n_attempts} attempts)" if n_attempts > 1 else ""
-                print(f"n={n:3d} | Train R²={r2_train:.4f} | Test R²={r2_test:.4f} | "
-                      f"SCR={tcs:5.1%} | Time={iter_time:5.1f}s | Iters={n_iter} {attempts_str}")
-            
+                if is_classification:
+                    print(f"n={n:3d} | Acc={cls_test['accuracy']:.4f} | MCC={cls_test['mcc']:.4f} | "
+                          f"SCR={tcs:5.1%} | Time={iter_time:5.1f}s | Iters={n_iter} {attempts_str}")
+                else:
+                    print(f"n={n:3d} | Train R²={r2_train:.4f} | Test R²={r2_test:.4f} | "
+                          f"SCR={tcs:5.1%} | Time={iter_time:5.1f}s | Iters={n_iter} {attempts_str}")
+
             # Constructive early stopping
-            if r2_test > best_r2_so_far:
-                best_r2_so_far = r2_test
+            if selection_metric > best_metric_so_far:
+                best_metric_so_far = selection_metric
                 no_improve_count = 0
             else:
                 no_improve_count += 1
-            
+
             if no_improve_count >= self.config.patience_constructive:
                 print(f"\n⏹️ Early stopping: {self.config.patience_constructive} models without improvement")
                 break
-            
+
             # Save params for next iteration (weight reuse)
             previous_param = copy.deepcopy(self.param)
-        
+
         results.total_time = time.time() - start_time
         results.avg_time_per_model = np.mean(results.iteration_times) if results.iteration_times else 0
-        
+
         # Restore best model
         if best_model_params is not None:
             self.param = best_model_params
             self.n_neurons = results.best_neurons
-        
+
         # Summary
         print("\n" + "=" * 70)
         print(f"✅ Training completed in {results.total_time:.1f}s")
         if results.best_neurons > 0:
-            print(f"🏆 Best: n={results.best_neurons} | R²={results.best_test_r2:.4f} | SCR={results.best_conformity:.1%}")
+            if is_classification:
+                print(f"🏆 Best: n={results.best_neurons} | Acc={results.best_test_accuracy:.4f} | "
+                      f"MCC={results.best_test_mcc:.4f} | SCR={results.best_conformity:.1%}")
+            else:
+                print(f"🏆 Best: n={results.best_neurons} | R²={results.best_test_r2:.4f} | SCR={results.best_conformity:.1%}")
         else:
             print("⚠️ No feasible configuration found")
         print("=" * 70)
-        
+
         return results
 
     # =========================================================================
