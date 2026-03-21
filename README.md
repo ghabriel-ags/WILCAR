@@ -5,65 +5,86 @@
 **Student:** Ghabriel Anton Gomes de Sá  
 **Advisors:** Marcelo Embiruçu & Cristiano Fontes  
 
-<h2 align="center">Constructive Neural Networks for Regression with Gain Sign Constraints</h2>
+<h2 align="center">Constructive Neural Networks for Regression and Classification with Gain Sign Constraints</h2>
 
 ---
 
 ## Description
 
-This project implements and compares **6 neural network methods** with a single hidden layer for MISO (Multiple Input, Single Output) regression problems, with the possibility of **gain sign constraints**.
+This repository contains the complete implementation of the methods developed and evaluated in the MSc dissertation. It implements and compares **6 constructive neural network methods** with a single hidden layer for both **regression** and **binary classification** problems, with the possibility of **gain sign constraints** enforced via SLSQP optimization.
 
 The proposed method (WILCAR) combines:
 - Weight initialization via **linearization** (Taylor series + Least Squares)
 - **Constructive** approach with weight reuse
 - Possibility of **gain sign constraints** via SLSQP optimization
+- Support for **optional (partial) constraints**, where only a subset of variables is constrained
+- **Dynamic Cross-Validation (DCV)** for architecture selection (WILCAR only)
+
+This is the **final version** of the code, incorporating all functionalities described in Chapters 2, 4, 5, and 6 of the dissertation. Due to iterative improvements in hyperparameters, data preprocessing, and validation strategies, the results produced by this code may differ from those originally reported in the published article (Sá, Fontes, and Embiruçu, 2022).
 
 ---
 
 ## Implemented Methods
 
-| ID | Method | Initialization | Training | Constraints |
-|----|--------|----------------|----------|-------------|
-| 1 | **WILCAR Unconstrained** | Linearization | Backpropagation | ❌ |
-| 2 | **WILCAR Constrained** | Linearization | SLSQP | ✅ |
-| 3 | **RIXM** | Xavier (Random) | Backpropagation | ❌ |
-| 4 | **RIXM Constrained** | Xavier (Random) | SLSQP | ✅ |
-| 5 | **ELM** | Xavier (Random, fixed) | Pseudo-inverse | ❌ |
-| 6 | **ELM Constrained** | Xavier (Random, fixed) | SLSQP | ✅ |
+| Method | Initialization | Training | Loss (Reg.) | Loss (Cls.) | Constraints |
+|--------|----------------|----------|-------------|-------------|-------------|
+| **WILCAR** | Linearization | Backpropagation | MSE | BCE | ❌ |
+| **WILCAR-C** | Linearization | SLSQP | MSE | BCE | ✅ |
+| **RIXM** | Xavier (Random) | Backpropagation | MSE | BCE | ❌ |
+| **RIXM-C** | Xavier (Random) | SLSQP | MSE | BCE | ✅ |
+| **ELM** | Random (fixed) | Pseudo-inverse | MSE | MSE* | ❌ |
+| **ELM-C** | Random (fixed) | SLSQP | MSE | BCE | ✅ |
+
+\* ELM retains MSE with pseudo-inverse for classification, following Huang et al. (2006).
 
 ### Method Descriptions
 
-- **WILCAR (Weight Initialization via Linearization with Constructive Algorithm and Reuse):** Proposed method that uses linearization for intelligent weight initialization.
-- **RIXM (Random Initialization Xavier Method):** Baseline with random Xavier initialization.
-- **ELM (Extreme Learning Machine):** Hidden layer weights are fixed (random), only output weights are trained via pseudo-inverse.
+- **WILCAR (Weight Initialization via Linearization with Constructive Algorithm and Reuse):** Proposed method that uses linearization for intelligent weight initialization and reuses weights from previous architectures during constructive expansion.
+- **RIXM (Random Initialization Xavier Method):** Baseline with random Xavier initialization. Each architecture is trained from scratch (no weight reuse).
+- **ELM (Extreme Learning Machine):** Hidden layer weights are fixed (random); only output weights are computed via Moore–Penrose pseudo-inverse. Each architecture is initialized from scratch.
 
-### 100% SCR Guarantee (Constrained Methods)
+### Constrained Variants (-C)
 
-Constrained methods (2, 4, and 6) implement a **reinitialization strategy** that guarantees 100% Signal Conformity Rate (SCR):
+Constrained methods enforce gain sign constraints through inequality constraints in the SLSQP optimization. A **reinitialization strategy** guarantees 100% Signal Conformity Rate (SCR):
 - Up to 100 reinitialization attempts per configuration
-- Verification on the **test** set (not training)
-- Configurations that don't achieve 100% SCR are skipped
+- Verification on the **test** set
+- Configurations that do not achieve 100% SCR are skipped
+
+### Optional (Partial) Constraints
+
+The signal vector supports three states per variable:
+- `+1`: positive gain expected (output increases with input)
+- `-1`: negative gain expected (output decreases with input)
+- `0`: unconstrained (no monotonicity imposed)
+
+This enables **partial constraint** scenarios where only variables with strong theoretical support are constrained.
 
 ---
 
-## Proposed Method (WILCAR)
+## Tasks Supported
 
-### Weight Initialization
+### Regression (`--task regression`, default)
+- Loss: Mean Squared Error (MSE)
+- Metrics: R², RMSE, MSE, SCR
+- Model selection: best R² on test set
+- Target normalization: MinMaxScaler to [0, 1]
 
-1. **Linearization** via Taylor series of the nonlinear neural model (network with 1 hidden neuron), using the mean of input and output variables as the equilibrium point.
+### Binary Classification (`--task classification`)
+- Loss: Binary Cross-Entropy (BCE) for backprop/SLSQP methods; MSE for ELM pseudo-inverse
+- Metrics: Accuracy, MCC, F1-score, SCR
+- Model selection: best MCC on test set
+- Target: binary {0, 1}, **not normalized**
+- Prediction threshold: 0.5
 
-2. **Multiple Linear Regression** via Least Squares Method applied to the dataset.
+---
 
-3. **Mathematical comparison** of results to obtain initial weight estimates (input → hidden layer weights).
+## Validation Strategies
 
-### Constructive Expansion
+### Standard K-Fold Cross-Validation
+Applied to all six methods. The constructive process runs independently within each fold. Results are reported as mean ± standard deviation across K folds.
 
-The neural network expands progressively:
-- Adds hidden neurons one by one up to the defined limit
-- **Reuses weights** from previous training as starting point
-- New neurons are initialized with **Xavier**
-- **Biases** initialized as zero
-- **Early stopping** based on constructive patience
+### Dynamic Cross-Validation (DCV)
+Applied exclusively to WILCAR and WILCAR-C (methods with weight reuse). Embeds K-fold cross-validation within the constructive loop, using the aggregated error across all folds as the stopping criterion. Produces a single, globally optimal architecture n*.
 
 ---
 
@@ -76,33 +97,31 @@ thesis/
 │   └── processed/              # Preprocessed data
 ├── src/
 │   ├── __init__.py
-│   ├── base.py                 # Base classes and configurations
+│   ├── base.py                 # Base classes, TrainingConfig, TrainingResults
 │   ├── wilcar/
 │   │   ├── __init__.py
-│   │   ├── unconstrained.py    # Method 1
-│   │   └── constrained.py      # Method 2
+│   │   ├── unconstrained.py    # WILCAR (backprop, weight reuse, linearization)
+│   │   └── constrained.py      # WILCAR-C (SLSQP + reinitialization)
 │   ├── rixm/
 │   │   ├── __init__.py
-│   │   ├── rixm.py             # Method 3
-│   │   └── rixm_constrained.py # Method 4
+│   │   ├── rixm.py             # RIXM (backprop, no reuse)
+│   │   └── rixm_constrained.py # RIXM-C (SLSQP + reinitialization)
 │   ├── elm/
 │   │   ├── __init__.py
-│   │   ├── elm.py              # Method 5
-│   │   └── elm_constrained.py  # Method 6
+│   │   ├── elm.py              # ELM (pseudo-inverse)
+│   │   └── elm_constrained.py  # ELM-C (SLSQP + reinitialization)
 │   └── utils/
 │       ├── __init__.py
-│       ├── data.py             # Data loading and preprocessing
-│       ├── metrics.py          # MSE, RMSE, R², MAE, MAPE
+│       ├── data.py             # Data loading, preprocessing, signal vectors
+│       ├── metrics.py          # Regression and classification metrics
 │       └── visualization.py    # Dashboards and plots
 ├── results/                    # Experiment results
-├── figures/                    # Generated figures
-├── notebooks/                  # Jupyter notebooks
-├── tests/                      # Unit tests
 │
 │   # Execution Scripts
 ├── run_experiment.py           # Single method execution
 ├── run_all_methods.py          # Batch execution (6 methods)
-├── run_cross_validation.py     # 5-fold cross-validation
+├── run_cross_validation.py     # K-fold cross-validation
+├── run_dynamic_cv.py           # Dynamic Cross-Validation (WILCAR only)
 ├── generate_figures.py         # Publication-quality figures
 ├── regenerate_dashboard.py     # Comparative dashboards
 │
@@ -110,15 +129,11 @@ thesis/
 ├── environment.yml             # Micromamba/Conda environment
 ├── requirements.txt            # pip dependencies
 ├── pyproject.toml              # Python project configuration
-│
-│   # Git and Development Configuration
-├── .gitignore                  # Files ignored by Git
-├── .gitattributes              # Git attributes (line endings)
-├── .editorconfig               # Editor settings
-├── .pre-commit-config.yaml     # Pre-commit hooks
-├── Makefile                    # Task automation
-│
-├── LICENSE                     # Proprietary License
+├── .gitignore
+├── .gitattributes
+├── .editorconfig
+├── .pre-commit-config.yaml
+├── LICENSE
 └── README.md
 ```
 
@@ -129,30 +144,15 @@ thesis/
 ### Via Micromamba (Recommended)
 
 ```bash
-# Create environment
 micromamba create -f environment.yml
-
-# Activate environment
 micromamba activate wilcar
-
-# Verify installation
 python -c "import numpy; import scipy; print('OK')"
-```
-
-### Via Conda
-
-```bash
-conda env create -f environment.yml
-conda activate wilcar
 ```
 
 ### Via pip
 
 ```bash
 pip install -r requirements.txt
-
-# For GPU support (optional)
-pip install torch
 ```
 
 ### Main Dependencies
@@ -166,321 +166,149 @@ pip install torch
 | scikit-learn | >= 1.3 |
 | Matplotlib | >= 3.7 |
 | Seaborn | >= 0.12 |
-| statsmodels | >= 0.14 |
 | PyTorch | >= 2.0 (optional, GPU) |
 
 ---
 
 ## Usage
 
-### Single Method Execution
+### Regression (default)
 
 ```bash
-# Method 1 (WILCAR) - default
-python run_experiment.py --dataset computer_hardware
+# Single method
+python run_experiment.py --dataset computer_hardware --method wilcar_unconstrained
 
-# Method 2 (WILCAR Constrained)
-python run_experiment.py --dataset computer_hardware --method wilcar_constrained
-
-# Method 3 (RIXM)
-python run_experiment.py --dataset computer_hardware --method rixm
-
-# Method 4 (RIXM Constrained)
-python run_experiment.py --dataset computer_hardware --method rixm_constrained
-
-# Method 5 (ELM)
-python run_experiment.py --dataset computer_hardware --method elm
-
-# Method 6 (ELM Constrained)
-python run_experiment.py --dataset computer_hardware --method elm_constrained
-
-# With custom parameters
-python run_experiment.py --dataset qsar_fish_toxicity --method wilcar_unconstrained \
-    --max-neurons 100 --patience 50 --seed 42
-
-# List available datasets
-python run_experiment.py --list
-```
-
-### Batch Execution (All Methods)
-
-```bash
-# All methods with default parameters
+# All methods
 python run_all_methods.py --dataset computer_hardware
 
-# Global parameters
-python run_all_methods.py --dataset qsar_fish_toxicity --max-neurons 100 --patience 50
+# 5-fold cross-validation
+python run_cross_validation.py --dataset computer_hardware --methods 1 2 3 4 5 6
 
-# Per-method parameters
-python run_all_methods.py --dataset computer_hardware \
-    --max-neurons-m1 750 --patience-m1 150 \
-    --max-neurons-m2 300 --patience-m2 100 \
-    --max-neurons-m3 750 --patience-m3 150 \
-    --max-neurons-m4 100 --patience-m4 50 \
-    --max-neurons-m5 125 \
-    --max-neurons-m6 150 --patience-m6 50
-
-# Only specific methods
-python run_all_methods.py --dataset computer_hardware --methods 1 2 5 6
-
-# Disable GPU
-python run_all_methods.py --dataset computer_hardware --no-gpu
+# Dynamic Cross-Validation (WILCAR only)
+python run_dynamic_cv.py --dataset computer_hardware --methods 1 2
 ```
 
-### Cross-Validation Execution
+### Binary Classification
 
 ```bash
-# 5-fold cross-validation with all methods
-python run_cross_validation.py --dataset computer_hardware
+# Single method
+python run_experiment.py --task classification --dataset breast__binary_ --method wilcar_unconstrained
 
-# With custom parameters
-python run_cross_validation.py --dataset qsar_fish_toxicity --folds 10 --seed 42
-```
+# All methods
+python run_all_methods.py --task classification --dataset breast__binary_
 
-### Figure Generation
+# 5-fold cross-validation
+python run_cross_validation.py --task classification --dataset breast__binary_ --methods 1 2 3 4 5 6
 
-```bash
-# Generate publication-quality figures
-python generate_figures.py --dataset computer_hardware
-
-# Regenerate comparative dashboard
-python regenerate_dashboard.py --dataset computer_hardware
+# Loop over all classification datasets
+for ds in Algerian_forest_fires__binary_ breast__binary_ Diagnostic_Breast_Cancer__binary_ heart_failure_clinical_records_dataset__binary_ pima__binary_; do
+    python run_cross_validation.py --task classification --methods 1 2 3 4 5 6 --dataset "$ds"
+done
 ```
 
 ---
 
 ## Supported Datasets
 
-| Dataset | Variables | Samples | Expected Signs |
-|---------|-----------|---------|----------------|
-| `computer_hardware` | 6 | 209 | `[-1, +1, +1, +1, +1, +1]` |
-| `qsar_fish_toxicity` | 6 | 908 | `[-1, +1, -1, +1, +1, +1]` |
-| `qsar_aquatic_toxicity` | 8 | 546 | `[+1, -1, +1, +1, +1, -1, +1, +1]` |
+### Regression (11 datasets, Chapter 5)
 
-### Expected Signs Justification
+| Dataset | p | n | CR | Signal Vector |
+|---------|---|---|-----|---------------|
+| `airfoil_self_noise` | 5 | 1503 | 80% | `[-1, 0, -1, +1, -1]` |
+| `computer_hardware` | 6 | 209 | 100% | `[-1, +1, +1, +1, +1, +1]` |
+| `ENB2012_Y1` (Heating Load) | 8 | 768 | 75% | `[-1, +1, +1, +1, -1, 0, +1, 0]` |
+| `ENB2012_Y2` (Cooling Load) | 8 | 768 | 75% | `[-1, +1, +1, +1, -1, 0, +1, 0]` |
+| `lavender_friction_DFC` | 3 | 625 | 67% | `[+1, -1, 0]` |
+| `optical_interconnection_network` | 3 | 630 | 67% | `[-1, 0, +1]` |
+| `qsar_aquatic_toxicity` | 8 | 546 | 100% | `[+1, -1, +1, +1, +1, -1, +1, +1]` |
+| `qsar_fish_toxicity` | 6 | 908 | 100% | `[-1, +1, -1, +1, +1, +1]` |
+| `Real_estate_valuation` | 3 | 414 | 100% | `[-1, -1, +1]` |
+| `synchronous_machine` | 4 | 557 | 100% | `[+1, +1, -1, +1]` |
+| `yacht_hydrodynamics` | 6 | 308 | 17% | `[0, 0, 0, 0, +1, 0]` |
 
-#### Computer Hardware
-| Variable | Sign | Justification |
-|----------|------|---------------|
-| MYCT (cycle time) | - | Higher cycle time → slower CPU → lower performance |
-| MMIN (min memory) | + | More memory → better performance |
-| MMAX (max memory) | + | More memory → better performance |
-| CACH (cache) | + | More cache → better performance |
-| CHMIN (min channels) | + | More I/O channels → better performance |
-| CHMAX (max channels) | + | More I/O channels → better performance |
+### Binary Classification (5 datasets, Chapter 6)
 
-#### QSAR Fish Toxicity
-| Variable | Sign | Justification |
-|----------|------|---------------|
-| CIC0 | - | Lower values → more heteroatoms → higher toxicity |
-| SM1_Dz(Z) | + | Higher values → more heteroatoms (F, Cl, Br) → higher toxicity |
-| GATS1i | - | Lower values → more aromatic/lipophilic → higher narcotic toxicity |
-| NdsCH | + | Electrophilic carbons (=CH-) → reactive with biological nucleophiles |
-| NdssC | + | Electrophilic carbons (=C<) → reactive with biological nucleophiles |
-| MLOGP | + | Higher lipophilicity → driving force of narcosis → higher toxicity |
+| Dataset | p | n | CR | Signal Vector |
+|---------|---|---|-----|---------------|
+| `Algerian_forest_fires__binary_` | 10 | 244 | 90% | `[+1, -1, 0, -1, +1, +1, +1, +1, +1, +1]` |
+| `breast__binary_` | 9 | 683 | 100% | `[+1, +1, +1, +1, +1, +1, +1, +1, +1]` |
+| `Diagnostic_Breast_Cancer__binary_` | 30 | 569 | 90% | `[+1]×9, [0], [+1]×9, [0], [+1]×9, [0]` |
+| `heart_failure_clinical_records_dataset__binary_` | 12 | 299 | 58% | `[+1, +1, 0, 0, -1, +1, 0, +1, -1, 0, 0, -1]` |
+| `pima__binary_` | 8 | 768 | 75% | `[+1, +1, 0, +1, 0, +1, +1, +1]` |
 
-#### QSAR Aquatic Toxicity
-| Variable | Sign | Justification |
-|----------|------|---------------|
-| TPSA | + | Polar surface area facilitates interaction with biological targets |
-| SAacc | - | H-bond acceptors increase hydrophilicity → reduced bioconcentration |
-| H-050 | + | H-bond donors enable specific interactions with biomolecules |
-| MLOGP | + | Lipophilicity is the driving force of narcosis |
-| RDCHI | + | Molecular size correlates with lipophilicity |
-| GATS1p | - | Low values → more polarizable bonds → more lipophilic → higher toxicity |
-| nN | + | Nitrogen nucleophilicity → covalent interactions → specific toxicity |
-| C-040 | + | Electrophilic carbons → reactivity with biological nucleophiles |
-
-### Adding a New Dataset
-
-1. Place the `.csv` file in `data/raw/`
-2. Add the expected signs in `src/utils/data.py`:
-```python
-EXPECTED_SIGNALS_THEORY = {
-    # ... existing datasets ...
-    'new_dataset': [+1, -1, +1, ...]  # theoretical signs
-}
-```
-
----
-
-## Outputs
-
-### Single Method (`run_experiment.py`)
-
-```
-results/<dataset>/<method>/run_<timestamp>/
-├── metrics/
-│   ├── detailed_metrics.csv    # Metrics per number of neurons
-│   ├── best_model_summary.json # Best model summary
-│   └── gains_analysis.csv      # Gains analysis
-├── models/
-│   └── best_model_n<X>.pkl     # Serialized model
-├── figures/
-│   ├── performance_dashboard.png/pdf
-│   ├── gains_comparison.png
-│   └── learning_curves.png
-└── logs/
-    └── execution_config.json
-```
-
-### Batch Execution (`run_all_methods.py`)
-
-```
-results/<dataset>/batch_<timestamp>/
-├── method_1_wilcar_unconstrained/
-├── method_2_wilcar_constrained/
-├── method_3_rixm/
-├── method_4_rixm_constrained/
-├── method_5_elm/
-├── method_6_elm_constrained/
-├── comparative/
-│   ├── all_methods_dashboard.png/pdf     # 6 methods comparison
-│   ├── paired_wilcar_1_2.png/pdf         # WILCAR vs WILCAR+R
-│   ├── paired_rixm_3_4.png/pdf           # RIXM vs RIXM+R
-│   ├── paired_elm_5_6.png/pdf            # ELM vs ELM+R
-│   ├── unconstrained_1_3_5.png/pdf       # Unconstrained methods
-│   ├── constrained_2_4_6.png/pdf         # Constrained methods
-│   ├── summary_table.csv                 # Summary table
-│   └── results_table.tex                 # LaTeX table
-└── batch_config.json
-```
-
-### Cross-Validation (`run_cross_validation.py`)
-
-```
-results/<dataset>/cross_validation_<timestamp>/
-├── fold_1/
-│   ├── method_1_wilcar_unconstrained/
-│   ├── method_2_wilcar_constrained/
-│   └── ...
-├── fold_2/
-├── ...
-├── fold_5/
-├── cv_summary.csv              # Summary statistics
-├── cv_results.json             # Detailed results
-└── cv_config.json              # Configuration used
-```
+CR = Constraint Ratio (proportion of variables with definite gain sign).
 
 ---
 
 ## Evaluation Metrics
 
+### Regression
+
 | Metric | Description |
 |--------|-------------|
-| **MSE** | Mean Squared Error |
+| **R²** | Coefficient of Determination (primary selection metric) |
 | **RMSE** | Root Mean Squared Error |
-| **R²** | Coefficient of Determination |
+| **MSE** | Mean Squared Error |
+| **SCR** | Signal Conformity Rate |
+
+### Classification
+
+| Metric | Description |
+|--------|-------------|
+| **MCC** | Matthews Correlation Coefficient (primary selection metric) |
+| **Accuracy** | Proportion of correct predictions |
+| **F1-score** | Harmonic mean of precision and recall |
 | **SCR** | Signal Conformity Rate |
 
 ### Signal Conformity Rate (SCR)
 
-Measures the percentage of variables whose calculated gains have the correct sign (according to theory):
+Measures the proportion of constrained variables whose computed gains match the expected signs:
 
 $$SCR = \frac{\text{Variables with correct sign}}{\text{Variables with known sign}} \times 100\%$$
 
+Computed via numerical perturbation (δ = 0.1) on the test set.
+
 ---
 
-## Configuration Parameters
+## Training Parameters
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `max_neurons` | 750 | Maximum number of hidden neurons |
-| `patience_constructive` | 150 | Constructive patience (neurons without improvement) |
-| `patience_early_stopping` | 250 | Training patience (epochs without improvement) |
-| `learning_rate` | 0.1 | Initial learning rate |
-| `lr_decay` | 0.999 | Learning rate decay factor |
-| `min_lr` | 1e-3 | Minimum learning rate |
-| `iterations` | 2501 | Maximum iterations per training |
-| `delta_perturbation` | 0.1 | Delta for gain calculation |
-| `tolerance` | 1e-6 | Convergence tolerance |
-| `seed` | 0 | Seed for reproducibility |
-| `test_size` | 0.2 | Test set fraction |
-| `use_gpu` | False | Enable GPU acceleration (requires PyTorch) |
-| `verbose` | 1 | Verbosity level (0=silent, 1=summary, 2=detailed) |
+| Parameter | Unconstrained | Constrained | Description |
+|-----------|---------------|-------------|-------------|
+| `max_neurons` | 750 | 50 | Maximum hidden neurons |
+| `patience_constructive` | 150 | 15 | Constructive patience |
+| `patience_early_stopping` | 250 | 250 | Epoch-level patience |
+| `learning_rate` | 0.1 | 0.1 | Initial learning rate |
+| `lr_decay` | 0.999 | 0.999 | LR decay factor per epoch |
+| `iterations` | 2501 | 2501 | Max epochs per step |
+| `delta_perturbation` | 0.1 | 0.1 | Delta for gain computation |
+| `seed` | 0 | 0 | Random seed |
+| `K` | 5 | 5 | Number of CV folds |
+
+These hyperparameters are uniform across all datasets and both tasks (regression and classification).
 
 ---
 
 ## References
 
-- **Xavier Initialization:** Glorot, X., & Bengio, Y. (2010). Understanding the difficulty of training deep feedforward neural networks.
-- **ELM:** Huang, G. B., Zhu, Q. Y., & Siew, C. K. (2006). Extreme learning machine: Theory and applications.
-- **Constructive Algorithms:** Kwok, T. Y., & Yeung, D. Y. (1997). Constructive algorithms for structure learning in feedforward neural networks for regression problems.
-- **WILCAR (original):** Gomes de Sá, G.A., Fontes, C.H., & Embiruçu, M. (2022). A new method for building single feedforward neural network models for multivariate static regression problems: a combined weight initialization and constructive algorithm. *Evolutionary Intelligence*. https://doi.org/10.1007/s12065-022-00813-z
+- **WILCAR:** Sá, G.A.G., Fontes, C.H., & Embiruçu, M. (2022). A new method for building single feedforward neural network models for multivariate static regression problems. *Evolutionary Intelligence*, 15, 1221–1231.
+- **Gain Sign Constraints:** Sá, G.A.G., Fontes, C.H., & Embiruçu, M. (2026). Physics-informed neural networks without a phenomenological model available. *Neural Computing and Applications*. Under review.
+- **Physical Consistency:** Fontes, C.H., Sá, G.A.G., & Embiruçu, M. (2024). Do properly validated networks ensure minimum physical consistency with reality? *Journal of Artificial Intelligence and Systems*, 6, 1–18.
+- **ELM:** Huang, G.B., Zhu, Q.Y., & Siew, C.K. (2006). Extreme learning machine: Theory and applications. *Neurocomputing*, 70, 489–501.
+- **Xavier Initialization:** Glorot, X. & Bengio, Y. (2010). Understanding the difficulty of training deep feedforward neural networks.
 
 ---
 
 ## License
 
-Copyright (c) 2025 Ghabriel Anton Gomes de Sá. All Rights Reserved.
+Copyright (c) 2025–2026 Ghabriel Anton Gomes de Sá. All Rights Reserved.
 
 This software is proprietary and may be subject to patent protection. See [LICENSE](LICENSE) for details.
-
----
-
-## Development Environment Setup
-
-### Git Initialization
-
-```bash
-# Clone repository (if applicable)
-git clone https://github.com/ghabriel-ags/WILCAR
-cd WILCAR
-
-# Or initialize new repository
-git init
-git add .
-git commit -m "feat: initial commit"
-```
-
-### Pre-commit Installation
-
-```bash
-# Install pre-commit
-pip install pre-commit
-
-# Install hooks in the repository
-pre-commit install
-
-# Run on all files (first time)
-pre-commit run --all-files
-```
-
-### Available Make Commands
-
-```bash
-make help          # Show all available commands
-make install       # Install dependencies
-make install-dev   # Install development dependencies
-make install-gpu   # Install GPU dependencies (PyTorch)
-make format        # Format code (ruff + isort)
-make lint          # Check code
-make test          # Run tests
-make run           # Run experiment (DATASET=... METHOD=...)
-make run-all       # Run all methods
-make run-cv        # Run cross-validation
-make figures       # Generate publication figures
-make dashboard     # Regenerate comparative dashboard
-make clean         # Remove temporary files
-```
-
-### Configuration Files
-
-| File | Description |
-|------|-------------|
-| `environment.yml` | Micromamba/Conda environment |
-| `requirements.txt` | pip dependencies |
-| `pyproject.toml` | Project configuration (ruff, isort, pytest) |
-| `.gitignore` | Files ignored by Git |
-| `.gitattributes` | Git attributes (line endings WSL/Windows) |
-| `.editorconfig` | Editor settings |
-| `.pre-commit-config.yaml` | Pre-commit hooks |
-| `Makefile` | Task automation |
 
 ---
 
 ## Contact
 
 - **Author:** Ghabriel Anton Gomes de Sá
-- **Program:** Graduate in Industrial Engineering - Universidade Federal da Bahia
+- **Program:** MSc in Industrial Engineering — Universidade Federal da Bahia
 - **Advisors:** Prof. Marcelo Embiruçu & Prof. Cristiano Fontes
+- **Repository:** [github.com/ghabriel-ags/WILCAR](https://github.com/ghabriel-ags/WILCAR)
