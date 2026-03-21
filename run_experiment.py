@@ -243,7 +243,8 @@ def save_results(results, model, dataset_name: str, expected_signals: list,
 
 
 def run_experiment(dataset_name: str, base_dir: Path, config: TrainingConfig,
-                   method: str = "wilcar_unconstrained", show_plots: bool = True):
+                   method: str = "wilcar_unconstrained", show_plots: bool = True,
+                   task: str = "regression"):
     """
     Run complete experiment with a real dataset.
     
@@ -297,7 +298,7 @@ def run_experiment(dataset_name: str, base_dir: Path, config: TrainingConfig,
     # 3. Preprocess
     print("\n⚙️ Preprocessing data...")
     train_inputs, train_targets, test_inputs, test_targets, scaler = preprocess_data(
-        data, test_size=0.2, seed=config.seed
+        data, test_size=0.2, seed=config.seed, task=task
     )
     
     # 4. Save processed data (optional)
@@ -460,6 +461,9 @@ Methods:
                        help='Do not display plots')
     parser.add_argument('--seed', '-s', type=int, default=0,
                        help='Seed for reproducibility (default: 0)')
+    parser.add_argument('--task', '-t', type=str, default='regression',
+                       choices=['regression', 'classification'],
+                       help='Task type (default: regression)')
     
     args = parser.parse_args()
     
@@ -488,23 +492,26 @@ Methods:
         delta_perturbation=0.1,
         seed=args.seed,
         use_gpu=gpu_info['cuda_available'],
-        verbose=1
+        verbose=1,
+        task=args.task
     )
     
     print(f"\n⚙️ Configuration:")
     print(f"   Dataset: {args.dataset}")
     print(f"   Method: {args.method}")
+    print(f"   Task: {args.task}")
     print(f"   Max neurons: {config.max_neurons}")
     print(f"   Patience: {config.patience_constructive}")
     print(f"   Seed: {config.seed}")
-    
+
     # Run
     results, model = run_experiment(
         dataset_name=args.dataset,
         base_dir=base_dir,
         config=config,
         method=args.method,
-        show_plots=not args.no_plots
+        show_plots=not args.no_plots,
+        task=args.task
     )
     
     if results:

@@ -126,11 +126,12 @@ class BatchConfig:
     test_size: float = 0.2
     verbose: int = 1
     use_gpu: bool = True
-    
+    task: str = 'regression'  # 'regression' or 'classification'
+
     # Default parameters (used if method-specific not provided)
     default_max_neurons: int = 750
     default_patience: int = 150
-    
+
     # Method-specific parameters (None means use default)
     method_configs: Dict[int, MethodConfig] = field(default_factory=dict)
     
@@ -191,7 +192,8 @@ def run_single_method(
         delta_perturbation=0.1,
         seed=batch_config.seed,
         verbose=batch_config.verbose,
-        use_gpu=batch_config.use_gpu
+        use_gpu=batch_config.use_gpu,
+        task=batch_config.task
     )
     
     # Create model
@@ -335,7 +337,8 @@ def run_batch(batch_config: BatchConfig, base_dir: Path):
     # Preprocess
     print("\n⚙️ Preprocessing data...")
     train_inputs, train_targets, test_inputs, test_targets, scaler = preprocess_data(
-        data, test_size=batch_config.test_size, seed=batch_config.seed
+        data, test_size=batch_config.test_size, seed=batch_config.seed,
+        task=batch_config.task
     )
     
     print(f"   Train: {train_inputs.shape[0]} | Test: {test_inputs.shape[0]}")
@@ -522,6 +525,9 @@ Examples:
                         help='Verbosity level (default: 1)')
     parser.add_argument('--no-gpu', action='store_true',
                         help='Disable GPU')
+    parser.add_argument('--task', type=str, default='regression',
+                        choices=['regression', 'classification'],
+                        help='Task type (default: regression)')
     parser.add_argument('--base-dir', type=str, default=None,
                         help='Base directory (default: script directory)')
     
@@ -546,6 +552,7 @@ def main():
         test_size=args.test_size,
         verbose=args.verbose,
         use_gpu=not args.no_gpu,
+        task=args.task,
         default_max_neurons=args.max_neurons,
         default_patience=args.patience
     )

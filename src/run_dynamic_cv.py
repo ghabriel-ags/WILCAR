@@ -103,6 +103,17 @@ ALL_DATASETS = [
     'yacht_hydrodynamics',      # A.10
 ]
 
+ALL_CLASSIFICATION_DATASETS = [
+    'Algerian_forest_fires__binary_',
+    'breast__binary_',
+    'Diagnostic_Breast_Cancer__binary_',
+    'heart_failure_clinical_records_dataset__binary_',
+    'pima__binary_',
+]
+
+# Datasets that have a header row in the CSV
+DATASETS_WITH_HEADER = {'pima__binary_'}
+
 
 @dataclass
 class VCDMethodConfig:
@@ -117,6 +128,7 @@ class VCDConfig:
     n_folds: int = 5
     seed: int = 0
     shuffle: bool = True
+    task: str = 'regression'
 
     # Default constructive parameters
     default_max_neurons: int = 750
@@ -162,6 +174,7 @@ def _default_vcd_configs():
     }
 
 VCD_METHOD_CONFIGS = {ds: _default_vcd_configs() for ds in ALL_DATASETS}
+VCD_METHOD_CONFIGS.update({ds: _default_vcd_configs() for ds in ALL_CLASSIFICATION_DATASETS})
 
 
 def get_vcd_method_config(dataset: str, method_id: int) -> VCDMethodConfig:
@@ -184,6 +197,12 @@ DATASET_FILES = {
     'real_estate': 'Real_estate_valuation',
     'synchronous_machine': 'synchronous machine',
     'yacht_hydrodynamics': 'yacht hydrodynamics',
+    # Classification datasets
+    'Algerian_forest_fires__binary_': 'Algerian_forest_fires__binary_',
+    'breast__binary_': 'breast__binary_',
+    'Diagnostic_Breast_Cancer__binary_': 'Diagnostic Breast Cancer__binary_',
+    'heart_failure_clinical_records_dataset__binary_': 'heart_failure_clinical_records_dataset__binary_',
+    'pima__binary_': 'pima__binary_',
 }
 
 EXPECTED_SIGNALS = {
@@ -198,6 +217,12 @@ EXPECTED_SIGNALS = {
     'real_estate': [-1, -1, 1],
     'synchronous_machine': [1, -1, 1, 1],
     'yacht_hydrodynamics': [0, 0, 0, 0, 0, 1],
+    # Classification datasets
+    'Algerian_forest_fires__binary_': [+1, -1, 0, -1, +1, +1, +1, +1, +1, +1],
+    'breast__binary_': [+1, +1, +1, +1, +1, +1, +1, +1, +1],
+    'Diagnostic_Breast_Cancer__binary_': [+1]*9 + [0] + [+1]*9 + [0] + [+1]*9 + [0],
+    'heart_failure_clinical_records_dataset__binary_': [+1, +1, 0, 0, -1, +1, 0, +1, -1, 0, 0, -1],
+    'pima__binary_': [+1, +1, 0, +1, 0, +1, +1, +1],
 }
 
 METHOD_NAMES = {
@@ -222,7 +247,8 @@ def load_raw_data(dataset_name: str, base_dir: str = ".") -> Tuple[np.ndarray, n
     if not data_path.exists():
         raise FileNotFoundError(f"Dataset not found: {data_path}")
 
-    data = pd.read_csv(data_path, header=None, sep=';')
+    has_header = dataset_name in DATASETS_WITH_HEADER
+    data = pd.read_csv(data_path, header=0 if has_header else None, sep=';')
     data = data.dropna(axis=1, how='all')  # Remove empty columns from trailing semicolons
     data = data.dropna()
 
@@ -232,16 +258,22 @@ def load_raw_data(dataset_name: str, base_dir: str = ".") -> Tuple[np.ndarray, n
 
 
 def normalize_data(X_train: np.ndarray, X_test: np.ndarray,
-                   y_train: np.ndarray, y_test: np.ndarray) -> Tuple:
-    """Normalize data using MinMaxScaler fitted on training data only."""
+                   y_train: np.ndarray, y_test: np.ndarray,
+                   task: str = 'regression') -> Tuple:
+    """Normalize data using MinMaxScaler fitted on training data only.
+    For classification, only normalizes inputs (targets must remain {0,1})."""
     scaler_X = MinMaxScaler()
-    scaler_y = MinMaxScaler()
 
     X_train_norm = scaler_X.fit_transform(X_train)
     X_test_norm = scaler_X.transform(X_test)
 
-    y_train_norm = scaler_y.fit_transform(y_train.reshape(-1, 1)).ravel()
-    y_test_norm = scaler_y.transform(y_test.reshape(-1, 1)).ravel()
+    if task == 'classification':
+        y_train_norm = y_train.astype(float)
+        y_test_norm = y_test.astype(float)
+    else:
+        scaler_y = MinMaxScaler()
+        y_train_norm = scaler_y.fit_transform(y_train.reshape(-1, 1)).ravel()
+        y_test_norm = scaler_y.transform(y_test.reshape(-1, 1)).ravel()
 
     return X_train_norm, X_test_norm, y_train_norm, y_test_norm
 
@@ -267,7 +299,8 @@ def create_training_config(vcd_config: VCDConfig,
         tolerance=vcd_config.tolerance,
         seed=vcd_config.seed,
         use_gpu=False,
-        verbose=0
+        verbose=0,
+        task=vcd_config.task
     )
 
 
@@ -454,9 +487,9 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
         X_train, X_test = inputs[train_idx], inputs[test_idx]
         y_train, y_test = targets[train_idx], targets[test_idx]
 
-        # Normalize (fit on fold training data only)
+        # Normalize (fit on fold training data only; skip target norm for classification)
         X_train_n, X_test_n, y_train_n, y_test_n = normalize_data(
-            X_train, X_test, y_train, y_test
+            X_train, X_test, y_train, y_test, task=vcd_config.task
         )
 
         # Create training config for this fold
@@ -513,6 +546,7 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
             'seed': vcd_config.seed,
             'use_gpu': False,
             'verbose': 0,
+            'task': vcd_config.task,
         }
         print(f"  ⚡ Parallel mode: {n_jobs} workers")
 
@@ -669,9 +703,12 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
 
         # Normalize all data
         scaler_X = MinMaxScaler()
-        scaler_y = MinMaxScaler()
         X_all_norm = scaler_X.fit_transform(inputs)
-        y_all_norm = scaler_y.fit_transform(targets.reshape(-1, 1)).ravel()
+        if vcd_config.task == 'classification':
+            y_all_norm = targets.astype(float)
+        else:
+            scaler_y = MinMaxScaler()
+            y_all_norm = scaler_y.fit_transform(targets.reshape(-1, 1)).ravel()
 
         # Create final model
         final_config = create_training_config(vcd_config, method_config)
@@ -934,9 +971,11 @@ def main():
     parser = argparse.ArgumentParser(
         description="Dynamic Cross-Validation (VCD) for Constructive Neural Networks"
     )
+    parser.add_argument('--task', '-t', type=str, default='regression',
+                        choices=['regression', 'classification'],
+                        help="Task type (default: regression)")
     parser.add_argument('--dataset', type=str, default=None,
-                        choices=ALL_DATASETS,
-                        help="Run specific dataset (default: all)")
+                        help="Run specific dataset (default: all for the given task)")
     parser.add_argument('--methods', type=int, nargs='+', default=[1, 2, 3, 4, 5, 6],
                         help="Methods to run (1=WILCAR, 2=WILCAR+R, 3=RIXM, 4=RIXM+R, 5=ELM, 6=ELM+R)")
     parser.add_argument('--n-folds', type=int, default=5,
@@ -967,10 +1006,13 @@ def main():
         return
 
     # Setup configuration
+    default_datasets = ALL_CLASSIFICATION_DATASETS if args.task == 'classification' else ALL_DATASETS
     vcd_config = VCDConfig(
         n_folds=args.n_folds,
         seed=args.seed,
         methods=args.methods,
+        task=args.task,
+        datasets=default_datasets.copy(),
     )
 
     if args.dataset:

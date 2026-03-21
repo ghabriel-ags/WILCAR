@@ -94,17 +94,18 @@ class MethodConfig:
     patience: int = 150
 
 
-@dataclass 
+@dataclass
 class CVConfig:
     """Cross-validation configuration."""
     n_folds: int = 5
     seed: int = 0
     shuffle: bool = True
-    
+    task: str = 'regression'
+
     # Default parameters (used when not specified per method)
     default_max_neurons: int = 750
     default_patience: int = 150
-    
+
     # Other training parameters (same for all methods)
     patience_early_stopping: int = 250
     learning_rate: float = 0.1
@@ -113,10 +114,10 @@ class CVConfig:
     iterations: int = 2501
     delta_perturbation: float = 0.1
     tolerance: float = 1e-6
-    
+
     # Methods to run (1-6)
     methods: List[int] = field(default_factory=lambda: [1, 2, 3, 4, 5, 6])
-    
+
     # Datasets to run
     datasets: List[str] = field(default_factory=lambda: ALL_DATASETS.copy())
 
@@ -136,6 +137,17 @@ ALL_DATASETS = [
     'yacht_hydrodynamics',      # A.10
 ]
 
+ALL_CLASSIFICATION_DATASETS = [
+    'Algerian_forest_fires__binary_',
+    'breast__binary_',
+    'Diagnostic_Breast_Cancer__binary_',
+    'heart_failure_clinical_records_dataset__binary_',
+    'pima__binary_',
+]
+
+# Datasets that have a header row in the CSV
+DATASETS_WITH_HEADER = {'pima__binary_'}
+
 
 # =============================================================================
 # DATASET-SPECIFIC METHOD CONFIGURATIONS
@@ -153,6 +165,7 @@ def _default_configs():
     }
 
 METHOD_CONFIGS = {ds: _default_configs() for ds in ALL_DATASETS}
+METHOD_CONFIGS.update({ds: _default_configs() for ds in ALL_CLASSIFICATION_DATASETS})
 
 
 def get_method_config(dataset: str, method_id: int) -> MethodConfig:
@@ -175,6 +188,12 @@ DATASET_FILES = {
     'real_estate': 'Real_estate_valuation',
     'synchronous_machine': 'synchronous machine',
     'yacht_hydrodynamics': 'yacht hydrodynamics',
+    # Classification datasets
+    'Algerian_forest_fires__binary_': 'Algerian_forest_fires__binary_',
+    'breast__binary_': 'breast__binary_',
+    'Diagnostic_Breast_Cancer__binary_': 'Diagnostic Breast Cancer__binary_',
+    'heart_failure_clinical_records_dataset__binary_': 'heart_failure_clinical_records_dataset__binary_',
+    'pima__binary_': 'pima__binary_',
 }
 
 EXPECTED_SIGNALS = {
@@ -189,6 +208,12 @@ EXPECTED_SIGNALS = {
     'real_estate': [-1, -1, 1],
     'synchronous_machine': [1, -1, 1, 1],
     'yacht_hydrodynamics': [0, 0, 0, 0, 0, 1],
+    # Classification datasets
+    'Algerian_forest_fires__binary_': [+1, -1, 0, -1, +1, +1, +1, +1, +1, +1],
+    'breast__binary_': [+1, +1, +1, +1, +1, +1, +1, +1, +1],
+    'Diagnostic_Breast_Cancer__binary_': [+1]*9 + [0] + [+1]*9 + [0] + [+1]*9 + [0],
+    'heart_failure_clinical_records_dataset__binary_': [+1, +1, 0, 0, -1, +1, 0, +1, -1, 0, 0, -1],
+    'pima__binary_': [+1, +1, 0, +1, 0, +1, +1, +1],
 }
 
 METHOD_NAMES = {
@@ -218,7 +243,8 @@ def load_raw_data(dataset_name: str, base_dir: str = ".") -> Tuple[np.ndarray, n
     if not data_path.exists():
         raise FileNotFoundError(f"Dataset not found: {data_path}")
     
-    data = pd.read_csv(data_path, header=None, sep=';')
+    has_header = dataset_name in DATASETS_WITH_HEADER
+    data = pd.read_csv(data_path, header=0 if has_header else None, sep=';')
     data = data.dropna(axis=1, how='all')  # Remove empty columns from trailing semicolons
     data = data.dropna()
     
@@ -228,24 +254,28 @@ def load_raw_data(dataset_name: str, base_dir: str = ".") -> Tuple[np.ndarray, n
     return inputs, targets
 
 
-def normalize_data(X_train: np.ndarray, X_test: np.ndarray, 
-                   y_train: np.ndarray, y_test: np.ndarray) -> Tuple:
+def normalize_data(X_train: np.ndarray, X_test: np.ndarray,
+                   y_train: np.ndarray, y_test: np.ndarray,
+                   task: str = 'regression') -> Tuple:
     """
     Normalize data using MinMaxScaler fitted on training data only.
+    For classification, only normalizes inputs (targets must remain {0,1}).
     """
-    # Combine for scaling
-    n_features = X_train.shape[1]
-    
     # Fit scaler on training data only
     scaler_X = MinMaxScaler()
-    scaler_y = MinMaxScaler()
-    
+
     X_train_norm = scaler_X.fit_transform(X_train)
     X_test_norm = scaler_X.transform(X_test)
-    
-    y_train_norm = scaler_y.fit_transform(y_train.reshape(-1, 1)).ravel()
-    y_test_norm = scaler_y.transform(y_test.reshape(-1, 1)).ravel()
-    
+
+    if task == 'classification':
+        # Do NOT normalize targets for classification (must stay {0, 1})
+        y_train_norm = y_train.astype(float)
+        y_test_norm = y_test.astype(float)
+    else:
+        scaler_y = MinMaxScaler()
+        y_train_norm = scaler_y.fit_transform(y_train.reshape(-1, 1)).ravel()
+        y_test_norm = scaler_y.transform(y_test.reshape(-1, 1)).ravel()
+
     return X_train_norm, X_test_norm, y_train_norm, y_test_norm
 
 
@@ -269,7 +299,8 @@ def create_training_config(cv_config: CVConfig, method_config: MethodConfig) -> 
         tolerance=cv_config.tolerance,
         seed=cv_config.seed,
         use_gpu=False,
-        verbose=0  # Minimal output during CV
+        verbose=0,  # Minimal output during CV
+        task=cv_config.task
     )
 
 
@@ -364,7 +395,7 @@ def run_method(method_id: int,
         training_time = time.time() - start_time
     
     # Extract metrics
-    return {
+    result = {
         'method_id': method_id,
         'method_name': METHOD_NAMES[method_id],
         'best_neurons': results.best_neurons,
@@ -378,6 +409,14 @@ def run_method(method_id: int,
         'training_time': training_time,
         'overfitting': results.best_train_r2 - results.best_test_r2
     }
+
+    # Add classification metrics if available
+    if config.task == 'classification':
+        result['test_accuracy'] = results.best_test_accuracy
+        result['test_f1'] = results.best_test_f1
+        result['test_mcc'] = results.best_test_mcc
+
+    return result
 
 
 # =============================================================================
@@ -429,9 +468,9 @@ def run_cv_for_dataset(dataset_name: str, cv_config: CVConfig,
         X_train, X_test = inputs[train_idx], inputs[test_idx]
         y_train, y_test = targets[train_idx], targets[test_idx]
         
-        # Normalize (fit on train only)
+        # Normalize (fit on train only; skip target norm for classification)
         X_train_norm, X_test_norm, y_train_norm, y_test_norm = normalize_data(
-            X_train, X_test, y_train, y_test
+            X_train, X_test, y_train, y_test, task=cv_config.task
         )
         
         # Run each method
@@ -469,8 +508,13 @@ def run_cv_for_dataset(dataset_name: str, cv_config: CVConfig,
                 
                 all_results.append(result)
                 
-                print(f"✓ R²={result['test_r2']:.4f} | SCR={result['scr']:.0%} | "
-                      f"n={result['best_neurons']} | t={result['training_time']:.1f}s")
+                if cv_config.task == 'classification':
+                    print(f"✓ Acc={result['test_accuracy']:.4f} | MCC={result['test_mcc']:.4f} | "
+                          f"SCR={result['scr']:.0%} | n={result['best_neurons']} | "
+                          f"t={result['training_time']:.1f}s")
+                else:
+                    print(f"✓ R²={result['test_r2']:.4f} | SCR={result['scr']:.0%} | "
+                          f"n={result['best_neurons']} | t={result['training_time']:.1f}s")
                 
                 # Incremental save after each method (in case of crash)
                 df_partial = pd.DataFrame(all_results)
@@ -551,8 +595,9 @@ def calculate_summary_stats(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate mean ± std for each method.
     """
-    metrics = ['test_r2', 'test_rmse', 'test_mse', 'train_r2', 'scr', 
-               'best_neurons', 'training_time', 'overfitting']
+    metrics = ['test_r2', 'test_rmse', 'test_mse', 'train_r2', 'scr',
+               'best_neurons', 'training_time', 'overfitting',
+               'test_accuracy', 'test_f1', 'test_mcc']
     
     summary_rows = []
     
@@ -773,9 +818,11 @@ def main():
     parser = argparse.ArgumentParser(
         description="5-Fold Cross-Validation for Neural Network Methods"
     )
+    parser.add_argument('--task', '-t', type=str, default='regression',
+                        choices=['regression', 'classification'],
+                        help="Task type (default: regression)")
     parser.add_argument('--dataset', type=str, default=None,
-                        choices=ALL_DATASETS,
-                        help="Run specific dataset (default: all)")
+                        help="Run specific dataset (default: all for the given task)")
     parser.add_argument('--methods', type=int, nargs='+', default=[1, 2, 3, 4, 5, 6],
                         help="Methods to run (1-6)")
     parser.add_argument('--n-folds', type=int, default=5,
@@ -796,12 +843,15 @@ def main():
     args = parser.parse_args()
     
     # Setup configuration
+    default_datasets = ALL_CLASSIFICATION_DATASETS if args.task == 'classification' else ALL_DATASETS
     cv_config = CVConfig(
         n_folds=args.n_folds,
         seed=args.seed,
-        methods=args.methods
+        methods=args.methods,
+        task=args.task,
+        datasets=default_datasets.copy()
     )
-    
+
     if args.dataset:
         cv_config.datasets = [args.dataset]
     
@@ -893,15 +943,21 @@ def main():
     
     # Print summary table
     if all_summaries:
+        is_cls = cv_config.task == 'classification'
         print("\n" + "-" * 70)
-        print("SUMMARY (Test R² mean ± std)")
+        print(f"SUMMARY ({'Accuracy / MCC mean ± std' if is_cls else 'Test R² mean ± std'})")
         print("-" * 70)
         for dataset_name, summary in all_summaries.items():
             print(f"\n{dataset_name.upper()}:")
             for _, row in summary.iterrows():
                 scr_str = f"{row['scr_mean']*100:.0f}%" if row['scr_mean'] == 1.0 else f"{row['scr_mean']*100:.1f}%"
-                print(f"  {row['method_name']:15s} R²={row['test_r2_mean']:.4f}±{row['test_r2_std']:.4f}  "
-                      f"SCR={scr_str:>6s}  n={row['best_neurons_mean']:5.1f}")
+                if is_cls and 'test_accuracy_mean' in row and not np.isnan(row.get('test_accuracy_mean', np.nan)):
+                    print(f"  {row['method_name']:15s} Acc={row['test_accuracy_mean']:.4f}±{row['test_accuracy_std']:.4f}  "
+                          f"MCC={row['test_mcc_mean']:.4f}±{row['test_mcc_std']:.4f}  "
+                          f"SCR={scr_str:>6s}  n={row['best_neurons_mean']:5.1f}")
+                else:
+                    print(f"  {row['method_name']:15s} R²={row['test_r2_mean']:.4f}±{row['test_r2_std']:.4f}  "
+                          f"SCR={scr_str:>6s}  n={row['best_neurons_mean']:5.1f}")
 
 
 if __name__ == "__main__":
