@@ -37,6 +37,12 @@ EXPECTED_SIGNALS_THEORY: Dict[str, List[int]] = {
     'computer_hardware':    [-1, 1, 1, 1, 1, 1],
     'qsar_fish_toxicity':   [-1, 1, -1, 1, 1, 1],
     'qsar_aquatic_toxicity': [1, -1, 1, 1, 1, -1, 1, 1],
+    # Classification datasets
+    'Algerian_forest_fires__binary_': [+1, -1, 0, -1, +1, +1, +1, +1, +1, +1],
+    'breast__binary_': [+1, +1, +1, +1, +1, +1, +1, +1, +1],
+    'Diagnostic_Breast_Cancer__binary_': [+1]*9 + [0] + [+1]*9 + [0] + [+1]*9 + [0],
+    'heart_failure_clinical_records_dataset__binary_': [+1, +1, 0, 0, -1, +1, 0, +1, -1, 0, 0, -1],
+    'pima__binary_': [+1, +1, 0, +1, 0, +1, +1, +1],
 }
 
 # Maps short dataset name → CSV file stem
@@ -44,7 +50,16 @@ DATASET_MAPPING: Dict[str, str] = {
     'computer_hardware': 'computer_hardware',
     'fish_toxicity':     'qsar_fish_toxicity',
     'aquatic_toxicity':  'qsar_aquatic_toxicity',
+    # Classification datasets
+    'Algerian_forest_fires__binary_': 'Algerian_forest_fires__binary_',
+    'breast__binary_': 'breast__binary_',
+    'Diagnostic_Breast_Cancer__binary_': 'Diagnostic_Breast_Cancer__binary_',
+    'heart_failure_clinical_records_dataset__binary_': 'heart_failure_clinical_records_dataset__binary_',
+    'pima__binary_': 'pima__binary_',
 }
+
+# Datasets that have a header row
+DATASETS_WITH_HEADER: set = {'pima__binary_'}
 
 
 def detect_dataset_name(filename: str) -> str:
@@ -55,12 +70,16 @@ def detect_dataset_name(filename: str) -> str:
         filename: Dataset filename (with or without .csv, with or without path)
 
     Returns:
-        Standardized dataset name (file stem, lowercase, no extension)
+        Standardized dataset name (file stem, no extension)
     """
-    stem = Path(filename).stem.lower()
-    # Return the reverse mapping if known, otherwise return stem as-is
+    stem = Path(filename).stem
+    # Check case-sensitive mapping first (for classification datasets)
     reverse = {v: k for k, v in DATASET_MAPPING.items()}
-    return reverse.get(stem, stem)
+    if stem in reverse:
+        return reverse[stem]
+    # Fallback to lowercase for regression datasets
+    stem_lower = stem.lower()
+    return reverse.get(stem_lower, stem_lower)
 
 
 # =============================================================================
@@ -393,7 +412,7 @@ def get_expected_signals(n_inputs: int, filename: str,
         # No constraints
         signals = [0, 0, 0, 0, 0, 0]
     """
-    dataset_name = filename.lower().replace('.csv', '')
+    dataset_name = filename.replace('.csv', '')
     
     # -----------------------------------------------------------------
     # Priority 1: Custom signals provided as parameter
@@ -405,7 +424,18 @@ def get_expected_signals(n_inputs: int, filename: str,
         return signals, dataset_name
     
     # -----------------------------------------------------------------
-    # Priority 2: JSON configuration file
+    # Priority 2: Built-in theory signals
+    # -----------------------------------------------------------------
+    if dataset_name in EXPECTED_SIGNALS_THEORY:
+        theory_signals = EXPECTED_SIGNALS_THEORY[dataset_name]
+        if len(theory_signals) == n_inputs:
+            signals = validate_expected_signals(theory_signals, n_inputs)
+            print(f"✅ Using built-in signal configuration for '{dataset_name}'")
+            print_constraint_summary(signals, dataset_name)
+            return signals, dataset_name
+
+    # -----------------------------------------------------------------
+    # Priority 3: JSON configuration file
     # -----------------------------------------------------------------
     json_config = load_signals_from_json(filename, base_dir)
     if json_config is not None:
@@ -478,131 +508,141 @@ def create_partial_signals(base_signals: List[int],
 def load_raw_data(filename: str, base_dir: str = "..") -> pd.DataFrame:
     """
     Load raw data from a CSV file.
-    
+
     Args:
         filename: File name (without .csv extension)
         base_dir: Base directory path
-    
+
     Returns:
         DataFrame with raw data
     """
-    filename_clean = filename.lower().replace('.csv', '')
+    filename_clean = filename.replace('.csv', '')
     data_path = Path(base_dir) / "data" / "raw" / f"{filename_clean}.csv"
-    
+
     if not data_path.exists():
-        raise FileNotFoundError(f"❌ File not found: {data_path}")
-    
-    data = pd.read_csv(data_path, header=None, sep=';')
-    
+        # Try lowercase
+        filename_lower = filename_clean.lower()
+        data_path = Path(base_dir) / "data" / "raw" / f"{filename_lower}.csv"
+        if not data_path.exists():
+            raise FileNotFoundError(f"❌ File not found: {data_path}")
+
+    # Detect header: check if dataset is known to have a header
+    has_header = filename_clean in DATASETS_WITH_HEADER
+    header_param = 0 if has_header else None
+
+    data = pd.read_csv(data_path, header=header_param, sep=';')
+
     if data.shape[1] < 2:
         raise ValueError(f"Dataset must have at least 2 columns. Found: {data.shape[1]}")
-    
+
     print(f"✅ Data loaded: {data.shape[0]} samples, {data.shape[1]-1} inputs, 1 output")
-    
+
     return data
 
 
-def preprocess_data(data: pd.DataFrame, 
-                   test_size: float = 0.2, 
-                   seed: int = 0) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, 'MinMaxScaler']:
+def preprocess_data(data: pd.DataFrame,
+                   test_size: float = 0.2,
+                   seed: int = 0,
+                   task: str = 'regression') -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, 'MinMaxScaler']:
     """
     Preprocess data: normalization and train/test split.
-    
+
     Args:
         data: Raw DataFrame
         test_size: Test set proportion
         seed: Random seed for reproducibility
-    
+        task: 'regression' or 'classification'
+
     Returns:
         Tuple: (train_inputs, train_targets, test_inputs, test_targets, scaler)
     """
     from sklearn.preprocessing import MinMaxScaler
     from sklearn.model_selection import train_test_split
-    
+
     # Remove missing data
     n_before = len(data)
     data = data.dropna()
     n_after = len(data)
     if n_before > n_after:
         print(f"⚠️ {n_before - n_after} rows removed (missing values)")
-    
-    # Normalize
-    scaler = MinMaxScaler()
-    data_normalized = scaler.fit_transform(data.values)
-    
-    # Separate inputs and output
-    inputs = data_normalized[:, :-1]
-    targets = data_normalized[:, -1]
-    
+
+    values = data.values.astype(float)
+
+    if task == 'classification':
+        # For classification: normalize only input columns, keep target as {0,1}
+        input_values = values[:, :-1]
+        target_values = values[:, -1]
+
+        scaler = MinMaxScaler()
+        inputs_normalized = scaler.fit_transform(input_values)
+        targets = target_values
+    else:
+        # For regression: normalize all columns (existing behavior)
+        scaler = MinMaxScaler()
+        data_normalized = scaler.fit_transform(values)
+        inputs_normalized = data_normalized[:, :-1]
+        targets = data_normalized[:, -1]
+
     # Train/test split
     train_inputs, test_inputs, train_targets, test_targets = train_test_split(
-        inputs, targets, test_size=test_size, random_state=seed
+        inputs_normalized, targets, test_size=test_size, random_state=seed
     )
-    
+
     print(f"✅ Data processed:")
     print(f"   Train: {train_inputs.shape[0]} samples")
     print(f"   Test: {test_inputs.shape[0]} samples")
-    
+    if task == 'classification':
+        print(f"   Task: classification (target NOT normalized)")
+
     return train_inputs, train_targets, test_inputs, test_targets, scaler
 
 
-def load_dataset(filename: str, base_dir: str = "..", 
+def load_dataset(filename: str, base_dir: str = "..",
                 test_size: float = 0.2, seed: int = 0,
                 custom_signals: List[Union[int, None]] = None,
-                interactive: bool = True) -> Dict[str, Any]:
+                interactive: bool = True,
+                task: str = 'regression') -> Dict[str, Any]:
     """
     Load and process a complete dataset.
-    
+
     Signal loading hierarchy:
         1. custom_signals parameter (if provided)
         2. JSON config file (data/raw/{filename}_config.json)
         3. Interactive mode (if interactive=True)
-    
+
     Args:
         filename: File name
         base_dir: Base directory
         test_size: Test proportion
         seed: Seed for reproducibility
         custom_signals: Optional custom signal configuration for partial constraints
-        interactive: If True, prompt user for signals when not found; 
+        interactive: If True, prompt user for signals when not found;
                     if False, raise error when signals not found
-    
+        task: 'regression' or 'classification'
+
     Returns:
         Dictionary with all data and configurations
-    
-    Example with partial constraints:
-        # Only constrain variables 1, 2, 5, 6 (leave 3, 4 free)
-        data = load_dataset('computer_hardware', 
-                           custom_signals=[-1, 1, 0, 0, 1, 1])
-    
-    Example with new dataset (interactive):
-        # Will prompt user for signals if config file not found
-        data = load_dataset('my_new_dataset')
-    
-    Example with new dataset (non-interactive):
-        # Will raise error if config file not found
-        data = load_dataset('my_new_dataset', interactive=False)
     """
     # Load raw data
     data = load_raw_data(filename, base_dir)
-    
+
     # Get expected signals (using hierarchy)
     n_inputs = data.shape[1] - 1
     expected_signals, dataset_name = get_expected_signals(
-        n_inputs, filename, 
+        n_inputs, filename,
         custom_signals=custom_signals,
         base_dir=base_dir,
         interactive=interactive
     )
-    
+
     # Preprocess
     train_inputs, train_targets, test_inputs, test_targets, scaler = preprocess_data(
-        data, test_size, seed
+        data, test_size, seed, task=task
     )
-    
+
     # Get constraint summary
     constraint_info = get_constraint_summary(expected_signals)
-    
+
     return {
         'train_inputs': train_inputs,
         'train_targets': train_targets,
@@ -613,7 +653,8 @@ def load_dataset(filename: str, base_dir: str = "..",
         'dataset_name': dataset_name,
         'n_inputs': n_inputs,
         'n_samples': data.shape[0],
-        'constraint_info': constraint_info
+        'constraint_info': constraint_info,
+        'task': task,
     }
 
 

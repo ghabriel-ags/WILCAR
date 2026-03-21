@@ -41,6 +41,7 @@ class TrainingConfig:
     use_gpu: bool = False
     batch_size: Optional[int] = None
     verbose: int = 1  # 0=silent, 1=summary, 2=detailed
+    task: str = 'regression'  # 'regression' or 'classification'
 
 
 @dataclass
@@ -56,6 +57,14 @@ class TrainingResults:
     conformity_rates: List[float] = field(default_factory=list)
     iteration_times: List[float] = field(default_factory=list)
     
+    # Classification metrics per neuron count
+    accuracy_train: List[float] = field(default_factory=list)
+    accuracy_test: List[float] = field(default_factory=list)
+    f1_test: List[float] = field(default_factory=list)
+    mcc_test: List[float] = field(default_factory=list)
+    bce_train: List[float] = field(default_factory=list)
+    bce_test: List[float] = field(default_factory=list)
+
     # Best model
     best_neurons: int = 0
     best_train_mse: float = float('inf')
@@ -65,6 +74,11 @@ class TrainingResults:
     best_test_rmse: float = float('inf')
     best_test_r2: float = -float('inf')
     best_conformity: float = 0.0
+
+    # Best classification metrics
+    best_test_accuracy: float = 0.0
+    best_test_f1: float = 0.0
+    best_test_mcc: float = -1.0
     
     # Conformity details for best model
     conformity_details: List[Dict] = field(default_factory=list)
@@ -178,6 +192,12 @@ class BaseNeuralNetwork(ABC):
         """Sigmoid derivative: σ'(x) = σ(x) * (1 - σ(x))"""
         s = BaseNeuralNetwork.sigmoid(x)
         return s * (1 - s)
+
+    @staticmethod
+    def bce_loss(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-12) -> float:
+        """Binary Cross-Entropy loss (numerically stable)."""
+        y_pred = np.clip(y_pred, eps, 1 - eps)
+        return float(-np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred)))
     
     def calculate_conformity(self, model_predict_fn) -> Tuple[float, List[Dict]]:
         """
