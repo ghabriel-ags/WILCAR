@@ -152,3 +152,6 @@ credentials.json
 *.tar.gz
 *.rar
 *.7z
+
+# revision campaign outputs
+results/revision/
