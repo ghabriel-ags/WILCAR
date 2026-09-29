@@ -1,7 +1,7 @@
-\begin{table}[!tbp]\centering\small
+\begin{table*}[!tbp]\centering\small
 \caption{Ablation of the certificate (\cref{alg:bb}) on 168 SLFNs (56 of each kind: seven real datasets, $n\in\{2,4,8,16\}$, two seeds), with the same budget of $2\times10^5$ boxes. Outcome shares (\%) and time per network (median and 90th percentile, ms). Dense sampling ($5\times10^4$ points) finds violations in 71\%, 20\% and 0\% of the unconstrained, mean-constrained and cegis networks; no certified network has a sampled violation.}
 \label{tab:certbench}
-\resizebox{\textwidth}{!}{\begin{tabular}{llrrrrr}\toprule
+\resizebox{\linewidth}{!}{\begin{tabular}{llrrrrr}\toprule
 Networks & Bounds & certified & counterex. & unknown & median & p90 \\\midrule
 unconstrained & natural interval extension & 28.6 & 71.4 & 0.0 & 0.4 & 5 \\
  & + mean-value form & 28.6 & 71.4 & 0.0 & 0.3 & 5 \\
@@ -17,4 +17,4 @@ cegis step & natural interval extension & 75.0 & 0.0 & 25.0 & 0.1 & 707 \\
  & + mean-value form & 85.7 & 0.0 & 14.3 & 0.1 & 626 \\
  & + monotonicity test & 89.3 & 0.0 & 10.7 & 0.1 & 686 \\
  & + pre-activation space & 96.4 & 0.0 & 3.6 & 0.0 & 338 \\
-\bottomrule\end{tabular}}\end{table}
+\bottomrule\end{tabular}}\end{table*}

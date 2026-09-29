@@ -47,10 +47,16 @@ def braced(s, i):
 
 
 def labels():
-    aux = (HERE / "main.aux").read_text()
+    """Numbers of every label of the article (main.aux) and of the Supplementary Material (supplement.aux, prefix S-)."""
     out = {}
-    for m in re.finditer(r"\\newlabel\{([^}@]+)@cref\}\{\{\[([a-z]+)\]\[[^\]]*\]\[[^\]]*\]([^}]*)\}", aux):
-        out[m.group(1)] = (" ".join(m.group(3).replace("~", " ").split()), m.group(2))
+    for aux_name, prefix in (("main.aux", ""), ("supplement.aux", "S-")):
+        f = HERE / aux_name
+        if not f.exists():
+            continue
+        for m in re.finditer(r"\\newlabel\{([^}@]+)@cref\}\{\{\[([a-z]+)\]\[[^\]]*\]\[[^\]]*\]([^}]*)\}", f.read_text()):
+            if prefix == "" and m.group(1).startswith(("S-", "M-")):
+                continue
+            out[prefix + m.group(1)] = (" ".join(m.group(3).replace("~", " ").split()), m.group(2))
     return out
 
 
@@ -168,7 +174,7 @@ def algorithmic_to_text(body):
 
 # ------------------------------------------------------------------------------------------ floats
 def convert_floats(tex, lab):
-    pat = re.compile(r"\\begin\{(algorithm|table\*?|figure\*?)\}(\[[^\]]*\])?(.*?)\\end\{\1\}", re.S)
+    pat = re.compile(r"\\begin\{(algorithm\*?|table\*?|figure\*?)\}(\[[^\]]*\])?(.*?)\\end\{\1\}", re.S)
 
     def repl(m):
         env, body = m.group(1).rstrip("*"), m.group(3)

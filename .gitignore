@@ -156,3 +156,5 @@ credentials.json
 # revision campaign outputs
 results/revision/
 data/benchmarks/
+paper/build_journal/
+paper/main_journal.pdf

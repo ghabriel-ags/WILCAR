@@ -122,15 +122,15 @@ def table_datasets():
             else:
                 lines.append(f"{short} & {name} {cite} & {dom} & -- & -- & -- & -- \\\\")
     write("datasets.tex", "\n".join([
-        r"\begin{table}[!tbp]\centering\small",
+        r"\begin{table*}[!tbp]\centering\small",
         r"\caption{Datasets. $n$: samples used for cross-validation; $p$: inputs; constrained: inputs with a prescribed gain sign $s_i\neq0$ (constraint ratio); positive: share of the positive class. The last three are the monotonicity benchmarks of \citet{Liu2020,Sivaraman2020,Runje2023}, with their preprocessing and monotone features.}",
         r"\label{tab:datasets}",
-        r"\resizebox{\textwidth}{!}{\begin{tabular}{llllrrr}\toprule",
+        r"\resizebox{\linewidth}{!}{\begin{tabular}{llllrrr}\toprule",
         r"ID & Dataset & Domain & $n$ & $p$ & Constrained & Positive (\%) \\\midrule",
         *lines,
         r"\bottomrule\end{tabular}}",
         r"\par\smallskip\footnotesize \textsuperscript{a}Stratified subsample of 20\,000 rows, used for cross-validation because of the cost of the constructive SLSQP fits (Section~\ref{sec:lit} keeps the official test set whole).",
-        r"\end{table}"]))
+        r"\end{table*}"]))
 
 
 def _ranks(M, lower_better):
@@ -144,7 +144,7 @@ def _ranks(M, lower_better):
     return sub.rank(axis=0, ascending=lower_better).mean(axis=1), cols
 
 
-def table_main(dfs, metric="mcc", name="main_mcc.tex", caption_metric="MCC", star=True):
+def table_main(dfs, metric="mcc", name="main_mcc.tex", caption_metric="MCC", star=True, supp=False):
     M = pd.DataFrame(index=[r[3] for r in MAIN_ROWS], columns=[k for k, _ in DS], dtype=float)
     S = M.copy()
     for role, meth, sel, disp in MAIN_ROWS:
@@ -176,6 +176,9 @@ def table_main(dfs, metric="mcc", name="main_mcc.tex", caption_metric="MCC", sta
     status += ("Pending campaigns: " + ", ".join(pend) + "." if pend else "")
     write(name, "\n".join([
         r"\begin{table*}[!tbp]\centering",
+        (rf"\caption{{Test {caption_metric} on the real datasets (mean and, in parentheses, standard deviation over the outer folds). "
+         r"Rows, groups and conventions as in Table~\ref{M-tab:main_mcc} of the main article; rank over the datasets with complete results.}"
+         if supp else
         rf"\caption{{Test {caption_metric} on the real datasets: mean and, in parentheses, standard deviation over the outer folds "
         r"($5\times5$-fold nested cross-validation; $5\times2$ for COM and LOAN). Constraint: cegis --- counterexample-guided, certified "
         r"(\cref{sec:cegis}); mean --- average-gain constraint (\cref{eq:mean}); sign --- sign-bounded coefficients; monotone --- "
@@ -184,9 +187,9 @@ def table_main(dfs, metric="mcc", name="main_mcc.tex", caption_metric="MCC", sta
         r"WILCAR, RIXM and ELM with a constraint are called WILCAR-C, RIXM-C and ELM-C in the text. "
         + "Best value per dataset in bold (datasets with complete results only). "
         + r"Rank: average rank over the datasets with complete results"
-        + (" (" + ", ".join(sn for k, sn in DS if k in rcols) + ")" if rcols else "") + r".}",
+        + (" (" + ", ".join(sn for k, sn in DS if k in rcols) + ")" if rcols else "") + r".}"),
         rf"\label{{tab:{name.split('.')[0]}}}",
-        r"\resizebox{\textwidth}{!}{\begin{tabular}{lll" + "c" * len(DS) + r"c}\toprule",
+        r"\resizebox{\linewidth}{!}{\begin{tabular}{lll" + "c" * len(DS) + r"c}\toprule",
         "Model & Constraint & Selection & " + " & ".join(sn for _, sn in DS) + r" & Rank \\\midrule",
         *(lines[:-1] if lines and lines[-1] == r"\midrule" else lines),
         r"\bottomrule\end{tabular}}",
@@ -196,14 +199,12 @@ def table_main(dfs, metric="mcc", name="main_mcc.tex", caption_metric="MCC", sta
 
 
 CERT_GROUPS = [
-    ("none", "main", [("WILCAR", "holdout"), ("WILCAR", "dcv"), ("RIXM", "holdout"), ("ELM", "holdout"), ("MLP", "holdout")]),
-    ("mean", "main", [("WILCAR-C", "holdout"), ("WILCAR-C", "dcv"), ("RIXM-C", "holdout"), ("ELM-C", "holdout")]),
-    ("anchor", "multi", [("WILCAR-C", "holdout"), ("WILCAR-C", "dcv"), ("RIXM-C", "holdout")]),
-    ("sign", "global", [("WILCAR-C", "holdout"), ("WILCAR-C", "dcv"), ("RIXM-C", "holdout"), ("ELM-C", "holdout")]),
-    ("cegis", "cegis", [("WILCAR-C", "holdout"), ("WILCAR-C", "dcv"), ("WILCAR-C", "dcv1se"), ("RIXM-C", "holdout"),
-                        ("ELM-C", "holdout")]),
-    ("sign / monotone / structural", "main", [("LR-C", "holdout"), ("XGB-C", "holdout"), ("LGBM-C", "holdout"),
-                                              ("MINMAX", "holdout"), ("CMNN", "holdout"), ("LMN", "holdout")]),
+    ("none", "main", [("WILCAR", "holdout"), ("RIXM", "holdout"), ("MLP", "holdout")]),
+    ("mean", "main", [("WILCAR-C", "holdout"), ("RIXM-C", "holdout")]),
+    ("anchor", "multi", [("WILCAR-C", "holdout"), ("RIXM-C", "holdout")]),
+    ("sign", "global", [("WILCAR-C", "holdout"), ("RIXM-C", "holdout")]),
+    ("cegis", "cegis", [("WILCAR-C", "holdout"), ("WILCAR-C", "dcv1se"), ("RIXM-C", "holdout")]),
+    ("by construction", "main", [("LR-C XGB-C LGBM-C MINMAX CMNN LMN", "holdout")]),
 ]
 
 
@@ -213,8 +214,9 @@ def table_cert(dfs):
         df = dfs.get(role)
         for k, (meth, sel) in enumerate(rows):
             first = mode if k == 0 else ""
-            name = f"{MODEL.get(meth, meth)}" + (f" ({'LR' if meth == 'LR-C' else ''})" if False else "")
-            d = None if df is None else df[(df.method == meth) & (df.selection == sel)]
+            meths = meth.split()
+            name = MODEL.get(meth, meth) if len(meths) == 1 else "six monotone baselines"
+            d = None if df is None else df[(df.method.isin(meths)) & (df.selection == sel)]
             if d is None or not len(d):
                 lines.append(f"{first} & {name} & {SELNAME[sel]} & -- & -- & -- & -- & -- & -- & -- \\\\"); continue
             nds = d.dataset.nunique()
@@ -235,10 +237,12 @@ def table_cert(dfs):
         r"\caption{Monotonicity on the real data by constraint, pooled over datasets and outer folds. $D$: datasets with results so far; "
         r"MCC: mean over those datasets; viol.: share of (point, constrained input) pairs whose gain has the wrong sign, on the test "
         r"points and on $10^4$ uniform points of $[0,1]^p$; cert.: share of final models proved monotone on $[0,1]^p$ by "
-        r"\cref{alg:bb} or monotone by construction (ELM-C in the sign and cegis modes, and the baselines of the last block); "
-        r"fallb.: cegis networks returned by the sign-constrained fallback of \cref{prop:always}; $n^\ast$: selected hidden units; ``--'': not applicable (ELM networks are not passed to the certificate) or not run yet.}",
+        r"\cref{alg:bb} or monotone by construction (last row: LR-C, XGBoost and LightGBM with monotone constraints, Min-Max, CMNN "
+        r"and LMN, pooled); fallb.: cegis networks returned by the sign-constrained fallback of \cref{prop:always}; $n^\ast$: "
+        r"selected hidden units; ``--'': not applicable or not run yet. Networks selected by DCV behave as those selected on the "
+        r"hold-out split (Supplementary \cref{S-tab:size}).}",
         r"\label{tab:cert}",
-        r"\resizebox{\textwidth}{!}{\begin{tabular}{lllrrrrrrr}\toprule",
+        r"\resizebox{\linewidth}{!}{\begin{tabular}{lllrrrrrrr}\toprule",
         r"Constraint & Model & Selection & $D$ & MCC & viol.\ test (\%) & viol.\ domain (\%) & cert.\ (\%) & fallb.\ (\%) & $n^\ast$ \\\midrule",
         *(lines[:-1] if lines and lines[-1] == r"\midrule" else lines),
         r"\bottomrule\end{tabular}}\end{table*}"]))
@@ -264,16 +268,16 @@ def table_lit(dfs):
             cells.append("--" if m is None else f"{100 * m:.1f} ({100 * s:.1f})" if not np.isnan(s) else f"{100 * m:.1f}")
         lines.append(f"{disp} & " + " & ".join(cells) + r" \\")
     write("literature.tex", "\n".join([
-        r"\begin{table}[!tbp]\centering\small",
+        r"\begin{table*}[!tbp]\centering\small",
         r"\caption{Test accuracy (\%) on the official train/test splits of the monotonicity benchmarks. Upper block: values reported in the cited papers "
         r"(mean and standard deviation of the best five of ten runs for CMNN). Lower block: this work, five seeds, hyper-parameters selected on a validation split "
         r"of the official training set; ``our runs'' are the published architectures trained under the same protocol.}",
         r"\label{tab:lit}",
-        r"\resizebox{\textwidth}{!}{\begin{tabular}{lccc}\toprule",
+        r"\resizebox{\linewidth}{!}{\begin{tabular}{lccc}\toprule",
         r"Method & " + " & ".join(n for _, n in keys) + r" \\\midrule",
         *lines, r"\bottomrule\end{tabular}}",
         "" if df is not None else r"\par\smallskip\footnotesize\textit{Pending run: lit}.",
-        r"\end{table}"]))
+        r"\end{table*}"]))
 
 
 def table_ablation(dfs):
@@ -297,14 +301,14 @@ def table_ablation(dfs):
             cells.append("--" if not k else f"{d.groupby('dataset').mcc.mean().mean():.3f}" + ("" if k == len(orig) else f"\\textsuperscript{{{k}}}"))
         lines.append(disp + " & " + " & ".join(cells) + r" \\")
     write("ablation.tex", "\n".join([
-        r"\begin{table}[!tbp]\centering\small",
+        r"\begin{table*}[!tbp]\centering\small",
         r"\caption{Ablations on the five original datasets: test MCC averaged over datasets (constrained variants with the average-gain "
         r"constraint). H: hold-out selection; DCV: dynamic cross-validation. A superscript gives the number of datasets averaged when "
         r"fewer than five are complete; ``--'': not run yet.}",
         r"\label{tab:ablation}",
-        r"\resizebox{\textwidth}{!}{\begin{tabular}{lcccccc}\toprule",
+        r"\resizebox{\linewidth}{!}{\begin{tabular}{lcccccc}\toprule",
         r"Setting & WILCAR (H) & WILCAR (DCV) & RIXM (H) & RIXM (DCV) & WILCAR-C (H) & RIXM-C (H) \\\midrule",
-        *lines, r"\bottomrule\end{tabular}}\end{table}"]))
+        *lines, r"\bottomrule\end{tabular}}\end{table*}"]))
 
 
 SYN_ROWS = [("syn_cegis", "WILCAR-C", "dcv", lab("WILCAR-C", "cegis", "dcv")), ("syn_cegis", "RIXM-C", "holdout", lab("RIXM-C", "cegis", "holdout")),
@@ -346,15 +350,15 @@ def table_syn(dfs):
     pending = [r for r in ("syn", "syn_cegis", "syn_global") if dfs.get(r) is None]
     note = (r"\par\smallskip\footnotesize\textit{Pending runs: " + ", ".join(pending).replace("_", r"\_") + "}.") if pending else ""
     write("synthetic.tex", "\n".join([
-        r"\begin{table}[!tbp]\centering\small",
-        r"\caption{Synthetic targets (\ref{app:signals}): mean absolute error between the fitted and the true "
+        r"\begin{table*}[!tbp]\centering\small",
+        r"\caption{Synthetic targets (Supplementary \cref{S-tab:synthdef}): mean absolute error between the fitted and the true "
         r"$P(Y=1\mid x)$ on $2\times10^4$ uniform points, averaged over the outer folds; cert.: share of final models "
         r"that are monotone on $[0,1]^p$ (certified by \cref{alg:bb} or by construction). Constraints as in \cref{tab:modes}; "
         r"every SLFN uses the best of three initialisations per constructive step. Best value per target in bold.}",
         r"\label{tab:synth}",
-        r"\resizebox{\textwidth}{!}{\begin{tabular}{lll" + "c" * (len(SYN_DS) + 1) + r"}\toprule",
+        r"\resizebox{\linewidth}{!}{\begin{tabular}{lll" + "c" * (len(SYN_DS) + 1) + r"}\toprule",
         "Model & Constraint & Selection & " + " & ".join(n for _, n in SYN_DS) + r" & cert.\ (\%) \\\midrule",
-        *lines, r"\bottomrule\end{tabular}}", note, r"\end{table}"]))
+        *lines, r"\bottomrule\end{tabular}}", note, r"\end{table*}"]))
 
 
 def table_cert_bench():
@@ -380,17 +384,17 @@ def table_cert_bench():
     per = nn // len(kinds)
     viol = {k: 100 * df[(df.kind == k) & (df.variant == "full")].sampled_violation.mean() for k, _ in kinds}
     write("cert_bench.tex", "\n".join([
-        r"\begin{table}[!tbp]\centering\small",
+        r"\begin{table*}[!tbp]\centering\small",
         rf"\caption{{Ablation of the certificate (\cref{{alg:bb}}) on {nn} SLFNs ({per} of each kind: seven real datasets, "
         r"$n\in\{2,4,8,16\}$, two seeds), with the same budget of $2\times10^5$ boxes. Outcome shares (\%) and time per network "
         r"(median and 90th percentile, ms). Dense sampling ($5\times10^4$ points) finds violations in "
         rf"{viol['free']:.0f}\%, {viol['mean']:.0f}\% and {viol['cegis']:.0f}\% of the unconstrained, mean-constrained and cegis networks; "
         r"no certified network has a sampled violation.}",
         r"\label{tab:certbench}",
-        r"\resizebox{\textwidth}{!}{\begin{tabular}{llrrrrr}\toprule",
+        r"\resizebox{\linewidth}{!}{\begin{tabular}{llrrrrr}\toprule",
         r"Networks & Bounds & certified & counterex. & unknown & median & p90 \\\midrule",
         *(lines[:-1] if lines and lines[-1] == r"\midrule" else lines),
-        r"\bottomrule\end{tabular}}\end{table}"]))
+        r"\bottomrule\end{tabular}}\end{table*}"]))
 
 
 def table_size(dfs):
@@ -415,7 +419,7 @@ def table_size(dfs):
         r"means over the outer folds. DCV: size minimising the summed validation cross-entropy; DCV-1SE: smallest size within one "
         r"standard error of that minimum.}",
         r"\label{tab:size}",
-        r"\resizebox{\textwidth}{!}{\begin{tabular}{lll" + "c" * len(DS) + r"}\toprule",
+        r"\resizebox{\linewidth}{!}{\begin{tabular}{lll" + "c" * len(DS) + r"}\toprule",
         "Model & Constraint & Selection & " + " & ".join(sn for _, sn in DS) + r" \\\midrule",
         *lines, r"\bottomrule\end{tabular}}\end{table*}"]))
 
@@ -506,8 +510,8 @@ def main():
     print({r: (None if d is None else len(d)) for r, d in dfs.items()})
     table_datasets()
     M, ranks = table_main(dfs, "mcc", "main_mcc.tex", "MCC")
-    table_main(dfs, "auc", "main_auc.tex", "AUC")
-    table_main(dfs, "brier", "main_brier.tex", "Brier score")
+    table_main(dfs, "auc", "main_auc.tex", "AUC", supp=True)
+    table_main(dfs, "brier", "main_brier.tex", "Brier score", supp=True)
     table_cert(dfs)
     table_lit(dfs)
     table_ablation(dfs)

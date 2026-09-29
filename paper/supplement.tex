@@ -1,0 +1,171 @@
+\documentclass[11pt,a4paper]{article}
+% Supplementary material of main.tex. Build after make_tables.py: latexmk -pdf supplement.tex (then main.tex, which
+% reads supplement.aux through xr for the S-numbered cross-references).
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs,graphicx,xcolor}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{natbib}
+\usepackage{xr}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage[capitalise,nameinlink]{cleveref}
+\usepackage{float}
+\usepackage[section]{placeins}
+\externaldocument[M-]{main}
+
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\theequation}{S\arabic{equation}}
+\renewcommand{\thealgorithm}{S\arabic{algorithm}}
+\crefname{algorithm}{Algorithm}{Algorithms}
+\crefname{section}{Section}{Sections}
+
+\newcommand{\todo}[1]{\textcolor{red!70!black}{\textbf{[TODO:} #1\textbf{]}}}
+\newcommand{\pend}{\textcolor{red!70!black}{[pending]}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\B}{\mathcal{B}}
+\newcommand{\I}{\mathcal{I}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\sig}{\sigma}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\title{Supplementary material for\\ ``Constructive neural networks with certified partial monotonicity for binary
+classification''}
+\author{Ghabriel A. G. de Sá, Cristiano H. O. Fontes, Marcelo Embiruçu}
+\date{}
+
+\begin{document}
+\maketitle
+
+\noindent Section, equation, table and algorithm numbers without the prefix S refer to the main article.
+
+% =====================================================================================================
+\section{Gradients of the gains}\label{sup:gradients}
+Write $a_j=\sig(z_j)$, $\sig_j'=a_j(1-a_j)$, $\sig_j''=\sig_j'(1-2a_j)$, $o=\sig(z_o)$, $\sig_o'=o(1-o)$,
+$\sig_o''=\sig_o'(1-2o)$ and $u_i=\sum_jv_j\sig_j'W_{ji}$, so that $g_i=\sig_o'u_i$ (Lemma~\ref{M-lem:gain}). Then, for
+$k=1,\dots,n$ and $l=1,\dots,p$,
+\begin{align*}
+\frac{\partial g_i}{\partial W_{kl}}&=\sig_o''\,v_k\sig_k'x_l\,u_i+\sig_o'\bigl(v_k\sig_k''x_lW_{ki}+v_k\sig_k'\,[i=l]\bigr),\\
+\frac{\partial g_i}{\partial b_k}&=\sig_o''\,v_k\sig_k'\,u_i+\sig_o'\,v_k\sig_k''W_{ki},\\
+\frac{\partial g_i}{\partial v_k}&=\sig_o''\,a_k\,u_i+\sig_o'\,\sig_k'W_{ki},\\
+\frac{\partial g_i}{\partial c}&=\sig_o''\,u_i ,
+\end{align*}
+where $[i=l]$ is 1 if $i=l$ and 0 otherwise. SLSQP therefore receives exact constraint Jacobians instead of finite
+differences. These expressions are checked against finite differences in the test suite of the code.
+
+% =====================================================================================================
+\section{Signal vectors and synthetic targets}\label{sup:signals}
+\begin{table}[H]\centering\small
+\caption{Expected gain signs. $+$: $P(Y=1\mid x)$ non-decreasing in the input; $-$: non-increasing; $0$: unconstrained.
+The signs of the five UCI datasets were derived from domain knowledge; those of the benchmarks are the ones used in the
+literature \citep{Liu2020,Sivaraman2020,Runje2023}.}\label{tab:signals}
+\begin{tabular}{lp{0.82\textwidth}}\toprule
+ID & Inputs (sign) \\\midrule
+ALG & temperature ($+$), relative humidity ($-$), wind speed (0), rain ($-$), FFMC, DMC, DC, ISI, BUI, FWI ($+$) \\
+BCO & clump thickness, uniformity of cell size, uniformity of cell shape, marginal adhesion, single epithelial cell size,
+bare nuclei, bland chromatin, normal nucleoli, mitoses (all $+$) \\
+BCD & mean, standard error and worst value of radius, texture, perimeter, area, smoothness, compactness, concavity,
+concave points and symmetry ($+$); fractal dimension (0) \\
+HF & age ($+$), anaemia ($+$), creatinine phosphokinase (0), diabetes (0), ejection fraction ($-$), high blood pressure
+($+$), platelets (0), serum creatinine ($+$), serum sodium ($-$), sex (0), smoking (0), follow-up time ($-$) \\
+PIM & pregnancies ($+$), glucose ($+$), blood pressure (0), skin thickness ($+$), insulin (0), BMI ($+$), diabetes
+pedigree function ($+$), age ($+$) \\
+HD & resting blood pressure ($+$), serum cholesterol ($+$); the other eleven inputs (0) \\
+COM & prior adult convictions, juvenile felonies, juvenile misdemeanours, other juvenile counts ($+$); age, race and sex
+indicators (0) \\
+LOAN & credit score, length of employment, annual income ($-$); public-record bankruptcies, debt-to-income ratio ($+$);
+23 other inputs (0) \todo{confirm the order of the first five features in the release} \\
+\bottomrule\end{tabular}
+\end{table}
+
+\begin{table}[H]\centering\small
+\caption{Synthetic targets, $P(Y=1\mid x)=\sig(\cdot)$ with $x$ uniform on $[0,1]^p$ and 2000 samples each. The minimum
+and maximum targets favour Min-Max networks, whose functional form is a maximum of minima of hyperplanes; the product and
+wave targets do not. The gains of ``wave'' stay between 1.5 and 10.5, but its natural representation uses the
+non-monotone ridge $\sin(3(x_1-x_2))$.}\label{tab:synthdef}
+\begin{tabular}{lll}\toprule
+Name & Logit & Signs \\\midrule
+and & $12(\min\{x_1,x_2\}-0.45)$ & $(+,+)$ \\
+or & $12(\max\{x_1,x_2\}-0.55)$ & $(+,+)$ \\
+prod & $12(x_1x_2-0.25)$ & $(+,+)$ \\
+and3 & $12(\min\{x_1,x_2,x_3\}-0.35)$ & $(+,+,+)$ \\
+andfree & $12(\min\{x_1,x_2\}-0.45)+1.5\sin(2\pi x_3)$ & $(+,+,0)$ \\
+andneg & $12(\min\{x_1,1-x_2\}-0.45)$ & $(+,-)$ \\
+wave & $6(x_1+x_2)-6+1.5\sin\bigl(3(x_1-x_2)\bigr)$ & $(+,+)$ \\
+\bottomrule\end{tabular}
+\end{table}
+
+% =====================================================================================================
+\section{Dynamic cross-validation}\label{sup:dcv}
+\Cref{alg:dcv} states the selection procedure of Section~\ref{M-sec:dcv}.
+
+\begin{algorithm}[H]
+\caption{Dynamic cross-validation (DCV) inside a training set $T$.}\label{alg:dcv}
+\begin{algorithmic}[1]
+\State split $T$ into $K$ stratified folds $(T_k^{\mathrm{tr}},T_k^{\mathrm{va}})$; initialise one model $M_k$ per fold on $T_k^{\mathrm{tr}}$
+\State $J^\ast\gets\infty$, $w\gets0$
+\For{$n=1,2,\dots,n_{\max}$}
+  \For{$k=1,\dots,K$} \State $M_k\gets$ constructive step $n$ of $M_k$ on $T_k^{\mathrm{tr}}$ (warm start from $M_k$ at $n-1$ if the method reuses weights) \EndFor
+  \State $L_k(n)\gets\mathrm{BCE}\bigl(M_k;T_k^{\mathrm{va}}\bigr)$, $J(n)\gets\sum_k L_k(n)$ \ ($J(n)=\infty$ if some $M_k$ is infeasible)
+  \If{$J(n)<J^\ast$} $J^\ast\gets J(n)$, $n^\ast\gets n$, $w\gets0$ \Else\ $w\gets w+1$; \textbf{if} $w=$ patience \textbf{break} \EndIf
+\EndFor
+\State $n^\ast_{1\mathrm{SE}}\gets\min\{n: J(n)\le J^\ast+\sqrt K\,\mathrm{sd}_k(L_k(n^\ast))\}$ \Comment{one-standard-error rule}
+\State \Return networks retrained on $T$ with $n^\ast$ (DCV) and $n^\ast_{1\mathrm{SE}}$ (DCV-1SE) units
+\end{algorithmic}
+\end{algorithm}
+
+% =====================================================================================================
+\section{Settings and hyper-parameter grids}\label{sup:settings}
+\begin{table}[H]\centering\small
+\caption{Settings of the constructive networks (all experiments unless stated otherwise).}\label{tab:settings}
+\begin{tabular}{@{}lp{0.62\textwidth}@{}}\toprule
+Setting & Value \\\midrule
+Maximum size, patience & 300 units, 30 steps (unconstrained); 50 units, 15 steps (constrained) \\
+Prior precision & $\lambda_0=0.3$ in \eqref{M-eq:loss} \\
+Optimisers & L-BFGS (unconstrained) and SLSQP (constrained, started from the unconstrained optimum), at most 1000 iterations; constraint tolerance $10^{-6}$ \\
+Constraint margins & $\varepsilon_m=0.05$ (mean, at most 1000 random training points); $\varepsilon_p=10^{-3}$ (anchor, cegis) \\
+Anchors & ten $k$-means centres, plus counterexamples (cegis) \\
+Restarts & $R=100$ random restarts of an infeasible step \\
+Initialisations & one per step on real data; best of three by training objective on synthetic data \\
+cegis & $R_{\mathrm{cex}}=10$ counterexample rounds, adversarial search from 16 starting points; $R_{\mathrm{rep}}=20$ repairs \\
+Certificate & $2\times10^5$ boxes (input space); 3000 linear programs (pre-activation space) \\
+Selection & stratified 80/20 hold-out (validation MCC) or DCV with $K=4$ (summed cross-entropy); one-hour budget per selection loop \\
+ELM & ReLU hidden units, weights and biases $U(-1,1)$, output bias; ELM-C: hidden weights of constrained inputs drawn with the prescribed sign (sign and cegis modes) \\
+\bottomrule\end{tabular}
+\end{table}
+
+\begin{table}[H]\centering\small
+\caption{Hyper-parameter grids of the baselines.}\label{tab:hyper}
+\begin{tabular}{@{}lp{0.66\textwidth}@{}}\toprule
+Method & Grid (selected by validation MCC; the chosen model is refitted on training + validation) \\\midrule
+LR, LR-C & $L_2$ penalty $\in\{10^{-4},10^{-3},10^{-2},10^{-1}\}$; LR-C: coefficient signs bounded by $s$ \\
+XGB(-C) & depth $\in\{2,3,4\}$, trees $\in\{100,300\}$, learning rate 0.05, subsample 0.9 \\
+LGBM(-C) & leaves $\in\{4,8,16\}$, trees $\in\{100,300\}$, learning rate 0.05, subsample 0.9 \\
+MLP & one hidden layer of $\{1,2,4,\dots,64\}$ logistic units \\
+Min-Max & $K$ groups of $K$ hyperplanes, $K\in\{2,4,8\}$ \\
+CMNN & width $\in\{8,16,32\}$, two monotone layers, ELU-based activations \\
+LMN & width $\in\{16,32\}$, Lipschitz constant $\lambda\in\{2,8,32\}$, GroupSort \\
+Min-Max, CMNN, LMN & Adam, learning rate $5\times10^{-3}$, batch 256, early stopping on the validation split (patience 50, at most 1000 epochs); refit for the selected number of epochs \\
+\bottomrule\end{tabular}
+\end{table}
+
+\paragraph{Implementation}
+Python with NumPy, SciPy (SLSQP, L-BFGS-B, HiGHS linear programs) and scikit-learn; the monotone baselines use PyTorch
+and the authors' packages \texttt{mononet} and \texttt{monotonicnetworks}. In the code, the anchor and sign modes are
+called \texttt{multi} and \texttt{global}. The closed-form gains, their gradients and the certificate are covered by unit
+tests, including soundness checks of the certificate against dense sampling. Experiments ran on a 16-thread
+workstation, one task per core.
+
+% =====================================================================================================
+\section{Additional results}\label{sup:more}
+\IfFileExists{tables/main_auc.tex}{\input{tables/main_auc.tex}}{}
+\IfFileExists{tables/main_brier.tex}{\input{tables/main_brier.tex}}{}
+\IfFileExists{tables/size.tex}{\input{tables/size.tex}}{}
+
+\bibliographystyle{elsarticle-harv}
+\bibliography{refs}
+
+\end{document}

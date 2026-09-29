@@ -1,38 +1,24 @@
 \begin{table*}[!tbp]\centering\small
-\caption{Monotonicity on the real data by constraint, pooled over datasets and outer folds. $D$: datasets with results so far; MCC: mean over those datasets; viol.: share of (point, constrained input) pairs whose gain has the wrong sign, on the test points and on $10^4$ uniform points of $[0,1]^p$; cert.: share of final models proved monotone on $[0,1]^p$ by \cref{alg:bb} or monotone by construction (ELM-C in the sign and cegis modes, and the baselines of the last block); fallb.: cegis networks returned by the sign-constrained fallback of \cref{prop:always}; $n^\ast$: selected hidden units; ``--'': not applicable (ELM networks are not passed to the certificate) or not run yet.}
+\caption{Monotonicity on the real data by constraint, pooled over datasets and outer folds. $D$: datasets with results so far; MCC: mean over those datasets; viol.: share of (point, constrained input) pairs whose gain has the wrong sign, on the test points and on $10^4$ uniform points of $[0,1]^p$; cert.: share of final models proved monotone on $[0,1]^p$ by \cref{alg:bb} or monotone by construction (last row: LR-C, XGBoost and LightGBM with monotone constraints, Min-Max, CMNN and LMN, pooled); fallb.: cegis networks returned by the sign-constrained fallback of \cref{prop:always}; $n^\ast$: selected hidden units; ``--'': not applicable or not run yet. Networks selected by DCV behave as those selected on the hold-out split (Supplementary \cref{S-tab:size}).}
 \label{tab:cert}
-\resizebox{\textwidth}{!}{\begin{tabular}{lllrrrrrrr}\toprule
+\resizebox{\linewidth}{!}{\begin{tabular}{lllrrrrrrr}\toprule
 Constraint & Model & Selection & $D$ & MCC & viol.\ test (\%) & viol.\ domain (\%) & cert.\ (\%) & fallb.\ (\%) & $n^\ast$ \\\midrule
 none & WILCAR & hold-out & 3 & 0.930 & 10.96 & 10.96 & 33 & -- & 1.4 \\
- & WILCAR & DCV & 3 & 0.926 & 9.82 & 9.83 & 36 & -- & 79.7 \\
  & RIXM & hold-out & 2 & 0.919 & 7.56 & 7.56 & 50 & -- & 1.6 \\
- & ELM & hold-out & 2 & 0.874 & 21.05 & 20.97 & -- & -- & 19.4 \\
  & MLP & hold-out & 2 & 0.901 & 6.86 & 6.78 & -- & -- & -- \\
 \midrule
 mean & WILCAR & hold-out & 3 & 0.911 & 0.02 & 0.04 & 99 & -- & 1.5 \\
- & WILCAR & DCV & 2 & 0.918 & 0.00 & 0.00 & 100 & -- & 27.1 \\
  & RIXM & hold-out & 2 & 0.920 & 0.00 & 0.00 & 100 & -- & 1.4 \\
- & ELM & hold-out & 2 & 0.858 & 15.05 & 17.74 & -- & -- & 16.5 \\
 \midrule
 anchor & WILCAR & hold-out & -- & -- & -- & -- & -- & -- & -- \\
- & WILCAR & DCV & -- & -- & -- & -- & -- & -- & -- \\
  & RIXM & hold-out & -- & -- & -- & -- & -- & -- & -- \\
 \midrule
 sign & WILCAR & hold-out & -- & -- & -- & -- & -- & -- & -- \\
- & WILCAR & DCV & -- & -- & -- & -- & -- & -- & -- \\
  & RIXM & hold-out & -- & -- & -- & -- & -- & -- & -- \\
- & ELM & hold-out & -- & -- & -- & -- & -- & -- & -- \\
 \midrule
 cegis & WILCAR & hold-out & -- & -- & -- & -- & -- & -- & -- \\
- & WILCAR & DCV & -- & -- & -- & -- & -- & -- & -- \\
  & WILCAR & DCV-1SE & -- & -- & -- & -- & -- & -- & -- \\
  & RIXM & hold-out & -- & -- & -- & -- & -- & -- & -- \\
- & ELM & hold-out & -- & -- & -- & -- & -- & -- & -- \\
 \midrule
-sign / monotone / structural & LR & hold-out & 2 & 0.927 & 0.00 & 0.00 & 100 & -- & -- \\
- & XGBoost & hold-out & 2 & 0.946 & 0.00 & 0.00 & 100 & -- & -- \\
- & LightGBM & hold-out & 2 & 0.936 & 0.00 & 0.00 & 100 & -- & -- \\
- & Min-Max & hold-out & 2 & 0.918 & 0.00 & 0.00 & 100 & -- & -- \\
- & CMNN & hold-out & 2 & 0.932 & 0.00 & 0.00 & 100 & -- & -- \\
- & LMN & hold-out & 2 & 0.913 & 0.00 & 0.00 & 100 & -- & -- \\
+by construction & six monotone baselines & hold-out & 2 & 0.929 & 0.00 & 0.00 & 100 & -- & -- \\
 \bottomrule\end{tabular}}\end{table*}

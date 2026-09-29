@@ -1,7 +1,7 @@
-\begin{table}[!tbp]\centering\small
+\begin{table*}[!tbp]\centering\small
 \caption{Test accuracy (\%) on the official train/test splits of the monotonicity benchmarks. Upper block: values reported in the cited papers (mean and standard deviation of the best five of ten runs for CMNN). Lower block: this work, five seeds, hyper-parameters selected on a validation split of the official training set; ``our runs'' are the published architectures trained under the same protocol.}
 \label{tab:lit}
-\resizebox{\textwidth}{!}{\begin{tabular}{lccc}\toprule
+\resizebox{\linewidth}{!}{\begin{tabular}{lccc}\toprule
 Method & COMPAS & Heart Disease & Loan Defaulter \\\midrule
 XGBoost \citep{Runje2023} & 68.5 (0.1) & -- & 63.7 (0.1) \\
 Min-Max Net \citep{Runje2023} & 67.8 (0.1) & 75 (4) & 64.9 (0.1) \\
@@ -25,4 +25,4 @@ CMNN (our runs) & -- & -- & -- \\
 LMN (our runs) & -- & -- & -- \\
 \bottomrule\end{tabular}}
 \par\smallskip\footnotesize\textit{Pending run: lit}.
-\end{table}
+\end{table*}

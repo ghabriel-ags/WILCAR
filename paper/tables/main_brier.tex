@@ -1,7 +1,7 @@
 \begin{table*}[!tbp]\centering
-\caption{Test Brier score on the real datasets: mean and, in parentheses, standard deviation over the outer folds ($5\times5$-fold nested cross-validation; $5\times2$ for COM and LOAN). Constraint: cegis --- counterexample-guided, certified (\cref{sec:cegis}); mean --- average-gain constraint (\cref{eq:mean}); sign --- sign-bounded coefficients; monotone --- monotone splits of the tree ensembles; structural --- monotone by architecture. Selection of the number of hidden units: hold-out split, DCV or DCV-1SE (\cref{sec:dcv}); the baselines select their hyper-parameters on the hold-out split. WILCAR, RIXM and ELM with a constraint are called WILCAR-C, RIXM-C and ELM-C in the text. Best value per dataset in bold (datasets with complete results only). Rank: average rank over the datasets with complete results (ALG, BCO).}
+\caption{Test Brier score on the real datasets (mean and, in parentheses, standard deviation over the outer folds). Rows, groups and conventions as in Table~\ref{M-tab:main_mcc} of the main article; rank over the datasets with complete results.}
 \label{tab:main_brier}
-\resizebox{\textwidth}{!}{\begin{tabular}{lllccccccccc}\toprule
+\resizebox{\linewidth}{!}{\begin{tabular}{lllccccccccc}\toprule
 Model & Constraint & Selection & ALG & BCO & BCD & HF & PIM & HD & COM & LOAN & Rank \\\midrule
 \multicolumn{12}{l}{\textit{Certified SLFNs (this work)}} \\
 WILCAR & cegis & DCV-1SE & -- & -- & -- & -- & -- & -- & -- & -- & -- \\

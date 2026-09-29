@@ -1,7 +1,7 @@
-\begin{table}[!tbp]\centering\small
-\caption{Synthetic targets (\ref{app:signals}): mean absolute error between the fitted and the true $P(Y=1\mid x)$ on $2\times10^4$ uniform points, averaged over the outer folds; cert.: share of final models that are monotone on $[0,1]^p$ (certified by \cref{alg:bb} or by construction). Constraints as in \cref{tab:modes}; every SLFN uses the best of three initialisations per constructive step. Best value per target in bold.}
+\begin{table*}[!tbp]\centering\small
+\caption{Synthetic targets (Supplementary \cref{S-tab:synthdef}): mean absolute error between the fitted and the true $P(Y=1\mid x)$ on $2\times10^4$ uniform points, averaged over the outer folds; cert.: share of final models that are monotone on $[0,1]^p$ (certified by \cref{alg:bb} or by construction). Constraints as in \cref{tab:modes}; every SLFN uses the best of three initialisations per constructive step. Best value per target in bold.}
 \label{tab:synth}
-\resizebox{\textwidth}{!}{\begin{tabular}{lllcccccccc}\toprule
+\resizebox{\linewidth}{!}{\begin{tabular}{lllcccccccc}\toprule
 Model & Constraint & Selection & and & or & prod & and3 & andfree & andneg & wave & cert.\ (\%) \\\midrule
 WILCAR & cegis & DCV & -- & -- & -- & -- & -- & -- & -- & -- \\
 RIXM & cegis & hold-out & -- & -- & -- & -- & -- & -- & -- & -- \\
@@ -11,7 +11,7 @@ RIXM & sign & hold-out & -- & -- & -- & -- & -- & -- & -- & -- \\
 \midrule
 WILCAR & mean & DCV & 0.025 & 0.028 & 0.027 & -- & -- & -- & -- & 33 \\
 \midrule
-WILCAR & none & DCV & 0.025 & 0.028 & \textbf{0.027} & -- & -- & -- & -- & 33 \\
+WILCAR & none & DCV & 0.025 & 0.028 & \textbf{0.027} & 0.056 & -- & -- & -- & 31 \\
 RIXM & none & hold-out & 0.046 & 0.061 & 0.034 & -- & -- & -- & -- & 53 \\
 MLP & none & hold-out & 0.128 & 0.119 & 0.086 & 0.160 & 0.136 & 0.125 & 0.058 & -- \\
 \midrule
@@ -23,4 +23,4 @@ CMNN & structural & hold-out & 0.048 & 0.038 & 0.032 & 0.061 & \textbf{0.048} & 
 LMN & structural & hold-out & 0.017 & 0.033 & 0.047 & \textbf{0.043} & 0.064 & \textbf{0.035} & \textbf{0.033} & 100 \\
 \bottomrule\end{tabular}}
 \par\smallskip\footnotesize\textit{Pending runs: syn\_cegis, syn\_global}.
-\end{table}
+\end{table*}
