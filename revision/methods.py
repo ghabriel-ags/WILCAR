@@ -32,8 +32,8 @@ from . import sfnn
 
 @dataclass
 class Cfg:
-    max_neurons: int = 750
-    patience: int = 150
+    max_neurons: int = 300
+    patience: int = 30
     max_neurons_c: int = 50
     patience_c: int = 15
     lr: float = 0.1
@@ -44,14 +44,20 @@ class Cfg:
     tol: float = 1e-6
     eps_mean: float = 0.05
     eps_point: float = 1e-3
-    constraint_mode: str = "mean"      # 'mean' | 'multi' | 'global'
+    constraint_mode: str = "mean"      # 'mean' | 'multi' | 'global' | 'cegis'
     n_anchors: int = 10
+    max_anchors_mean: int = 1000       # 'mean' mode: random subset of the training data when larger
+    cegis_rounds: int = 10             # counterexample rounds per constructive step
+    cegis_starts: int = 16             # multi-start adversarial search per constrained input
+    bb_budget: int = 200_000           # branch-and-bound nodes per constrained input
+    time_budget: float = 3600.0        # seconds per constructive selection loop (0 = none)
     max_reinit: int = 100
     slsqp_maxiter: int = 1000
     zero_out: bool = False             # WILCAR: new neuron's output weight starts at 0
     optimizer: str = "lbfgs"           # unconstrained training: 'lbfgs' (quasi-Newton, like SLSQP) | 'gd' (dissertation)
     lbfgs_maxiter: int = 1000
-    l2: float = 1e-3                   # weight decay on W1, W2 (same for constrained and unconstrained objectives)
+    l2: float = 0.3                    # Gaussian-prior precision lambda0 on W1, W2 (MAP): mean BCE + (lambda0 / N) ||W||^2,
+                                       # same in constrained and unconstrained objectives (= 1e-3 at N = 300)
     elm_bias: bool = True              # random hidden biases U(-1,1) + output bias (standard ELM); False = dissertation
 
 
@@ -72,6 +78,7 @@ class Model:
         self.cfg = cfg
         self.rng = np.random.default_rng(seed)
         self.first = None
+        self.extra = None                  # counterexample anchors ('cegis')
 
     # ------------------------------------------------------------------ helpers
     @property
@@ -83,7 +90,12 @@ class Model:
         return self.cfg.patience_c if self.constrained else self.cfg.patience
 
     def anchors(self, X):
-        if self.cfg.constraint_mode == "mean" or len(X) <= self.cfg.n_anchors:
+        c = self.cfg
+        if c.constraint_mode == "mean":
+            if len(X) > c.max_anchors_mean:
+                return X[self.rng.choice(len(X), c.max_anchors_mean, replace=False)]
+            return X
+        if len(X) <= c.n_anchors:
             return X
         from sklearn.cluster import KMeans
         km = KMeans(self.cfg.n_anchors, n_init=4, random_state=int(self.rng.integers(1 << 31))).fit(X)
@@ -137,7 +149,8 @@ class Model:
     # ------------------------------------------------------------------ initial parameters
     @property
     def _aligned(self):
-        return self.constrained and self.cfg.constraint_mode == "global" and len(self.idx) > 0
+        m = self.cfg.constraint_mode
+        return self.constrained and len(self.idx) > 0 and (m == "global" or (m == "cegis" and self.base == "ELM"))
 
     def _align(self, W1, W2):
         """Sign-align hidden weights of constrained inputs and make output weights >= 0 (feasible for 'global')."""
@@ -166,8 +179,8 @@ class Model:
 
     # ------------------------------------------------------------------ unconstrained training
     def _obj(self, X, y, n):
-        """BCE (+ l2 * ||[W1, W2]||^2) and its gradient."""
-        lam = self.cfg.l2
+        """Mean BCE + (lambda0 / N) * ||[W1, W2]||^2 (MAP with a Gaussian prior) and its gradient."""
+        lam = self.cfg.l2 / len(y)
         if lam <= 0:
             return lambda v: sfnn.bce_grad(v, X, y, n)
         p = X.shape[1]
@@ -232,9 +245,20 @@ class Model:
             return J
         return {"type": "ineq", "fun": fun, "jac": jac}, fun
 
+    @property
+    def cegis(self):
+        return self.constrained and self.cfg.constraint_mode == "cegis" and self.base != "ELM" and len(self.idx) > 0
+
+    def _anchor_set(self, An):
+        return An if self.extra is None else np.vstack([An, self.extra])
+
+    def _add_anchors(self, P):
+        if len(P):
+            self.extra = P if self.extra is None else np.vstack([self.extra, P])
+
     def _constraints(self, An, n, elm=None):
         c, s, idx = self.cfg, self.s, self.idx
-        if c.constraint_mode == "global":
+        if c.constraint_mode == "global" or (c.constraint_mode == "cegis" and elm is not None):
             p = len(s)
             return self._global_constraints(n, p, elm)
         mode_mean = c.constraint_mode == "mean"
@@ -274,17 +298,60 @@ class Model:
         if not len(self.idx):
             theta = self._fit_free(self._init_theta(n, p, prev), X, y, n)
             return theta, {"feasible": True, "attempts": 1}
-        cons, cfun = self._constraints(An, n)
         obj = self._obj(X, y, n)
+        v, feasible, attempts = self._solve(n, p, obj, self._anchor_set(An), prev)
+        info = {"feasible": feasible, "attempts": attempts}
+        if self.cegis and feasible:
+            v, info = self._cegis_loop(v, n, p, obj, An, prev, info, X)
+        return v, info
+
+    def _solve(self, n, p, obj, An, prev, warm=None):
+        """SLSQP with random re-initialisation until the constraints on the anchors hold."""
+        cons, cfun = self._constraints(An, n)
         best, best_viol = None, np.inf
         for a in range(self.cfg.max_reinit):
-            v = self._slsqp(obj, self._init_theta(n, p, prev), cons)
+            v0 = warm if (a == 0 and warm is not None) else self._init_theta(n, p, prev)
+            v = self._slsqp(obj, v0, cons)
             viol = max(0.0, -cfun(v).min())
             if viol < best_viol:
                 best, best_viol = v, viol
             if viol <= 1e-8:
-                return v, {"feasible": True, "attempts": a + 1}
-        return best, {"feasible": False, "attempts": self.cfg.max_reinit}
+                return v, True, a + 1
+        return best, False, self.cfg.max_reinit
+
+    def _cegis_loop(self, v, n, p, obj, An, prev, info, X=None):
+        """Counterexample-guided refinement: adversarial search on [0,1]^p, add violators as anchors, re-solve."""
+        from . import certify
+        rounds = 0
+        for rounds in range(1, self.cfg.cegis_rounds + 1):
+            cex = certify.adversarial(v, n, p, self.s, self.rng, starts=self.cfg.cegis_starts, X0=X)
+            if not len(cex):
+                rounds -= 1
+                break
+            self._add_anchors(cex)
+            v2, ok, _ = self._solve(n, p, obj, self._anchor_set(An), prev, warm=v)
+            if not ok:
+                return v2, {**info, "feasible": False, "cegis_rounds": rounds}
+            v = v2
+        return v, {**info, "cegis_rounds": rounds, "n_anchors": len(self._anchor_set(An))}
+
+    def certify_and_repair(self, v, n, X, y, An, rounds=5):
+        """Final sound check (branch-and-bound); counterexamples are added as anchors and the model re-solved."""
+        from . import certify
+        p = X.shape[1]
+        status, cex, nodes = certify.certify(v, n, p, self.s, budget=self.cfg.bb_budget)
+        r = 0
+        if self.cegis:
+            obj = self._obj(X, y, n)
+            while status == "counterexample" and r < rounds:
+                r += 1
+                self._add_anchors(cex)
+                v, ok, _ = self._solve(n, p, obj, self._anchor_set(An), None, warm=v)
+                if ok:
+                    v, _ = self._cegis_loop(v, n, p, obj, An, None, {"feasible": True}, X)
+                status, cex, nd = certify.certify(v, n, p, self.s, budget=self.cfg.bb_budget)
+                nodes += nd
+        return v, {"cert_status": status, "cert_nodes": nodes, "cert_repairs": r}
 
     def _step_elm(self, n, X, y, An):
         p = X.shape[1]

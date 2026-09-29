@@ -87,3 +87,50 @@ def test_lbfgs_unconstrained_fits():
     m = Model("RIXM", [0, 0, 0], Cfg(), seed=3)
     th, _ = m.step(2, X, y)
     assert np.mean((m.predict(th, X, 2) >= 0.5) == y) > 0.9
+
+def test_certify_sound_and_complete_on_small_nets():
+    from revision import certify
+    n, p = 5, 3
+    s = [1, 0, -1]
+    for seed in range(20):
+        th = np.random.default_rng(seed).normal(size=sfnn.n_params(n, p)) * 2
+        st, cex, _ = certify.certify(th, n, p, s, budget=100_000)
+        U = np.random.default_rng(99).random((20000, p))
+        g = sfnn.gains(th, U, n)[:, [0, 2]] * np.array([1, -1])
+        if st == "certified":
+            assert (g >= -1e-12).all()
+        if st == "counterexample":
+            gc = sfnn.gains(th, cex, n)[:, [0, 2]] * np.array([1, -1])
+            assert (gc < 0).any(axis=1).all()
+        if (g < -1e-6).any():
+            assert st != "certified"
+
+def test_cegis_mode_certifies():
+    from revision.methods import Model, Cfg
+    X = rng.random((200, 4)); y = ((2 * X[:, 0] - X[:, 1] + np.sin(5 * X[:, 2]) + 0.3 * rng.normal(size=200)) > 0.5).astype(float)
+    s = [1, -1, 0, 0]
+    m = Model("RIXM-C", s, Cfg(constraint_mode="cegis", max_reinit=5), seed=4)
+    An = m.anchors(X)
+    th, info = m.step(4, X, y, None, An)
+    assert info["feasible"]
+    th, cert = m.certify_and_repair(th, 4, X, y, An)
+    assert cert["cert_status"] in ("certified", "unknown")
+
+def test_certify_zspace_sound():
+    from revision import certify
+    n, p = 3, 8
+    s = [1, -1, 0, 0, 1, 0, 0, 0]
+    seen = set()
+    for seed in range(40):
+        th = np.random.default_rng(seed).normal(size=sfnn.n_params(n, p)) * 2
+        W1, b1, idx, C = certify.coefficients(th, n, p, s)
+        U = np.random.default_rng(7).random((20000, p))
+        for a in range(len(idx)):
+            st, x, _ = certify._bb_z(W1, b1, C[a], p)
+            seen.add(st)
+            h = certify._dsig(U @ W1.T + b1) @ C[a]
+            if st == "certified":
+                assert (h >= -1e-12).all()
+            if st == "counterexample":
+                assert certify.h_value(x, W1, b1, C[a]) < 0 and (0 <= x).all() and (x <= 1).all()
+    assert {"certified", "counterexample"} <= seen

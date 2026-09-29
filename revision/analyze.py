@@ -18,7 +18,8 @@ from scipy import stats
 
 ROOT = Path(__file__).resolve().parents[1] / "results" / "revision"
 PAIRS = [("WILCAR", "WILCAR-C"), ("RIXM", "RIXM-C"), ("ELM", "ELM-C"), ("LR", "LR-C"),
-         ("XGB", "XGB-C"), ("LGBM", "LGBM-C")]
+         ("XGB", "XGB-C"), ("LGBM", "LGBM-C"), ("MLP", "MINMAX"), ("MLP", "CMNN"), ("MLP", "LMN"),
+         ("WILCAR-C", "CMNN"), ("WILCAR-C", "LMN")]
 # Nemenyi critical values q_0.05 (Demšar, 2006), k = 2..20
 Q05 = {2: 1.960, 3: 2.343, 4: 2.569, 5: 2.728, 6: 2.850, 7: 2.949, 8: 3.031, 9: 3.102, 10: 3.164,
        11: 3.219, 12: 3.268, 13: 3.313, 14: 3.354, 15: 3.391, 16: 3.426, 17: 3.458, 18: 3.489, 19: 3.517, 20: 3.544}
@@ -47,10 +48,14 @@ def main():
     a = ap.parse_args()
     out = ROOT / a.tag; out.mkdir(parents=True, exist_ok=True)
     df = load(a.tag)
-    cols = ["mcc", "acc", "f1", "auc", "brier", "viol_test", "viol_domain", "vars_violated_domain", "scr_legacy", "n_star", "time_s"]
+    cols = [c for c in ["mcc", "acc", "f1", "auc", "brier", "viol_test", "viol_domain", "vars_violated_domain",
+                        "certified", "scr_legacy", "n_star", "time_s"] if c in df]
     g = df.groupby(["dataset", "label"])[cols]
     summ = g.mean().round(4).join(g.std().round(4), rsuffix="_std")
-    summ.to_csv(out / "summary.csv"); print(summ[["mcc", "mcc_std", "viol_domain", "n_star"]].to_string())
+    summ.to_csv(out / "summary.csv")
+    print(summ[[c for c in ["mcc", "mcc_std", "viol_domain", "certified", "n_star", "time_s"] if c in summ]].to_string())
+    if "cert_status" in df:
+        df.groupby(["dataset", "label"])["cert_status"].value_counts().unstack(fill_value=0).to_csv(out / "certification.csv")
 
     # ---- Friedman over datasets on mean metric
     piv = df.groupby(["dataset", "label"])[a.metric].mean().unstack()

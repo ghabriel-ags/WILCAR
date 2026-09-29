@@ -19,6 +19,7 @@ from sklearn.model_selection import StratifiedKFold, StratifiedShuffleSplit
 from sklearn.preprocessing import MinMaxScaler
 
 from .methods import Model, Cfg
+from .mono_baselines import MONO_BASELINES, fit as mono_fit
 
 
 # ============================================================================ metrics
@@ -77,7 +78,10 @@ def select_holdout(make, Xtr, ytr, Xva, yva):
     """Constructive loop on (Xtr, ytr); stopping and n* by validation MCC."""
     m = make(); m.start(Xtr, ytr); An = m.anchors(Xtr) if m.constrained else None
     best, best_n, wait, prev, curve = -np.inf, None, 0, None, []
+    t0 = time.time()
     for n in range(1, m.max_neurons + 1):
+        if m.cfg.time_budget and time.time() - t0 > m.cfg.time_budget:
+            curve.append((n, "budget")); break
         state, info = m.step(n, Xtr, ytr, prev, An)
         prev = state                        # keeps shapes consistent for weight reuse
         if not info["feasible"]:
@@ -104,7 +108,10 @@ def select_dcv(make, X, y, k_in, seed):
         m = make(); m.start(X[tr], y[tr]); models.append(m)
         anchors.append(m.anchors(X[tr]) if m.constrained else None)
     best, best_n, wait, curve = np.inf, None, 0, []
+    t0 = time.time()
     for n in range(1, models[0].max_neurons + 1):
+        if models[0].cfg.time_budget and time.time() - t0 > models[0].cfg.time_budget:
+            curve.append((n, "budget")); break
         J, ok = 0.0, True
         for f, (tr, va) in enumerate(folds):
             state, info = models[f].step(n, X[tr], y[tr], prevs[f], anchors[f])
@@ -129,7 +136,13 @@ def refit(make, n_star, X, y):
     for n in sizes:
         state, info = m.step(n, X, y, prev, An)
         prev = state
-    return m, prev, n_star, info["feasible"]
+    cert = {}
+    if m.base != "ELM":                     # sound certificate on [0,1]^p (cegis: with repair)
+        if len(m.idx):
+            prev, cert = m.certify_and_repair(prev, n_star, X, y, An)
+    elif m.constrained and m._aligned:
+        cert = {"cert_status": "by_construction"}
+    return m, prev, n_star, info["feasible"], cert
 
 
 # ============================================================================ baselines
@@ -181,6 +194,8 @@ def baseline(name, signals, Xtr, ytr, Xva, yva, seed):
             return lambda Z: clf.predict_proba(Z)[:, 1]
         nl, ne = max(grid, key=lambda g: score(fit(Xtr, ytr, *g)))
         return fit(Xall, yall, nl, ne), {"num_leaves": nl, "n_estimators": ne}
+    if name in MONO_BASELINES:
+        return mono_fit(name, s, Xtr, ytr, Xva, yva, seed)
     if name == "MLP":
         from sklearn.neural_network import MLPClassifier
         grid = [1, 2, 4, 8, 16, 32, 64]
@@ -193,23 +208,26 @@ def baseline(name, signals, Xtr, ytr, Xva, yva, seed):
     raise ValueError(name)
 
 
-BASELINES = ("LR", "LR-C", "XGB", "XGB-C", "LGBM", "LGBM-C", "MLP")
+BASELINES = ("LR", "LR-C", "XGB", "XGB-C", "LGBM", "LGBM-C", "MLP") + MONO_BASELINES
 
 
-# ============================================================================ one outer fold
-def run_fold(X, y, signals, method, selection, rep, fold, k_out=5, k_in=4, cfg: Cfg | None = None):
+# ============================================================================ evaluation
+CERTIFIED_BY_CONSTRUCTION = {"LR-C", "XGB-C", "LGBM-C", "MINMAX", "CMNN", "LMN"}
+
+
+def evaluate(Xtr_raw, ytr, Xte_raw, yte, signals, method, selection, seed, k_in=4, cfg: Cfg | None = None):
+    """Scale on the training part, select, refit, evaluate once on the test part."""
     cfg = cfg or Cfg()
-    skf = StratifiedKFold(k_out, shuffle=True, random_state=rep)
-    tr, te = list(skf.split(X, y))[fold]
-    sc = MinMaxScaler().fit(X[tr])                     # scaler fitted on the outer training set only
-    Xtr, Xte, ytr, yte = sc.transform(X[tr]), sc.transform(X[te]), y[tr], y[te]
-    seed = 1000 * rep + fold
+    sc = MinMaxScaler().fit(Xtr_raw)                   # scaler fitted on the training part only
+    Xtr, Xte = sc.transform(Xtr_raw), sc.transform(Xte_raw)
     t0 = time.time()
-    extra = {}
+    extra, cert = {}, {}
     if method in BASELINES:
         itr, iva = next(StratifiedShuffleSplit(1, test_size=0.2, random_state=seed).split(Xtr, ytr))
         f, extra = baseline(method, signals, Xtr[itr], ytr[itr], Xtr[iva], ytr[iva], seed)
         n_star, feasible = None, True
+        if method in CERTIFIED_BY_CONSTRUCTION and any(signals):
+            cert = {"cert_status": "by_construction"}
     else:
         make = lambda: Model(method, signals, cfg, seed)
         if selection == "dcv":
@@ -217,12 +235,22 @@ def run_fold(X, y, signals, method, selection, rep, fold, k_out=5, k_in=4, cfg: 
         else:
             itr, iva = next(StratifiedShuffleSplit(1, test_size=0.2, random_state=seed).split(Xtr, ytr))
             n_star, curve = select_holdout(make, Xtr[itr], ytr[itr], Xtr[iva], ytr[iva])
-        m, state, n_star, feasible = refit(make, n_star, Xtr, ytr)
+        m, state, n_star, feasible, cert = refit(make, n_star, Xtr, ytr)
         f = lambda Z: m.predict(state, Z, n_star)
-        extra = {"curve_len": len(curve)}
+        extra = {"curve_len": len(curve), "budget_hit": any(c[1] == "budget" for c in curve)}
     prob = f(Xte)
+    st = cert.get("cert_status", "none")
     row = {"method": method, "selection": selection if method not in BASELINES else "holdout",
-           "rep": rep, "fold": fold, "n_star": n_star, "feasible": feasible,
-           "time_s": time.time() - t0, **cls_metrics(yte, prob),
-           **monotonicity(f, signals, Xte, seed=seed), **extra}
+           "n_star": n_star, "feasible": feasible, "time_s": time.time() - t0,
+           **cls_metrics(yte, prob), **monotonicity(f, signals, Xte, seed=seed),
+           "certified": {"certified": 1.0, "by_construction": 1.0, "counterexample": 0.0}.get(st, float("nan")),
+           **cert, **extra}
+    row["cert_status"] = st
     return row
+
+
+def run_fold(X, y, signals, method, selection, rep, fold, k_out=5, k_in=4, cfg: Cfg | None = None):
+    skf = StratifiedKFold(k_out, shuffle=True, random_state=rep)
+    tr, te = list(skf.split(X, y))[fold]
+    row = evaluate(X[tr], y[tr], X[te], y[te], signals, method, selection, 1000 * rep + fold, k_in, cfg)
+    return {**row, "rep": rep, "fold": fold}
