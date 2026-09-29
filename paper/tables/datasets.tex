@@ -1,4 +1,4 @@
-\begin{table}[t]\centering\small
+\begin{table}[!tbp]\centering\small
 \caption{Datasets. $n$: samples used for cross-validation; $p$: inputs; constrained: inputs with a prescribed gain sign $s_i\neq0$ (constraint ratio); positive: share of the positive class. The last three are the monotonicity benchmarks of \citet{Liu2020,Sivaraman2020,Runje2023}, with their preprocessing and monotone features.}
 \label{tab:datasets}
 \resizebox{\textwidth}{!}{\begin{tabular}{llllrrr}\toprule
@@ -10,7 +10,7 @@ HF & Heart failure records \citet{Ahmad2017} & Cardiology & 299 & 12 & 7 (58\%) 
 PIM & Pima Indians diabetes \citet{Smith1988} & Endocrinology & 768 & 8 & 6 (75\%) & 34.9 \\
 HD & Heart disease (Cleveland) \citet{Detrano1989} & Cardiology & 303 & 13 & 2 (15\%) & 27.4 \\
 COM & COMPAS recidivism \citet{Dressel2018} & Criminal justice & 6172 & 13 & 4 (31\%) & 45.5 \\
-LOAN & Loan defaulter \citet{Liu2020} & Credit risk & -- & -- & -- & -- \\
+LOAN & Loan defaulter \citet{Liu2020} & Credit risk & 20000\textsuperscript{a} & 28 & 5 (18\%) & \pend \\
 \bottomrule\end{tabular}}
-\par\smallskip\footnotesize $^{a}$Stratified subsample of the 20\,000 rows used for cross-validation (the full official split is used in Section~\ref{sec:lit}).
+\par\smallskip\footnotesize \textsuperscript{a}Stratified subsample of 20\,000 rows, used for cross-validation because of the cost of the constructive SLSQP fits (Section~\ref{sec:lit} keeps the official test set whole).
 \end{table}

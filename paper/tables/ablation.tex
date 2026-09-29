@@ -1,9 +1,9 @@
-\begin{table}[t]\centering\small
-\caption{Ablations on the five original datasets: test MCC averaged over datasets (constrained variants in the dissertation's mean-gain mode). H: hold-out selection; DCV: dynamic cross-validation.}
+\begin{table}[!tbp]\centering\small
+\caption{Ablations on the five original datasets: test MCC averaged over datasets (constrained variants with the average-gain constraint). H: hold-out selection; DCV: dynamic cross-validation. A superscript gives the number of datasets averaged when fewer than five are complete; ``--'': not run yet.}
 \label{tab:ablation}
 \resizebox{\textwidth}{!}{\begin{tabular}{lcccccc}\toprule
 Setting & WILCAR (H) & WILCAR (DCV) & RIXM (H) & RIXM (DCV) & WILCAR-C (H) & RIXM-C (H) \\\midrule
-L-BFGS, $\lambda_0=0.3$ (default) & 0.930 & 0.926 & 0.919 & -- & 0.911 & 0.920 \\
+L-BFGS, $\lambda_0=0.3$ (default) & 0.930\textsuperscript{3} & 0.926\textsuperscript{3} & 0.919\textsuperscript{2} & -- & 0.911\textsuperscript{3} & 0.920\textsuperscript{2} \\
 L-BFGS, $\lambda_0=0$ & -- & -- & -- & -- & -- & -- \\
 gradient descent, $\lambda_0=0$ (dissertation) & -- & -- & -- & -- & -- & -- \\
 new unit starts at $v_{n}=0$ & -- & -- & -- & -- & -- & -- \\

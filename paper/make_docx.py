@@ -285,6 +285,23 @@ def reference_doc(path):
     d.save(str(path))
 
 
+_FONT = None
+
+
+def _text_pt(txt):
+    """Width in points of txt set in a Times-metric serif at 10 pt (Liberation Serif); heuristic fallback."""
+    global _FONT
+    if _FONT is None:
+        try:
+            from PIL import ImageFont
+            _FONT = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf", 100)
+        except Exception:
+            _FONT = False
+    if _FONT:
+        return _FONT.getlength(txt) / 10
+    return 5.0 * len(txt)
+
+
 def finish(path):
     """Line numbers (continuous), page numbers, table font."""
     import docx
@@ -313,34 +330,66 @@ def finish(path):
         (jc.addprevious(sup) if jc is not None else ppr.append(sup))
         fld = OxmlElement("w:fldSimple"); fld.set(qn("w:instr"), "PAGE")
         r = OxmlElement("w:r"); t = OxmlElement("w:t"); t.text = "1"; r.append(t); fld.append(r); p._p.append(fld)
-    # tables: full text width (16 cm = 9072 dxa), fixed layout, column widths proportional to the longest word/entry
-    TOTAL = 9072
+    # table captions stay with their table
+    import re as _re
+    for para in d.paragraphs:
+        if _re.match(r"Table \d+\.", para.text.strip()):
+            para.paragraph_format.keep_with_next = True
+    # tables: full text width (16 cm = 9072 dxa), fixed layout, narrow cell margins; column widths from the longest entry
+    # (up to 16 characters) or word, and a font size (10 -> 7 pt) small enough for the widest table to fit without
+    # breaking words
+    from docx.shared import Pt
+    TOTAL, MAR = 9072, 40
     for tbl in d.tables:
         t = tbl._tbl; pr = t.tblPr
         ncol = max(len(r.cells) for r in tbl.rows)
-        need = [0] * ncol
+        need = [0.0] * ncol                                   # widths in points at 10 pt
         for r in tbl.rows:
-            for k, c in enumerate(r.cells[:ncol]):
-                txt = c.text.strip()
-                longest = max([len(w) for w in txt.split()] + [0])
-                need[k] = max(need[k], min(len(txt), 28), longest + 2)
-        need = [max(n, 6) for n in need]
-        widths = [int(TOTAL * n / sum(need)) for n in need]
-        for old in pr.findall(qn("w:tblW")) + pr.findall(qn("w:tblLayout")):
+            cells = r.cells[:ncol]
+            if len({id(c._tc) for c in cells}) == 1 and ncol > 1:      # merged group-title row: no width demand
+                continue
+            for k, c in enumerate(cells):
+                txt = " ".join(c.text.split())
+                words = txt.split() or [""]
+                short = txt if len(txt) <= 30 else max(words, key=_text_pt)
+                need[k] = max(need[k], _text_pt(short), max(_text_pt(w) for w in words))
+        need = [max(n, 12.0) for n in need]
+        size = 10.0
+        while size > 7 and sum(n * size / 10 * 20 * 1.04 + 2 * MAR for n in need) > TOTAL:
+            size -= 0.5
+        base = [n * size / 10 * 20 * 1.04 + 2 * MAR for n in need]
+        extra = max(TOTAL - sum(base), 0)
+        widths = [int(b + extra * b / sum(base)) for b in base]
+        for old in pr.findall(qn("w:tblW")) + pr.findall(qn("w:tblLayout")) + pr.findall(qn("w:tblCellMar")):
             pr.remove(old)
         w = OxmlElement("w:tblW"); w.set(qn("w:w"), str(TOTAL)); w.set(qn("w:type"), "dxa"); pr.append(w)
         lay = OxmlElement("w:tblLayout"); lay.set(qn("w:type"), "fixed"); pr.append(lay)
+        mar = OxmlElement("w:tblCellMar")
+        for side in ("left", "right"):
+            e = OxmlElement(f"w:{side}"); e.set(qn("w:w"), str(MAR)); e.set(qn("w:type"), "dxa"); mar.append(e)
+        pr.append(mar)
         grid = t.find(qn("w:tblGrid"))
         if grid is not None:
             for gc, wd in zip(grid.findall(qn("w:gridCol")), widths):
                 gc.set(qn("w:w"), str(wd))
         for r in tbl.rows:
+            seen = set()
             for c, wd in zip(r.cells, widths):
+                if id(c._tc) in seen:
+                    continue
+                seen.add(id(c._tc))
                 tcpr = c._tc.get_or_add_tcPr()
                 tcw = tcpr.find(qn("w:tcW"))
                 if tcw is None:
                     tcw = OxmlElement("w:tcW"); tcpr.append(tcw)
-                tcw.set(qn("w:type"), "dxa"); tcw.set(qn("w:w"), str(wd))
+                span = tcpr.find(qn("w:gridSpan"))
+                k0 = [id(x._tc) for x in r.cells].index(id(c._tc))
+                nspan = int(span.get(qn("w:val"))) if span is not None else 1
+                tcw.set(qn("w:type"), "dxa"); tcw.set(qn("w:w"), str(sum(widths[k0:k0 + nspan])))
+                for para in c.paragraphs:
+                    para.paragraph_format.keep_with_next = r._tr is not tbl.rows[-1]._tr   # keep the table on one page
+                    for run in para.runs:
+                        run.font.size = Pt(size)
     d.save(str(path))
     _xml_fixes(path)
 

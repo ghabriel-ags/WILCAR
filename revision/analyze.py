@@ -118,7 +118,7 @@ def main():
         ax.set_xlim(0.8, k + 0.5); ax.set_ylim(-(k + 1), 1.2); ax.set_yticks([]); ax.set_xlabel(f"average rank ({a.metric.upper()})")
         for s in ("left", "right", "top"):
             ax.spines[s].set_visible(False)
-        fig.tight_layout(); fig.savefig(out / "cd_diagram.png", dpi=200)
+        fig.tight_layout(); fig.savefig(out / "cd_diagram.png", dpi=200); fig.savefig(out / "cd_diagram.pdf")
     except Exception as e:
         print("CD diagram skipped:", e)
 

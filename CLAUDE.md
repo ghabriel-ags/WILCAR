@@ -74,6 +74,9 @@ LaTeX (elsarticle, Neural Networks style) in `paper/`: `main.tex`, `refs.bib`, t
 `python paper/make_tables.py` from `results/revision/<tag>/summary.csv` (placeholders until the tags exist).
 Build: `python paper/make_tables.py && cd paper && latexmk -pdf main.tex && python make_docx.py` (Word copy for co-authors:
 algorithms/tables as images, equations native). Red `[TODO: ...]` / `[pending]` markers must all be gone before submission.
+`make_tables.py` also writes the CD diagram `paper/figures/fig_cd.pdf` (one representative per family, Nemenyi) once ≥ 6
+datasets are complete for all of them; before that the figure is a placeholder. Floats are kept inside their section
+(`placeins`); the Word copy uses native tables sized from the text width (7–10 pt).
 
 ## Analysis to produce when runs finish
 * Table: MCC / AUC / Brier mean ± sd per dataset × method (main + cegis + global), certified %, viol_domain, n*, time.

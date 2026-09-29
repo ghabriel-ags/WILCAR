@@ -9,6 +9,9 @@
 \usepackage[capitalise,nameinlink]{cleveref}
 \usepackage{lineno}
 \usepackage{float}
+\usepackage[section]{placeins}   % floats stay within their section
+\renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.8}\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.75}\setcounter{topnumber}{3}\setcounter{totalnumber}{5}
 
 \newtheorem{definition}{Definition}
 \newtheorem{lemma}{Lemma}
@@ -27,6 +30,9 @@
 \providecommand{\MeanCertified}{\pend}
 \providecommand{\FreeViolDomain}{\pend}
 
+% no "Preprint submitted to" footer on the title page (it collides with the author footnotes under lineno)
+\makeatletter\def\ps@pprintTitle{\let\@oddhead\@empty\let\@evenhead\@empty\def\@oddfoot{\hfil\thepage\hfil}\let\@evenfoot\@oddfoot}\makeatother
+\emergencystretch=1.5em
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\B}{\mathcal{B}}
 \newcommand{\I}{\mathcal{I}}
@@ -39,7 +45,6 @@
 \journal{Neural Networks}
 
 \begin{document}
-\linenumbers
 
 \begin{frontmatter}
 
@@ -58,27 +63,26 @@
 \begin{abstract}
 The probability of the positive class is often known to increase or decrease with some inputs. We study
 single-hidden-layer networks grown one hidden unit at a time under such \emph{partial} monotonicity requirements and
-ask for models that are monotone on the whole input domain, not only on the training data. The gains
-$\partial p/\partial x_i$ and their weight gradients are written in closed form and imposed as constraints of a
-sequential quadratic program at every constructive step. Earlier work constrained the sign of the average gain, the
-global effect of each input; we extend it to point-wise monotonicity on the whole domain. We show that sign constraints
-on the weights, which guarantee monotonicity, fail on simple monotone targets with one hidden layer, and that
-single-hidden-layer networks monotone on the domain are universal approximators of continuous partially monotone
-functions. To find them, point-wise constraints are imposed at anchors that grow with
-the violations found by an adversarial search, and the result is checked by a sound branch-and-bound certificate based
-on interval global optimisation, exact in pre-activation space; the returned network is always certified. Model size
-is selected by dynamic cross-validation. On synthetic targets with a known probability, certified networks are as
-accurate as unconstrained ones and markedly better than sign-constrained ones. On eight datasets, including the COMPAS,
-Heart Disease and Loan Defaulter benchmarks, under nested cross-validation against sixteen methods including Min-Max,
-Constrained Monotonic and Lipschitz Monotonic networks, \todo{one-sentence result after the campaign}.
+ask for models that are monotone on the whole input domain, not only on the training data. Earlier work constrained the
+sign of the average gain, the global effect of each input; we extend it to point-wise monotonicity, with closed-form
+gains imposed as constraints of a sequential quadratic program at every constructive step. We show that sign constraints on the weights, which guarantee monotonicity, fail on simple
+monotone targets, whereas single-hidden-layer networks monotone on the domain are universal approximators of continuous
+partially monotone functions. To find them, point-wise constraints are imposed at anchors that grow with the violations
+found by an adversarial search, and a sound branch-and-bound certificate, exact in pre-activation space, checks the
+result; the returned network is always certified. Model size is selected by
+dynamic cross-validation. On synthetic targets with a known probability and on eight datasets, including the COMPAS,
+Heart Disease and Loan Defaulter benchmarks, and under nested cross-validation against sixteen
+alternatives, including Min-Max, Constrained Monotonic and Lipschitz Monotonic networks,
+\todo{one-sentence result after the campaign}.
 \end{abstract}
 
 \begin{keyword}
-Monotonic neural networks \sep Partial monotonicity \sep Constructive neural networks \sep Formal verification \sep
-Counterexample-guided learning \sep Cross-validation
+Partial monotonicity \sep Constructive neural networks \sep Formal verification \sep
+Counterexample-guided learning \sep Dynamic cross-validation
 \end{keyword}
 
 \end{frontmatter}
+\linenumbers
 
 % =====================================================================================================
 \section{Introduction}\label{sec:intro}
@@ -324,7 +328,7 @@ that, for a single hidden layer, the failure of the sign parametrisation is not 
 networks that are monotone on the domain are as expressive as unconstrained ones, and the margin makes the certificate
 complete for them. The remaining question is how to find them.
 
-\begin{figure}[t]\centering
+\begin{figure}[!tbp]\centering
 \IfFileExists{figures/fig_surfaces.pdf}{\includegraphics[width=\textwidth]{figures/fig_surfaces.pdf}}{\fbox{figure \pend}}
 \caption{Why sign constraints fail and certified networks do not, on the synthetic ``and'' target
 $P(Y=1\mid x)=\sig(12(\min\{x_1,x_2\}-0.45))$, increasing in both inputs (2000 samples; SLFNs with eight hidden units,
@@ -339,7 +343,7 @@ sign constraint keeps every unit in the quadrant. (f) The cegis network uses two
 in one input --- whose combination sharpens the corner while the network as a whole stays monotone.}\label{fig:surfaces}
 \end{figure}
 
-\begin{figure}[t]\centering
+\begin{figure}[!tbp]\centering
 \IfFileExists{figures/fig_capacity.pdf}{\includegraphics[width=0.9\textwidth]{figures/fig_capacity.pdf}}{\fbox{figure \pend}}
 \caption{Error against the true probability as a function of the number of hidden units $n$ (log scale), for
 the ``and'' target of \cref{fig:surfaces} and the ``wave'' target $\sig(6(x_1+x_2)-6+1.5\sin(3(x_1-x_2)))$, which has no
@@ -378,7 +382,20 @@ The network returned by the cegis mode is $s$-monotone on $\B$.
 
 Either \cref{alg:bb} certified it (\cref{thm:sound}) or it satisfies \eqref{eq:sign} exactly (\cref{prop:sign}). We
 report how often the fallback is used; in the experiments it measures how much of the flexibility of \cref{thm:ua} the
-procedure actually reaches.
+procedure actually reaches. \Cref{tab:modes} summarises the four constraint families and the unconstrained reference.
+
+\begin{table}[!tbp]\centering\small
+\caption{Constraint families compared. ``Where'' is the set on which the gain condition is imposed; ``guarantee'' is
+what holds on the whole domain $\B$ for the network returned.}\label{tab:modes}
+\resizebox{\textwidth}{!}{\begin{tabular}{lllll}\toprule
+Mode & Condition imposed & Where & Guarantee on $\B$ & Hidden units \\\midrule
+none & --- & --- & none & free \\
+mean \citep{Sa2026} & average gain $\ge\varepsilon_m$, \eqref{eq:mean} & training inputs, on average & sign of the global effect & free \\
+anchor & gain $\ge\varepsilon_p$, \eqref{eq:point} & $k$-means anchors & none between anchors & free \\
+sign & $s_iv_jW_{ji}\ge0$, \eqref{eq:sign} & weights & monotone (\cref{prop:sign}) & each monotone \\
+cegis & gain $\ge\varepsilon_p$ + certificate & anchors grown by counterexamples & monotone (\cref{prop:always}) & free \\
+\bottomrule\end{tabular}}
+\end{table}
 
 \begin{algorithm}[t]
 \caption{Constructive step $n$ in the cegis mode.}\label{alg:cegis}
@@ -417,8 +434,11 @@ $[\underline{e}_j,\overline{e}_j]$ the range of $\sig''$ on $[\alpha_j,\beta_j]$
 $\partial h/\partial x_d=\sum_j c_jW_{jd}\sig''(z_j)$ are enclosed on $Q$ by intervals $[G^-_d,G^+_d]$ obtained by
 interval arithmetic, and
 \begin{equation}\label{eq:lbx}
-L(Q)=\max\Bigl\{\sum_{c_j\ge0}c_j\underline{d}_j+\sum_{c_j<0}c_j\overline{d}_j,\ \ h(m)-\sum_{d=1}^{p}r_d\max\{|G^-_d|,|G^+_d|\}\Bigr\}
-\le\min_{x\in Q}h(x).
+\begin{aligned}
+L(Q)&=\max\Bigl\{\sum_{c_j\ge0}c_j\underline{d}_j+\sum_{c_j<0}c_j\overline{d}_j,\ \
+h(m)-\sum_{d=1}^{p}r_d\max\{|G^-_d|,|G^+_d|\}\Bigr\}\\
+&\le\min_{x\in Q}h(x).
+\end{aligned}
 \end{equation}
 The first term is the natural interval extension, the second the mean-value form, which becomes tight as boxes shrink
 \citep{Moore2009}. Before bounding, the \emph{monotonicity test} of interval global optimisation
@@ -583,11 +603,16 @@ task per core.
 % =====================================================================================================
 \section{Results}\label{sec:results}
 
+\todo{Draft status (29 Sep 2026): real-data results complete for ALG and BCO (unconstrained, mean-constrained and baseline
+methods) and partial for BCD; the cegis, sign and anchor runs, the remaining datasets, the official-split runs and the
+ablations are running. Tables are generated from the result files and fill in automatically; the text of this section
+describes only what is already available.}
+
 \subsection{Synthetic targets with a known probability}\label{sec:synth}
 \IfFileExists{tables/synthetic.tex}{\input{tables/synthetic.tex}}{}
-\todo{Describe \cref{tab:synth}: cegis matches the unconstrained networks on the error against the true probability and
-is always certified; the sign constraint stalls on the and/or/and3/andneg targets; the mean constraint is accurate but
-leaves counterexamples; CMNN/LMN/Min-Max for reference.}
+\todo{Pending: synthetic runs with the cegis and sign constraints. To report: error of cegis vs.\ unconstrained and
+sign-constrained networks per target, certification rate, and the structural baselines (Min-Max is favoured by the
+min/max targets).}
 
 \subsection{Predictive performance on real data}\label{sec:perf}
 \IfFileExists{tables/main_mcc.tex}{\input{tables/main_mcc.tex}}{}
@@ -605,9 +630,9 @@ an average gain of at least $\varepsilon_m=0.05$, the value used in the regressi
 of the 27 correlated cell-nucleus measurements to carry a sizeable effect of its own. The anchor and cegis constraints
 ask only for the sign ($\varepsilon_p=10^{-3}$).
 
-\begin{figure}[t]\centering
-\IfFileExists{../results/revision/main/cd_diagram.pdf}{\includegraphics[width=0.8\textwidth]{../results/revision/main/cd_diagram.pdf}}{\fbox{\parbox{0.8\textwidth}{\centering\vspace{2em}critical-difference diagram \pend\vspace{2em}}}}
-\caption{Average MCC ranks over the eight datasets and Nemenyi critical difference ($\alpha=0.05$).}\label{fig:cd}
+\begin{figure}[!tbp]\centering
+\IfFileExists{figures/fig_cd.pdf}{\includegraphics[width=0.85\textwidth]{figures/fig_cd.pdf}}{\fbox{\parbox{0.8\textwidth}{\centering\vspace{2em}critical-difference diagram \pend\vspace{2em}}}}
+\caption{Critical-difference diagram \citep{Demsar2006}: average MCC ranks over the eight datasets of one representative per family (\cref{tab:main_mcc}; lower is better). Methods joined by a thick bar are not significantly different (Nemenyi test, $\alpha=0.05$).}\label{fig:cd}
 \end{figure}
 
 \subsection{Monotonicity and certification}\label{sec:cert}
@@ -638,8 +663,8 @@ of \cref{prop:always}.
 
 \subsection{Comparison with published results}\label{sec:lit}
 \IfFileExists{tables/literature.tex}{\input{tables/literature.tex}}{}
-\todo{Describe \cref{tab:lit}. Published numbers are the mean of the best five of ten runs with tuned hyper-parameters;
-ours are all five seeds.}
+\todo{Pending: runs on the official splits. Note for the text: published numbers are the mean of the best five of ten
+runs; ours average all five seeds.}
 
 \subsection{Ablations}\label{sec:ablation}
 \IfFileExists{tables/ablation.tex}{\input{tables/ablation.tex}}{}
@@ -847,11 +872,15 @@ wave & $6(x_1+x_2)-6+1.5\sin\bigl(3(x_1-x_2)\bigr)$ & $(+,+)$ \\
 \bottomrule\end{tabular}
 \end{table}
 
+\section{Additional results}\label{app:more}
+\IfFileExists{tables/main_auc.tex}{\input{tables/main_auc.tex}}{}
+\IfFileExists{tables/main_brier.tex}{\input{tables/main_brier.tex}}{}
+
 \section{Hyper-parameter grids}\label{app:hyper}
 \begin{table}[H]\centering\small
 \caption{Hyper-parameter grids of the baselines.}\label{tab:hyper}
-\begin{tabular}{ll}\toprule
-Method & Grid (selected on the validation split) \\\midrule
+\begin{tabular}{@{}lp{0.66\textwidth}@{}}\toprule
+Method & Grid (selected by validation MCC; the chosen model is refitted on training + validation) \\\midrule
 LR, LR-C & $L_2$ penalty $\in\{10^{-4},10^{-3},10^{-2},10^{-1}\}$; LR-C: coefficient signs bounded by $s$ \\
 XGB(-C) & depth $\in\{2,3,4\}$, trees $\in\{100,300\}$, learning rate 0.05, subsample 0.9 \\
 LGBM(-C) & leaves $\in\{4,8,16\}$, trees $\in\{100,300\}$, learning rate 0.05, subsample 0.9 \\
@@ -859,8 +888,7 @@ MLP & one hidden layer of $\{1,2,4,\dots,64\}$ logistic units \\
 Min-Max & $K$ groups of $K$ hyperplanes, $K\in\{2,4,8\}$ \\
 CMNN & width $\in\{8,16,32\}$, two monotone layers, ELU-based activations \\
 LMN & width $\in\{16,32\}$, Lipschitz constant $\lambda\in\{2,8,32\}$, GroupSort \\
-Min-Max, CMNN, LMN & Adam, learning rate $5\times10^{-3}$, batch 256, early stopping \\
- & (patience 50, at most 1000 epochs) \\
+Min-Max, CMNN, LMN & Adam, learning rate $5\times10^{-3}$, batch 256, early stopping on the validation split (patience 50, at most 1000 epochs); refit for the selected number of epochs \\
 \bottomrule\end{tabular}
 \end{table}
 
