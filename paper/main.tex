@@ -482,7 +482,11 @@ input, a version with a decreasing input, an ``or'' target (maximum instead of m
 $\sin\bigl(3(x_1-x_2)\bigr)$. The minimum and maximum targets favour Min-Max networks, whose functional form is a maximum
 of minima of hyperplanes; the product and wave targets do not. Each
 data set has 2000 uniform inputs with Bernoulli labels. Because the probability is known, the error of $p_\theta$
-against it is measured on $2\times10^4$ uniform points, which isolates approximation from label noise.
+against it is measured on $2\times10^4$ uniform points, which isolates approximation from label noise. Since the
+question here is what each constrained class can represent, every constructive step of every SLFN --- free or
+constrained --- keeps the best of three initialisations by training objective; a single start often ends in a poor basin
+(on the ``or'' target, an error of 0.111 instead of 0.023 for the unconstrained network), which would confound the
+comparison. On the real data a single initialisation is used, as is usual.
 
 \emph{Real data.} \Cref{tab:datasets} lists the eight datasets. The first five come from the UCI repository; their
 signal vectors, derived from domain knowledge, are given in \ref{app:signals}. The last three are the classification
