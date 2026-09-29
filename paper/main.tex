@@ -287,9 +287,21 @@ The sign constraint pays for its guarantee with expressiveness: every hidden uni
 direction, in every constrained input. A single hidden layer of such units cannot approximate every monotone function
 \citep{DanielsVelikova2010,Gupta2016}. \Cref{fig:surfaces} shows a concrete case: the target
 $P(Y=1\mid x)=\sig\bigl(12(\min\{x_1,x_2\}-0.45)\bigr)$, increasing in both inputs, has an L-shaped decision boundary
-that sums of sigmoids of non-negative combinations of $x_1$ and $x_2$ approximate poorly: the error of the
-sign-constrained network stops decreasing after a few units, while that of the unconstrained network keeps falling
-(\cref{fig:capacity}). The obstruction lies in the parametrisation, not in the single hidden layer:
+with a sharp corner at $(0.45,0.45)$ (panel a). Under the sign constraint every hidden unit is a sigmoid ridge that
+increases in both inputs, so the logit is a sum of such ridges and its level sets bend smoothly: the fitted boundary is
+a rounded hyperbola that cuts the corner (panel c), and the error is three times that of the unconstrained network.
+Panel (e) shows why: each arrow is a hidden unit, drawn as $v_jw_j$, the direction and strength with which it moves the
+logit; the sign constraint confines every arrow to the grey quadrant, and the network in fact relies on essentially two
+units, one per input, i.e.\ an additive model. The unconstrained network (panel b) forms the corner, but in two regions --- a
+band in the upper left, where $P\approx0$, and a small area on the right --- increasing an input lowers the
+probability; the violations are small in size, sit where the data give little information, and cannot be seen in the
+accuracy, which is why they need a certificate to be ruled out. The cegis network (panels d and f) forms the corner and
+is certified: two of its units point out of the quadrant, one in the direction of $x_2-x_1$ and one of $x_1-x_2$, so
+that each on its own is decreasing in one input; together they act like the term $-|x_1-x_2|$ in
+$\min\{x_1,x_2\}=\tfrac12(x_1+x_2-|x_1-x_2|)$, which is what sharpens the corner, while the other units keep every gain
+positive. \Cref{fig:capacity} repeats the comparison over the number of hidden units: with the sign constraint the
+error stops decreasing after two units on both targets, whereas the cegis networks follow the unconstrained ones and
+remain certified. The obstruction lies in the parametrisation, not in the single hidden layer:
 
 \begin{theorem}[Universal approximation with a certificate margin]\label{thm:ua}
 Let $f:\B\to(0,1)$ be continuous and $s$-monotone on $\B$. For every $\varepsilon>0$ there is an SLFN \eqref{eq:slfn}
@@ -306,18 +318,33 @@ complete for them. The remaining question is how to find them.
 
 \begin{figure}[t]\centering
 \IfFileExists{figures/fig_surfaces.pdf}{\includegraphics[width=\textwidth]{figures/fig_surfaces.pdf}}{\fbox{figure \pend}}
-\caption{Synthetic target increasing in both inputs (left) and SLFNs with eight hidden units trained on 2000 samples.
-Shades: $P(Y=1\mid x)$ from 0 (white) to 1 (black); black line: decision boundary; red, hatched: region where a gain
-has the wrong sign. The unconstrained network is accurate but not monotone; the sign-constrained network is certified but
-cannot form the corner; the network trained with counterexample-guided constraints is both.}\label{fig:surfaces}
+\caption{Why sign constraints fail and certified networks do not, on the synthetic ``and'' target
+$P(Y=1\mid x)=\sig(12(\min\{x_1,x_2\}-0.45))$, increasing in both inputs (2000 samples; SLFNs with eight hidden units,
+same data and initialisation seed). Top row: grey levels give $P(Y=1\mid x)$ in steps of 0.1 (white 0, black 1); the
+black line is the decision boundary $P=0.5$; the red hatched regions are where some gain has the wrong sign. The titles
+give the mean absolute error against the true probability on $2\times10^4$ uniform points and the outcome of
+\cref{alg:bb}. (a) True probability. (b) Unconstrained network: accurate, but not monotone. (c) Sign-constrained
+network: certified, but the boundary cannot turn the corner. (d) Counterexample-guided (cegis) network: accurate and
+certified. Bottom row: hidden units of (c) and (d), one arrow per unit, drawn as $v_jw_j$ (the effect of unit $j$ on
+the logit per unit change of each input); the grey quadrant contains the units that increase in both inputs. (e) The
+sign constraint keeps every unit in the quadrant. (f) The cegis network uses two units that leave it --- each decreasing
+in one input --- whose combination sharpens the corner while the network as a whole stays monotone.}\label{fig:surfaces}
 \end{figure}
 
 \begin{figure}[t]\centering
 \IfFileExists{figures/fig_capacity.pdf}{\includegraphics[width=0.9\textwidth]{figures/fig_capacity.pdf}}{\fbox{figure \pend}}
-\caption{Mean absolute error against the true probability as a function of the number of hidden units, for the
-``and'' and ``wave'' targets (\ref{app:signals}; 2000 samples, fixed size; RIXM initialisation, best of three
-initialisations by training loss). Filled markers: networks
-certified monotone on $[0,1]^2$; open markers: networks with a counterexample.}\label{fig:capacity}
+\caption{Error against the true probability as a function of the number of hidden units $n$ (log scale), for
+the ``and'' target of \cref{fig:surfaces} and the ``wave'' target $\sig(6(x_1+x_2)-6+1.5\sin(3(x_1-x_2)))$, which has no
+min/max structure (\ref{app:signals}). Each point is one network of fixed size trained on the same 2000 samples (no
+model selection), the best of three initialisations by training objective, evaluated on $2\times10^4$ uniform points.
+Grey circles: unconstrained; blue squares: sign constraints; red triangles: cegis. Filled markers: network certified
+monotone on $[0,1]^2$ by \cref{alg:bb}; open markers: \cref{alg:bb} found a counterexample. With one unit all three
+coincide (a single ridge is monotone or not by itself). With the sign constraint the error stops decreasing after two
+units (at about 0.066 and 0.045), because additional units in the quadrant of \cref{fig:surfaces}(e) cannot represent the corner
+of ``and'' or the oblique ridge $\sin(3(x_1-x_2))$ of ``wave''. The cegis networks keep improving and are certified at
+every size: on ``wave'' they coincide with the unconstrained ones, which are themselves monotone at every size except $n=2$; on
+``and'' they settle about 0.005 above the unconstrained networks, which are not monotone from two units on --- the price of excluding the
+wrong-sign regions of \cref{fig:surfaces}(b).}\label{fig:capacity}
 \end{figure}
 
 \subsection{Counterexample-guided constraints}\label{sec:cegis}
