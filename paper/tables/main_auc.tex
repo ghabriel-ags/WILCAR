@@ -3,24 +3,27 @@
 \label{tab:main_auc}
 \resizebox{\textwidth}{!}{\begin{tabular}{lccccccccc}\toprule
 Method & ALG & BCO & BCD & HF & PIM & HD & COM & LOAN & Rank \\\midrule
+WILCAR-C$^{\star}$ (DCV-1SE) & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
 WILCAR-C$^{\star}$ (DCV) & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
 WILCAR-C$^{\star}$ & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
 RIXM-C$^{\star}$ & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
 \midrule
-WILCAR-C (mean) & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-WILCAR (DCV) & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-WILCAR & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-RIXM & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+WILCAR-C (mean) & 0.992\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.979\,{\scriptsize(0.06)} & -- & -- & -- & -- & -- & -- \\
+WILCAR-C (mean, DCV) & 0.992\,{\scriptsize(0.01)} & \textbf{0.996\,{\scriptsize(0.00)}} & -- & -- & -- & -- & -- & -- & -- \\
+WILCAR (DCV-1SE) & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+WILCAR (DCV) & 0.992\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & \textbf{0.994\,{\scriptsize(0.01)}} & -- & -- & -- & -- & -- & -- \\
+WILCAR & 0.993\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & -- & -- & -- & -- & -- & -- \\
+RIXM & 0.993\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & -- \\
 \midrule
-ELM & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+ELM & 0.972\,{\scriptsize(0.02)} & 0.993\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & -- \\
 \midrule
-MLP & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-LR-C & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-XGB-C & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-LGBM-C & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-Min-Max & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-CMNN & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-LMN & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+MLP & 0.979\,{\scriptsize(0.02)} & 0.995\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & -- \\
+LR-C & 0.995\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & -- \\
+XGB-C & \textbf{0.998\,{\scriptsize(0.00)}} & 0.993\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & -- \\
+LGBM-C & 0.998\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & -- \\
+Min-Max & 0.990\,{\scriptsize(0.01)} & 0.994\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & -- \\
+CMNN & 0.994\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & -- \\
+LMN & 0.986\,{\scriptsize(0.02)} & 0.995\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & -- \\
 \bottomrule\end{tabular}}
-\par\smallskip\footnotesize\textit{Pending runs: cegis, main}.
+\par\smallskip\footnotesize\textit{Pending runs: cegis}.
 \end{table*}

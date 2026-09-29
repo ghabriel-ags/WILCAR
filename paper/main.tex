@@ -484,6 +484,12 @@ is a stratified 80/20 hold-out split with the validation MCC as criterion. DCV a
 the MCC because the MCC is piecewise constant in the weights and its sum over folds changes in jumps, which makes the
 patience rule erratic; the hold-out split, with a single curve, uses the classification metric directly.
 
+Under the prior of \eqref{eq:loss} additional units rarely hurt the validation loss, so $J(n)$ is often flat beyond a
+few units and its minimiser can lie far out on the plateau (\cref{sec:cost}). We therefore also apply the
+one-standard-error rule \citep{Breiman1984,Hastie2009}: with $L_k(n)$ the validation loss of fold $k$, the size
+$n^\ast_{1\mathrm{SE}}$ is the smallest $n$ with $J(n)\le J(n^\ast)+\sqrt K\,\mathrm{sd}_k\bigl(L_k(n^\ast)\bigr)$, the
+standard error of $J$ at the minimum. Both choices come from the same run and are reported as DCV and DCV-1SE.
+
 \begin{algorithm}[t]
 \caption{Dynamic cross-validation (DCV) inside a training set $T$.}\label{alg:dcv}
 \begin{algorithmic}[1]
@@ -491,10 +497,11 @@ patience rule erratic; the hold-out split, with a single curve, uses the classif
 \State $J^\ast\gets\infty$, $w\gets0$
 \For{$n=1,2,\dots,n_{\max}$}
   \For{$k=1,\dots,K$} \State $M_k\gets$ constructive step $n$ of $M_k$ on $T_k^{\mathrm{tr}}$ (warm start from $M_k$ at $n-1$ if the method reuses weights) \EndFor
-  \State $J(n)\gets\sum_k \mathrm{BCE}\bigl(M_k;T_k^{\mathrm{va}}\bigr)$ \ ($J(n)=\infty$ if some $M_k$ is infeasible)
+  \State $L_k(n)\gets\mathrm{BCE}\bigl(M_k;T_k^{\mathrm{va}}\bigr)$, $J(n)\gets\sum_k L_k(n)$ \ ($J(n)=\infty$ if some $M_k$ is infeasible)
   \If{$J(n)<J^\ast$} $J^\ast\gets J(n)$, $n^\ast\gets n$, $w\gets0$ \Else\ $w\gets w+1$; \textbf{if} $w=$ patience \textbf{break} \EndIf
 \EndFor
-\State \Return network retrained on $T$ with $n^\ast$ units
+\State $n^\ast_{1\mathrm{SE}}\gets\min\{n: J(n)\le J^\ast+\sqrt K\,\mathrm{sd}_k(L_k(n^\ast))\}$ \Comment{one-standard-error rule}
+\State \Return networks retrained on $T$ with $n^\ast$ (DCV) and $n^\ast_{1\mathrm{SE}}$ (DCV-1SE) units
 \end{algorithmic}
 \end{algorithm}
 
@@ -576,9 +583,18 @@ leaves counterexamples; CMNN/LMN/Min-Max for reference.}
 
 \subsection{Predictive performance on real data}\label{sec:perf}
 \IfFileExists{tables/main_mcc.tex}{\input{tables/main_mcc.tex}}{}
-\todo{Describe \cref{tab:main_mcc}: Friedman/Iman--Davenport result, CD diagram (\cref{fig:cd}), where the certified
-networks rank relative to the free SLFNs and to CMNN/LMN/Min-Max/XGB-C/LGBM-C; AUC and Brier tables in the supplementary
-material.}
+\todo{Partial results: the nested cross-validation is complete for ALG and BCO and partial for BCD; the cegis runs,
+the other datasets, the Friedman analysis and \cref{fig:cd} are pending. Revise this subsection when they finish.}
+On the two complete datasets, constraining the networks costs nothing measurable. WILCAR-C and WILCAR differ by
+$+0.0001$ MCC on ALG and $+0.0045$ on BCO (Wilcoxon signed-rank $p=0.81$ and $0.06$; corrected resampled $t$-test
+$p=0.99$ and $0.53$), RIXM-C and RIXM by $-0.001$ and $+0.004$, and on BCO the constrained single-hidden-layer networks
+have the highest MCC of all sixteen methods (0.936, against 0.935 for LightGBM and 0.925--0.932 for Min-Max, CMNN and
+LMN). On ALG gradient-boosted trees are ahead of every neural model (XGBoost 0.967; SLFNs 0.90--0.91, CMNN 0.937,
+Min-Max 0.911, LMN 0.894), and monotone constraints change little for them. The one clear loss so far is caused by the
+mean-gain constraint of our earlier work on BCD, where 27 of the 30 inputs are constrained: WILCAR-C falls to 0.891
+against 0.953 for WILCAR (Wilcoxon $p_{\mathrm{Holm}}=0.01$; corrected $t$-test $p=0.35$). Requiring an average gain of
+at least $\varepsilon_m=0.05$ forces each of the 27 inputs to have a sizeable effect, which is a stronger assumption than
+monotonicity; the anchor and cegis constraints ask only for the sign ($\varepsilon_p=10^{-3}$).
 
 \begin{figure}[t]\centering
 \IfFileExists{../results/revision/main/cd_diagram.pdf}{\includegraphics[width=0.8\textwidth]{../results/revision/main/cd_diagram.pdf}}{\fbox{\parbox{0.8\textwidth}{\centering\vspace{2em}critical-difference diagram \pend\vspace{2em}}}}
@@ -587,10 +603,16 @@ material.}
 
 \subsection{Monotonicity and certification}\label{sec:cert}
 \IfFileExists{tables/certification.tex}{\input{tables/certification.tex}}{}
-\todo{Describe \cref{tab:cert}: violations of free networks (\FreeViolDomain{} of domain points), residual
-violations and certification rate of the mean mode (\MeanCertified{}), anchor mode, sign mode, and cegis (certified by the
-branch and bound in \CegisBB{} of the cases, fallback in \CegisFallback{}); counterexample rounds, anchors, certificate
-time.}
+Unconstrained networks contradict the prescribed signs often, even when they are tiny. On ALG the hold-out selection
+chooses a single hidden unit in almost every fold, and yet 23 of the 25 networks are not monotone: one unit fixes the sign
+of every gain, and with strongly correlated fire-weather indices the fit gives one or two of the nine constrained inputs
+the wrong sign everywhere (14\% of the (point, input) pairs of the domain). On BCD all 25 unconstrained WILCAR networks
+have counterexamples, with 17--18\% of wrong-sign pairs; on BCO 2 of 25 do. The one-hidden-layer MLP, with its own
+hyper-parameter grid, shows the same picture (11\% and 2\% of wrong-sign pairs on ALG and BCO). Networks trained with the
+mean-gain constraint are certified in every fold of ALG and BCO, where the selected networks are small, but not on BCD
+(one fold of 23 has a counterexample): the constraint helps, but guarantees nothing. \todo{Complete with
+\cref{tab:cert} once the anchor, sign and cegis runs finish: certification by branch and bound (\CegisBB{}) and by the
+fallback (\CegisFallback{}), counterexample rounds, anchors and certificate time.}
 
 \IfFileExists{tables/cert_bench.tex}{\input{tables/cert_bench.tex}}{}
 \Cref{tab:certbench} isolates the certificate. Unconstrained networks are usually not monotone (counterexamples in
@@ -615,8 +637,15 @@ WILCAR appears superior; with L-BFGS the gap closes; (ii) prior precision $\lamb
 new unit; (iv) DCV without weight reuse.}
 
 \subsection{Model size and cost}\label{sec:cost}
-\todo{$n^\ast$ by method and selection; time per outer fold; WILCAR vs RIXM cost (warm start); cost of cegis rounds and
-of the certificate.}
+\IfFileExists{tables/size.tex}{\input{tables/size.tex}}{}
+Hold-out selection chooses one or two hidden units on the three datasets processed so far (\cref{tab:size}), for both
+unconstrained and constrained networks. DCV with the plain minimum chooses much larger networks --- 150, 19 and 71 units
+for WILCAR on ALG, BCO and BCD --- without any gain in MCC (0.897, 0.929 and 0.952, against 0.907, 0.931 and 0.953 with the
+hold-out split): under the prior, the summed validation loss is almost flat once a few units are present, so its
+minimiser is poorly determined. This observation motivated the one-standard-error variant of \cref{sec:dcv}, whose results
+are \pend. With weight reuse the constructive path is cheap: WILCAR needs about one second per outer fold with the hold-out
+split, RIXM about three. The constrained networks (mean mode) cost 5--7 seconds per fold on ALG and BCO with the hold-out split and 1--2 minutes
+with DCV, but 870 seconds per fold on BCD with the hold-out split, where each SLSQP step handles 27 constrained inputs. \todo{cost of cegis rounds and of the certificate.}
 
 % =====================================================================================================
 \section{Discussion}\label{sec:discussion}

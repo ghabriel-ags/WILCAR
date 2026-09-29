@@ -160,3 +160,12 @@ def test_cegis_fallback_always_certified():
     th2, info = m.certify_and_repair(th, 8, X, y, An, rounds=0)
     assert info["cert_status"] == "certified"
     assert certify.certify(th2, 8, 2, s)[0] == "certified"
+
+def test_dcv_one_se_rule():
+    from revision.methods import Model, Cfg
+    from revision.protocol import select_dcv
+    X = rng.random((240, 3)); y = ((X[:, 0] + X[:, 1] + 0.3 * rng.normal(size=240)) > 1).astype(float)
+    make = lambda: Model("WILCAR", [1, 1, 0], Cfg(max_neurons=12, patience=4), seed=0)
+    n_min, n_1se, curve = select_dcv(make, X, y, 3, 0, one_se=True)
+    J = dict((n, v) for n, v in curve if isinstance(v, float))
+    assert 1 <= n_1se <= n_min and J[n_1se] >= J[n_min]

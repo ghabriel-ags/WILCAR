@@ -22,17 +22,20 @@ def task(ds, method, sel, rep, fold, cfg, out):
     try:
         if fold < 0:                     # official train/test split of a benchmark, rep = seed
             (Xtr, ytr), (Xte, yte), s = load(ds, split=True)
-            row = {**evaluate(Xtr, ytr, Xte, yte, s, method, sel, seed=rep, cfg=cfg), "rep": rep, "fold": fold}
+            out_ = evaluate(Xtr, ytr, Xte, yte, s, method, sel, seed=rep, cfg=cfg)
+            row = [{**r, "rep": rep, "fold": fold} for r in out_] if isinstance(out_, list) else {**out_, "rep": rep, "fold": fold}
         else:
             X, y, s = load(ds)
             row = run_fold(X, y, s, method, sel, rep, fold, cfg=cfg,
                            ptrue=true_prob(ds) if ds in SYNTHETIC else None)
-        row["dataset"] = ds
+        for r in (row if isinstance(row, list) else [row]):
+            r["dataset"] = ds
     except Exception as e:  # keep the campaign going; the error is logged
         row = {"dataset": ds, "method": method, "selection": sel, "rep": rep, "fold": fold,
                "error": repr(e), "trace": traceback.format_exc()[-2000:]}
     with open(out, "a") as fh:
-        fh.write(json.dumps(row, default=float) + "\n")
+        for r in (row if isinstance(row, list) else [row]):
+            fh.write(json.dumps(r, default=float) + "\n")
     return row
 
 
@@ -87,11 +90,15 @@ def main():
     for ds in a.datasets:
         for m in a.methods:
             sels = ["holdout"] + (["dcv"] if a.dcv and m in a.dcv_methods else [])
+            # a 'dcv' task writes both the 'dcv' (argmin) and the 'dcv1se' (one-standard-error) rows; runs made before
+            # the 1-SE rule existed get a separate 'dcv1se' task that repeats the selection
             for sel in sels:
                 for rep in range(a.reps):
                     for fold in ([-1] if a.lit else range(a.folds)):
                         if (ds, m, sel, rep, fold) not in done:
                             jobs.append((ds, m, sel, rep, fold))
+                        elif sel == "dcv" and (ds, m, "dcv1se", rep, fold) not in done:
+                            jobs.append((ds, m, "dcv1se", rep, fold))
     (OUT / f"config_{a.tag}.json").write_text(json.dumps({"cfg": asdict(cfg), "args": vars(a)}, indent=1))
     print(f"{len(jobs)} tasks -> {out}  ({a.jobs} workers)")
     t0 = time.time()

@@ -100,32 +100,46 @@ def select_holdout(make, Xtr, ytr, Xva, yva):
     return best_n or 1, curve
 
 
-def select_dcv(make, X, y, k_in, seed):
-    """Dynamic Cross-Validation: one model per inner fold, advanced together; n* = argmin sum of validation BCE."""
+def select_dcv(make, X, y, k_in, seed, one_se=False):
+    """
+    Dynamic Cross-Validation: one model per inner fold, advanced together; n* = argmin of the sum of validation BCE.
+    With one_se=True the function returns (n_min, n_1se, curve): n_1se is the smallest size whose summed loss is within
+    one standard error of the minimum (one-standard-error rule), SE = sqrt(K) * sd of the K fold losses at n_min.
+    """
     folds = list(StratifiedKFold(k_in, shuffle=True, random_state=seed).split(X, y))
     models, prevs, anchors = [], [None] * k_in, []
     for tr, _ in folds:
         m = make(); m.start(X[tr], y[tr]); models.append(m)
         anchors.append(m.anchors(X[tr]) if m.constrained else None)
-    best, best_n, wait, curve = np.inf, None, 0, []
+    best, best_n, wait, curve, fold_losses = np.inf, None, 0, [], []
     t0 = time.time()
     for n in range(1, models[0].max_neurons + 1):
         if models[0].cfg.time_budget and time.time() - t0 > models[0].cfg.time_budget:
             curve.append((n, "budget")); break
-        J, ok = 0.0, True
+        J, ok, Ls = 0.0, True, []
         for f, (tr, va) in enumerate(folds):
             state, info = models[f].step(n, X[tr], y[tr], prevs[f], anchors[f])
             prevs[f] = state
             ok = ok and info["feasible"]
-            J += _bce(y[va], models[f].predict(state, X[va], n))
+            Ls.append(_bce(y[va], models[f].predict(state, X[va], n)))
+            J += Ls[-1]
         curve.append((n, J if ok else None))
+        fold_losses.append((n, Ls if ok else None))
         if ok and J < best:
             best, best_n, wait = J, n, 0
         else:
             wait += 1
             if wait >= models[0].patience:
                 break
-    return best_n or 1, curve
+    n_min = best_n or 1
+    if not one_se:
+        return n_min, curve
+    Lmin = dict(fold_losses).get(n_min)
+    n_1se = n_min
+    if Lmin is not None:
+        thr = best + np.sqrt(len(Lmin)) * np.std(Lmin, ddof=1)
+        n_1se = min(n for n, Ls in fold_losses if Ls is not None and sum(Ls) <= thr)
+    return n_min, n_1se, curve
 
 
 def refit(make, n_star, X, y):
@@ -231,18 +245,36 @@ def evaluate(Xtr_raw, ytr, Xte_raw, yte, signals, method, selection, seed, k_in=
             cert = {"cert_status": "by_construction"}
     else:
         make = lambda: Model(method, signals, cfg, seed)
-        if selection == "dcv":
-            n_star, curve = select_dcv(make, Xtr, ytr, k_in, seed)
+        if selection in ("dcv", "dcv1se"):
+            n_min, n_1se, curve = select_dcv(make, Xtr, ytr, k_in, seed, one_se=True)
+            t_sel = time.time() - t0
+            rows = []
+            for sel_name, n_sel in (("dcv", n_min), ("dcv1se", n_1se)):
+                if selection == "dcv1se" and sel_name == "dcv":
+                    continue                     # completing an older run that already has the 'dcv' row
+                t1 = time.time()
+                m, state, n_star, feasible, cert = refit(make, n_sel, Xtr, ytr)
+                f = lambda Z, m=m, state=state, n_star=n_star: m.predict(state, Z, n_star)
+                extra = {"curve_len": len(curve), "budget_hit": any(c[1] == "budget" for c in curve),
+                         "n_min": n_min, "n_1se": n_1se}
+                rows.append(_row(method, sel_name, n_star, feasible, t_sel + time.time() - t1, f, yte, Xte, signals,
+                                 seed, cert, extra, ptrue, sc, Xtr_raw))
+            return rows if len(rows) > 1 else rows[0]
         else:
             itr, iva = next(StratifiedShuffleSplit(1, test_size=0.2, random_state=seed).split(Xtr, ytr))
             n_star, curve = select_holdout(make, Xtr[itr], ytr[itr], Xtr[iva], ytr[iva])
         m, state, n_star, feasible, cert = refit(make, n_star, Xtr, ytr)
         f = lambda Z: m.predict(state, Z, n_star)
         extra = {"curve_len": len(curve), "budget_hit": any(c[1] == "budget" for c in curve)}
+    return _row(method, selection if method not in BASELINES else "holdout", n_star, feasible, time.time() - t0, f,
+                yte, Xte, signals, seed, cert, extra, ptrue, sc, Xtr_raw)
+
+
+def _row(method, selection, n_star, feasible, time_s, f, yte, Xte, signals, seed, cert, extra, ptrue, sc, Xtr_raw):
     prob = f(Xte)
     st = cert.get("cert_status", "none")
-    row = {"method": method, "selection": selection if method not in BASELINES else "holdout",
-           "n_star": n_star, "feasible": feasible, "time_s": time.time() - t0,
+    row = {"method": method, "selection": selection,
+           "n_star": n_star, "feasible": feasible, "time_s": time_s,
            **cls_metrics(yte, prob), **monotonicity(f, signals, Xte, seed=seed),
            "certified": {"certified": 1.0, "by_construction": 1.0, "counterexample": 0.0}.get(st, float("nan")),
            **cert, **extra}
@@ -258,5 +290,7 @@ def evaluate(Xtr_raw, ytr, Xte_raw, yte, signals, method, selection, seed, k_in=
 def run_fold(X, y, signals, method, selection, rep, fold, k_out=5, k_in=4, cfg: Cfg | None = None, ptrue=None):
     skf = StratifiedKFold(k_out, shuffle=True, random_state=rep)
     tr, te = list(skf.split(X, y))[fold]
-    row = evaluate(X[tr], y[tr], X[te], y[te], signals, method, selection, 1000 * rep + fold, k_in, cfg, ptrue)
-    return {**row, "rep": rep, "fold": fold}
+    out = evaluate(X[tr], y[tr], X[te], y[te], signals, method, selection, 1000 * rep + fold, k_in, cfg, ptrue)
+    if isinstance(out, list):
+        return [{**r, "rep": rep, "fold": fold} for r in out]
+    return {**out, "rep": rep, "fold": fold}

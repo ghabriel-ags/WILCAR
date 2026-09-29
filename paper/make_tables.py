@@ -27,10 +27,13 @@ STAR = r"$^{\star}$"
 
 # (role, method, selection, display) -- rows of the main comparison
 MAIN_ROWS = [
+    ("cegis", "WILCAR-C", "dcv1se", "WILCAR-C" + STAR + " (DCV-1SE)"),
     ("cegis", "WILCAR-C", "dcv", "WILCAR-C" + STAR + " (DCV)"),
     ("cegis", "WILCAR-C", "holdout", "WILCAR-C" + STAR),
     ("cegis", "RIXM-C", "holdout", "RIXM-C" + STAR),
     ("main", "WILCAR-C", "holdout", "WILCAR-C (mean)"),
+    ("main", "WILCAR-C", "dcv", "WILCAR-C (mean, DCV)"),
+    ("main", "WILCAR", "dcv1se", "WILCAR (DCV-1SE)"),
     ("main", "WILCAR", "dcv", "WILCAR (DCV)"),
     ("main", "WILCAR", "holdout", "WILCAR"),
     ("main", "RIXM", "holdout", "RIXM"),
@@ -347,6 +350,32 @@ def table_cert_bench():
         r"\bottomrule\end{tabular}}\end{table}"]))
 
 
+def table_size(dfs):
+    """Selected size n* and time per outer fold (mean), by dataset: hold-out vs DCV vs DCV-1SE."""
+    rows = [("main", "WILCAR", "holdout", "WILCAR, hold-out"), ("main", "WILCAR", "dcv", "WILCAR, DCV"),
+            ("main", "WILCAR", "dcv1se", "WILCAR, DCV-1SE"), ("main", "RIXM", "holdout", "RIXM, hold-out"),
+            ("main", "WILCAR-C", "holdout", "WILCAR-C (mean), hold-out"), ("main", "WILCAR-C", "dcv", "WILCAR-C (mean), DCV"),
+            ("cegis", "WILCAR-C", "holdout", "WILCAR-C" + STAR + ", hold-out"), ("cegis", "WILCAR-C", "dcv", "WILCAR-C" + STAR + ", DCV"),
+            ("cegis", "WILCAR-C", "dcv1se", "WILCAR-C" + STAR + ", DCV-1SE"), ("cegis", "RIXM-C", "holdout", "RIXM-C" + STAR + ", hold-out")]
+    lines = []
+    for role, meth, sel, disp in rows:
+        cells = []
+        for key, _ in DS:
+            m, _s = cell_stats(dfs.get(role), meth, sel, key, "n_star")
+            t, _t = cell_stats(dfs.get(role), meth, sel, key, "time_s")
+            cells.append("--" if m is None else f"{m:.1f}\\,{{\\scriptsize({t:.0f}\\,s)}}")
+        lines.append(disp + " & " + " & ".join(cells) + r" \\")
+    write("size.tex", "\n".join([
+        r"\begin{table*}[t]\centering",
+        r"\caption{Selected number of hidden units $n^\ast$ and, in parentheses, time per outer fold (selection, refit and certificate), "
+        r"means over the outer folds. DCV: size minimising the summed validation cross-entropy; DCV-1SE: smallest size within one "
+        r"standard error of that minimum.}",
+        r"\label{tab:size}",
+        r"\resizebox{\textwidth}{!}{\begin{tabular}{l" + "c" * len(DS) + r"}\toprule",
+        "Method, selection & " + " & ".join(sn for _, sn in DS) + r" \\\midrule",
+        *lines, r"\bottomrule\end{tabular}}\end{table*}"]))
+
+
 def numbers(dfs, M, ranks):
     def mac(name, val):
         return f"\\newcommand{{\\{name}}}{{{val}}}"
@@ -385,6 +414,7 @@ def main():
     table_lit(dfs)
     table_ablation(dfs)
     table_syn(dfs)
+    table_size(dfs)
     table_cert_bench()
     numbers(dfs, M, ranks)
 

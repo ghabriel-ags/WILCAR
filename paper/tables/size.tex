@@ -1,0 +1,16 @@
+\begin{table*}[t]\centering
+\caption{Selected number of hidden units $n^\ast$ and, in parentheses, time per outer fold (selection, refit and certificate), means over the outer folds. DCV: size minimising the summed validation cross-entropy; DCV-1SE: smallest size within one standard error of that minimum.}
+\label{tab:size}
+\resizebox{\textwidth}{!}{\begin{tabular}{lcccccccc}\toprule
+Method, selection & ALG & BCO & BCD & HF & PIM & HD & COM & LOAN \\\midrule
+WILCAR, hold-out & 1.1\,{\scriptsize(1\,s)} & 2.0\,{\scriptsize(1\,s)} & 1.1\,{\scriptsize(1\,s)} & -- & -- & -- & -- & -- \\
+WILCAR, DCV & 149.5\,{\scriptsize(25\,s)} & 18.6\,{\scriptsize(8\,s)} & 71.0\,{\scriptsize(23\,s)} & -- & -- & -- & -- & -- \\
+WILCAR, DCV-1SE & -- & -- & -- & -- & -- & -- & -- & -- \\
+RIXM, hold-out & 1.1\,{\scriptsize(3\,s)} & 2.0\,{\scriptsize(3\,s)} & -- & -- & -- & -- & -- & -- \\
+WILCAR-C (mean), hold-out & 1.0\,{\scriptsize(5\,s)} & 1.7\,{\scriptsize(7\,s)} & 1.7\,{\scriptsize(867\,s)} & -- & -- & -- & -- & -- \\
+WILCAR-C (mean), DCV & 33.6\,{\scriptsize(77\,s)} & 20.6\,{\scriptsize(111\,s)} & -- & -- & -- & -- & -- & -- \\
+WILCAR-C$^{\star}$, hold-out & -- & -- & -- & -- & -- & -- & -- & -- \\
+WILCAR-C$^{\star}$, DCV & -- & -- & -- & -- & -- & -- & -- & -- \\
+WILCAR-C$^{\star}$, DCV-1SE & -- & -- & -- & -- & -- & -- & -- & -- \\
+RIXM-C$^{\star}$, hold-out & -- & -- & -- & -- & -- & -- & -- & -- \\
+\bottomrule\end{tabular}}\end{table*}
