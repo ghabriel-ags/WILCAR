@@ -48,10 +48,12 @@ the 3600 s budget), `tail <tag>.log`. On errors read the `trace` field of the JS
 Constrained training changed (see `revision/README.md`, "Changes of 2026-09-29"): `git pull`, run the tests (12 passed),
 then for every tag already (partly) run: `python -m revision.purge --tag <tag> --methods WILCAR-C RIXM-C ELM-C` and rerun
 the same command (unconstrained methods and baselines are unaffected and are kept). New queue items:
-| 11 | syn | `--syn --dcv --reps 5 --tag syn` | synthetic ground truth, all methods (mean mode) |
-| 12 | syn_cegis | `--syn --methods WILCAR-C RIXM-C --dcv --mode cegis --reps 5 --tag syn_cegis` | |
-| 13 | syn_global | `--syn --methods WILCAR-C RIXM-C --dcv --mode global --reps 5 --tag syn_global` | |
-Priority: 0–3 (main, cegis), then 11–13, then 4–10. Paper figures: `python paper/make_figures.py`.
+| 11 | syn | `--syn --dcv --reps 5 --starts 3 --tag syn` | synthetic ground truth, all methods (mean mode) |
+| 12 | syn_cegis | `--syn --methods WILCAR-C RIXM-C --dcv --mode cegis --reps 5 --starts 3 --tag syn_cegis` | |
+| 13 | syn_global | `--syn --methods WILCAR-C RIXM-C --dcv --mode global --reps 5 --starts 3 --tag syn_global` | |
+| 14 | cert_bench | `python -m revision.cert_bench` (not revision.run; ~10 min) | ablation of the certificate, Table cert_bench; rerun here because COMPAS/Heart Disease must come from the Zenodo files |
+Priority: 0–3 (main, cegis), then 11–14, then 4–10. Synthetic runs use `--starts 3` (best of three initialisations per
+constructive step for every SLFN, free or constrained); real-data runs keep the default `--starts 1`. Paper figures: `python paper/make_figures.py`.
 
 ## Key facts established so far (fast-config pilots, in `revision/README.md`)
 * With L-BFGS + L2 prior (λ₀ = 0.3, penalty λ₀/N) the dissertation's WILCAR > RIXM advantage disappears (it was a GD effect) → WILCAR's argument must be

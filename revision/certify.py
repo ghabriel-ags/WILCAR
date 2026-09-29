@@ -99,7 +99,7 @@ def _d2_range(zl, zu):
     return lo, hi
 
 
-def _box_bounds(l, u, W1, b1, c, absW, K):
+def _box_bounds(l, u, W1, b1, c, absW, K, mv=True):
     """Bounds of h on a batch of boxes: natural interval extension, gradient enclosure, mean-value form."""
     mid, rad = (l + u) / 2, (u - l) / 2
     zc = mid @ W1.T + b1; zr = rad @ absW.T
@@ -110,11 +110,12 @@ def _box_bounds(l, u, W1, b1, c, absW, K):
     t1, t2 = K[None] * lo[:, :, None], K[None] * hi[:, :, None]          # (B, n, p)
     Glo, Ghi = np.minimum(t1, t2).sum(axis=1), np.maximum(t1, t2).sum(axis=1)   # enclosure of dh/dx_d on the box
     hc = _dsig(zc) @ c
-    LB = np.maximum(LB, hc - (np.maximum(np.abs(Glo), np.abs(Ghi)) * rad).sum(axis=1))
+    if mv:
+        LB = np.maximum(LB, hc - (np.maximum(np.abs(Glo), np.abs(Ghi)) * rad).sum(axis=1))
     return LB, hc, mid, Glo, Ghi
 
 
-def _bb_one(W1, b1, c, p, budget, batch=4096):
+def _bb_one(W1, b1, c, p, budget, batch=4096, mv=True, mono=True):
     """
     Input-space branch and bound (interval global optimisation, cf. Hansen & Walster): natural interval extension and
     mean-value form with an enclosure of the gradient; monotonicity test -- if dh/dx_d has a fixed sign on a box, the
@@ -130,11 +131,11 @@ def _bb_one(W1, b1, c, p, budget, batch=4096):
         l, u = L[-take:].copy(), U[-take:].copy(); L, U = L[:-take], U[:-take]
         nodes += take
         # monotonicity test (applied twice: collapsing some coordinates tightens the enclosure of the others)
-        for _ in range(2):
+        for _ in range(2 if mono else 0):
             _, _, _, Glo, Ghi = _box_bounds(l, u, W1, b1, c, absW, K)
             inc, dec = Glo > 0, Ghi < 0                                # h increasing / decreasing in x_d on the box
             u = np.where(inc, l, u); l = np.where(dec, u, l)
-        LB, hc, mid, Glo, Ghi = _box_bounds(l, u, W1, b1, c, absW, K)
+        LB, hc, mid, Glo, Ghi = _box_bounds(l, u, W1, b1, c, absW, K, mv=mv)
         open_ = LB < 0
         if not open_.any():
             continue
@@ -199,13 +200,17 @@ def _bb_z(W1, b1, c, p, max_lp=3000):
     return "certified", None, lps
 
 
-def certify(theta, n, p, signals, budget=200_000):
-    """Sound certificate over [0,1]^p for every constrained input. Returns (status, counterexamples, nodes)."""
+def certify(theta, n, p, signals, budget=200_000, mv=True, mono=True, zspace=True):
+    """
+    Sound certificate over [0,1]^p for every constrained input. Returns (status, counterexamples, nodes).
+    mv / mono / zspace switch off the mean-value form, the monotonicity test and the pre-activation-space search
+    (used only by the ablation in revision/cert_bench.py).
+    """
     W1, b1, idx, C = coefficients(theta, n, p, signals)
     status, cex, total = "certified", [], 0
     for a in range(len(idx)):
-        st, x, nd = _bb_one(W1, b1, C[a], p, budget // 4 if n < p else budget)
-        if st == "unknown" and n < p:
+        st, x, nd = _bb_one(W1, b1, C[a], p, budget // 4 if (n < p and zspace) else budget, mv=mv, mono=mono)
+        if st == "unknown" and n < p and zspace:
             st, x, nd2 = _bb_z(W1, b1, C[a], p); nd += nd2
         total += nd
         if st == "counterexample":

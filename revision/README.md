@@ -100,3 +100,13 @@ See `CLAUDE.md` at the repository root for the experiment queue, decisions and o
 * The certificate holds on [0,1]^p, the training box after min-max scaling; test points outside it are extrapolation.
 * Loan Defaulter is stratified-subsampled to 20 000 rows for cross-validation (constructive SLSQP cost); with `--lit`
   the official test set is kept whole and the training set is subsampled to 20 000.
+
+## Additions of 2026-09-29 (afternoon)
+* `--starts k`: every constructive step of every SLFN (free or constrained) is repeated from k initialisations and the
+  feasible result with the lowest training objective is kept. Used with k = 3 on the synthetic targets, where single
+  starts often land in a poor basin (e.g. MAE 0.111 instead of 0.023 on "or") for free and constrained networks alike;
+  real-data runs keep k = 1.
+* `python -m revision.cert_bench`: ablation of the certificate (interval / + mean value / + monotonicity test /
+  + pre-activation space) on 168 trained SLFNs; soundness cross-checked by dense sampling. Pilot: cegis-step networks
+  decided in 75 / 86 / 89 / 96 % of the cases; 20 % of the mean-constrained networks have counterexamples.
+

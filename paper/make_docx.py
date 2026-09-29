@@ -308,6 +308,9 @@ def finish(path):
             sp.append(ln)
         p = sec.footer.paragraphs[0] if sec.footer.paragraphs else sec.footer.add_paragraph()
         p.alignment = 1
+        ppr = p._p.get_or_add_pPr(); sup = OxmlElement("w:suppressLineNumbers")
+        jc = ppr.find(qn("w:jc"))
+        (jc.addprevious(sup) if jc is not None else ppr.append(sup))
         fld = OxmlElement("w:fldSimple"); fld.set(qn("w:instr"), "PAGE")
         r = OxmlElement("w:r"); t = OxmlElement("w:t"); t.text = "1"; r.append(t); fld.append(r); p._p.append(fld)
     # tables: full text width (16 cm = 9072 dxa), fixed layout, column widths proportional to the longest word/entry

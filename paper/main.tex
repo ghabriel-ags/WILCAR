@@ -220,8 +220,9 @@ when a validation criterion has not improved for a number of steps (the \emph{pa
 $n^\ast$. We study three members of this family and their constrained variants. \emph{WILCAR} \citep{Sa2022,Fontes2021}
 initialises the first unit by linearising the network around the mean input so that it matches the least-squares linear
 model, and \emph{reuses weights}: the network with $n$ units starts from the trained network with $n-1$ units plus one
-new unit, so that successive networks form a continuous path. \emph{RIXM} re-initialises all weights at every size with
-Glorot initialisation \citep{Glorot2010}. \emph{ELM} \citep{Huang2006} draws the hidden layer at random (ReLU units,
+new unit, so that successive networks form a continuous path. \emph{RIXM} re-initialises all weights at every size from
+a zero-mean Gaussian with variance equal to the inverse fan-in, a scaled initialisation of the Xavier family
+\citep{Glorot2010}. \emph{ELM} \citep{Huang2006} draws the hidden layer at random (ReLU units,
 weights and biases uniform in $[-1,1]$) and solves the output layer by least squares. The constrained variants are
 WILCAR-C, RIXM-C and ELM-C.
 
@@ -262,8 +263,8 @@ constraints, where $\A\subset\B$ is a finite set of \emph{anchors}:
 \text{anchor:}\quad & s_i\,g_i(a;\theta)\ \ge\ \varepsilon_{p}, && i\in\I,\ a\in\A, \label{eq:point}\\
 \text{sign:}\quad & c_{ij}=s_i\,v_j\,W_{ji}\ \ge\ 0, && i\in\I,\ j=1,\dots,n. \label{eq:sign}
 \end{align}
-The mean constraint \eqref{eq:mean}, with $\A$ the training inputs, is the constraint of our earlier work
-\citep{Sa2026}. It does not imply monotonicity: an average of $g_i$ can be positive while $g_i$ is negative on a region
+The mean constraint \eqref{eq:mean}, with $\A$ the training inputs (a random subset of 1000 of them when there are more),
+is the constraint of our earlier work \citep{Sa2026}, with the finite-difference gain replaced by the exact one. It does not imply monotonicity: an average of $g_i$ can be positive while $g_i$ is negative on a region
 of positive measure, and a finite-sample average says nothing about $\B\setminus\A$. The anchor constraint
 \eqref{eq:point}, with $k$-means centres as anchors, is stronger but still covers only $\A$. The sign constraint is
 sufficient everywhere:
@@ -298,8 +299,10 @@ $p_\theta$ is $s$-monotone on $\B$ and \cref{alg:bb} certifies it after finitely
 
 The proof (\ref{app:proofs}) smooths $f$ by a monotone mollification, adds a small linear term that creates a strictly
 positive gain margin, and uses the density of SLFNs in $C^1$ \citep{Hornik1991}: an approximation of the logit and of
-its first derivatives preserves the margin. The certified networks are thus as expressive as unconstrained ones, and the
-margin makes the certificate complete for them. The remaining question is how to find them.
+its first derivatives preserves the margin. The argument is elementary once $C^1$ density is available; its point is
+that, for a single hidden layer, the failure of the sign parametrisation is not a limitation of the architecture:
+networks that are monotone on the domain are as expressive as unconstrained ones, and the margin makes the certificate
+complete for them. The remaining question is how to find them.
 
 \begin{figure}[t]\centering
 \IfFileExists{figures/fig_surfaces.pdf}{\includegraphics[width=\textwidth]{figures/fig_surfaces.pdf}}{\fbox{figure \pend}}
@@ -330,8 +333,9 @@ are inherited at size $n+1$; with weight reuse (WILCAR-C) the network they const
 
 After the final refit, \cref{alg:bb} is run; its counterexamples are added to the anchors and the network re-solved
 (\emph{repair}). If the network is still not certified after $R_{\mathrm{rep}}$ repairs, it is projected onto the sign
-constraints --- the products $c_{ij}<0$ are set to zero --- and re-solved by SLSQP under \eqref{eq:sign}
-(\emph{fallback}).
+constraints --- the weights $W_{ji}$ with $c_{ij}<0$ are set to zero --- and re-solved by SLSQP under \eqref{eq:sign}
+from that point; any product that remains negative at the solver tolerance is set to zero again, so that \eqref{eq:sign}
+holds exactly (\emph{fallback}).
 
 \begin{proposition}[Certified output]\label{prop:always}
 The network returned by the cegis mode is $s$-monotone on $\B$.
@@ -426,10 +430,20 @@ many boxes when $N=\infty$.
 
 By \cref{thm:ua}, networks with a positive margin are dense, and for them the search is complete. The only undecided
 case is a minimum exactly at zero, where the network is monotone but touches the boundary; the search then stops at
-the budget with \textsc{unknown}, which the cegis mode treats like a counterexample (repair, then fallback). The
+the budget with \textsc{unknown}, which the cegis mode resolves by the fallback. The
 certificate is exact up to floating-point rounding; directed rounding \citep{Moore2009} would make it rigorous in that
 sense as well. \Cref{thm:sound} holds for any SLFN, so we also certify the networks trained with the mean and anchor
 constraints and the unconstrained ones, which measures how often their monotonicity holds without a guarantee.
+
+\paragraph{Cost}
+Bounding a box costs $O(np)$ operations (the pre-activation intervals, the enclosures of $\sig'$ and $\sig''$ and the
+gradient enclosure), and boxes are processed in vectorised batches. In pre-activation space each box costs one linear
+program with $p$ variables and $2n$ inequalities. The number of boxes is exponential in the dimension of the search
+space in the worst case, as for any complete global method; the practical cost is governed by the margin
+$\min_\B h_i$, since a box is discarded as soon as its radius falls below a multiple of that margin (proof of
+\cref{prop:term}), and by the dimension, which is $\min\{n,p\}$. The certificate is run once per constrained input on
+the final network; its time is reported in \cref{sec:cost}. The quadratic programs of SLSQP, whose cost grows with the
+cube of the number of weights $n(p+2)+1$, are the dominant cost of the constrained methods.
 
 \subsection{Dynamic cross-validation}\label{sec:dcv}
 
@@ -439,7 +453,9 @@ cross-entropies. Growth stops when the criterion has not improved for the patien
 the whole training set with the selected size $n^\ast$ (for WILCAR, along the constructive path $1,\dots,n^\ast$). The
 criterion is informative only if the $K$ curves are smooth functions of $n$, which weight reuse provides and random
 re-initialisation does not; we test this by also running DCV for RIXM (\cref{sec:ablation}). The alternative selection
-is a stratified 80/20 hold-out split with the validation MCC as criterion.
+is a stratified 80/20 hold-out split with the validation MCC as criterion. DCV aggregates the cross-entropy rather than
+the MCC because the MCC is piecewise constant in the weights and its sum over folds changes in jumps, which makes the
+patience rule erratic; the hold-out split, with a single curve, uses the classification metric directly.
 
 \begin{algorithm}[t]
 \caption{Dynamic cross-validation (DCV) inside a training set $T$.}\label{alg:dcv}
@@ -514,7 +530,7 @@ cross-validation folds.
 \subsection{Implementation}
 Everything is implemented in Python with NumPy, SciPy \citep{Virtanen2020} (SLSQP, L-BFGS-B, HiGHS linear programs) and
 scikit-learn \citep{Pedregosa2011}; the monotone baselines use PyTorch and the packages \texttt{mononet} and
-\texttt{monotonicnetworks}. The closed-form gains, their gradients and the certificate are covered by unit tests,
+\texttt{monotonicnetworks}. In the code, the anchor and sign modes are called \texttt{multi} and \texttt{global}. The closed-form gains, their gradients and the certificate are covered by unit tests,
 including soundness checks of the certificate against dense sampling. Experiments ran on a 16-thread workstation, one
 task per core.
 
@@ -544,6 +560,17 @@ material.}
 violations and certification rate of the mean mode (\MeanCertified{}), anchor mode, sign mode, and cegis (certified by the
 branch and bound in \CegisBB{} of the cases, fallback in \CegisFallback{}); counterexample rounds, anchors, certificate
 time.}
+
+\IfFileExists{tables/cert_bench.tex}{\input{tables/cert_bench.tex}}{}
+\Cref{tab:certbench} isolates the certificate. Unconstrained networks are usually not monotone (counterexamples in
+71\% of them) and networks trained with the mean-gain constraint of our earlier work still violate the prescribed signs
+in about one case in five; in both populations every network is decided at once, because violations are large and
+monotone networks have comfortable margins. Networks produced by a cegis step are the hard case: they are monotone
+(dense sampling finds no violation), but by a thin margin, since the anchor constraints hold with
+$\varepsilon_p=10^{-3}$. There each component matters: the natural interval extension decides 75\% of them, the
+mean-value form 86\%, the monotonicity test 89\% and the pre-activation search 96\%, with a median time below a
+millisecond and a 90th percentile of a third of a second. The remaining undecided networks are handled by the fallback
+of \cref{prop:always}.
 
 \subsection{Comparison with published results}\label{sec:lit}
 \IfFileExists{tables/literature.tex}{\input{tables/literature.tex}}{}
@@ -652,7 +679,7 @@ $s_i\bigl(F_\delta(x+te_i)-F_\delta(x)\bigr)=\int\phi_\delta(y)\,s_i\bigl(\tilde
 $s_i\,\partial_iF_\delta\ge0$; by uniform continuity of $\tilde F$ on a neighbourhood of $\B$,
 $\sup_\B|F_\delta-F|\to0$ as $\delta\to0$. \emph{Margin.} Let $\eta>0$ and
 $H=F_\delta+\eta\sum_{i\in\I}s_ix_i$; then $s_i\partial_iH\ge\eta$ on $\B$ for $i\in\I$. \emph{Approximation.} The
-logistic function is bounded, non-constant and in $C^\infty$, so by \citet[Theorem 3]{Hornik1991} functions of the form
+logistic function is non-constant and has bounded derivatives of every order, so by \citet[Theorem 3]{Hornik1991} functions of the form
 $z_o(x)=\sum_jv_j\sig(w_j^\top x+b_j)+c$ are dense in $C^1$ on compact sets: there is $z_o$ with
 $\sup_\B|z_o-H|<\eta$ and $\sup_\B|\partial_iz_o-\partial_iH|<\eta/2$ for $i\in\I$. Hence
 $s_i\partial_iz_o>\eta/2$ on $\B$, and $p_\theta=\sig(z_o)$ has $s_ig_i=\sig'(z_o)s_i\partial_iz_o>0$; by

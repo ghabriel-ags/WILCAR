@@ -45,6 +45,7 @@ def main():
                     help="methods that also get DCV selection (e.g. RIXM RIXM-C to test the weight-reuse claim)")
     ap.add_argument("--all", action="store_true", help="all datasets (incl. benchmarks), methods and DCV")
     ap.add_argument("--syn", action="store_true", help="synthetic ground-truth datasets only")
+    ap.add_argument("--starts", type=int, default=1, help="initialisations per constructive step, all SLFN methods")
     ap.add_argument("--lit", action="store_true", help="benchmarks only, official train/test split, --reps seeds")
     ap.add_argument("--reps", type=int, default=5)
     ap.add_argument("--folds", type=int, default=5)
@@ -68,7 +69,7 @@ def main():
         a.datasets = [d for d in a.datasets if d in BENCHMARKS] or list(BENCHMARKS)
     for d in a.datasets:                 # fail fast (e.g. benchmarks not downloaded)
         load(d)
-    base = dict(constraint_mode=a.mode, zero_out=a.zero_out, optimizer=a.optimizer, elm_bias=not a.elm_no_bias, l2=a.l2,
+    base = dict(constraint_mode=a.mode, zero_out=a.zero_out, optimizer=a.optimizer, elm_bias=not a.elm_no_bias, l2=a.l2, n_starts=a.starts,
                 time_budget=a.time_budget)
     cfg = Cfg(**base)
     if a.fast:

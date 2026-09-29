@@ -311,6 +311,42 @@ def table_syn(dfs):
         *lines, r"\bottomrule\end{tabular}}", note, r"\end{table}"]))
 
 
+def table_cert_bench():
+    f = RES / "cert_bench.jsonl"
+    if not f.exists():
+        return
+    df = pd.DataFrame([json.loads(l) for l in open(f)])
+    kinds = [("free", "unconstrained"), ("mean", "mean constraint"), ("cegis", "cegis step")]
+    variants = [("interval", "natural interval extension"), ("+mv", "+ mean-value form"),
+                ("+mono", "+ monotonicity test"), ("full", "+ pre-activation space")]
+    lines = []
+    for k, kd in kinds:
+        d0 = df[df.kind == k]
+        for v, vd in variants:
+            d = d0[d0.variant == v]
+            if not len(d):
+                continue
+            lines.append(f"{kd if v == 'interval' else ''} & {vd} & {100 * np.mean(d.status == 'certified'):.1f} & "
+                         f"{100 * np.mean(d.status == 'counterexample'):.1f} & {100 * np.mean(d.status == 'unknown'):.1f} & "
+                         f"{1000 * d.time_s.median():.1f} & {1000 * np.percentile(d.time_s, 90):.0f} \\\\")
+        lines.append(r"\midrule")
+    nn = len(df) // len(variants)
+    per = nn // len(kinds)
+    viol = {k: 100 * df[(df.kind == k) & (df.variant == "full")].sampled_violation.mean() for k, _ in kinds}
+    write("cert_bench.tex", "\n".join([
+        r"\begin{table}[t]\centering\small",
+        rf"\caption{{Ablation of the certificate (\cref{{alg:bb}}) on {nn} SLFNs ({per} of each kind: seven real datasets, "
+        r"$n\in\{2,4,8,16\}$, two seeds), with the same budget of $2\times10^5$ boxes. Outcome shares (\%) and time per network "
+        r"(median and 90th percentile, ms). Dense sampling ($5\times10^4$ points) finds violations in "
+        rf"{viol['free']:.0f}\%, {viol['mean']:.0f}\% and {viol['cegis']:.0f}\% of the unconstrained, mean-constrained and cegis networks; "
+        r"no certified network has a sampled violation.}",
+        r"\label{tab:certbench}",
+        r"\resizebox{\textwidth}{!}{\begin{tabular}{llrrrrr}\toprule",
+        r"Networks & Bounds & certified & counterex. & unknown & median & p90 \\\midrule",
+        *(lines[:-1] if lines and lines[-1] == r"\midrule" else lines),
+        r"\bottomrule\end{tabular}}\end{table}"]))
+
+
 def numbers(dfs, M, ranks):
     def mac(name, val):
         return f"\\newcommand{{\\{name}}}{{{val}}}"
@@ -349,6 +385,7 @@ def main():
     table_lit(dfs)
     table_ablation(dfs)
     table_syn(dfs)
+    table_cert_bench()
     numbers(dfs, M, ranks)
 
 

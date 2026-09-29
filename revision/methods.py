@@ -59,6 +59,7 @@ class Cfg:
     lbfgs_maxiter: int = 1000
     l2: float = 0.3                    # Gaussian-prior precision lambda0 on W1, W2 (MAP): mean BCE + (lambda0 / N) ||W||^2,
                                        # same in constrained and unconstrained objectives (= 1e-3 at N = 300)
+    n_starts: int = 1                  # independent initialisations per constructive step (best training objective)
     constrained_init: str = "free"     # first SLSQP start: 'free' = unconstrained L-BFGS optimum from the usual init
                                        # (then projected by SLSQP); 'plain' = the usual init (reuse / random)
     elm_bias: bool = True              # random hidden biases U(-1,1) + output bias (standard ELM); False = dissertation
@@ -291,7 +292,24 @@ class Model:
 
     # ------------------------------------------------------------------ one constructive step
     def step(self, n, X, y, prev=None, An=None):
-        """Return (state, info). state is theta (MLP methods) or dict (ELM)."""
+        """
+        Return (state, info). state is theta (MLP methods) or dict (ELM).
+        With n_starts > 1 the whole step (free fit, projection, counterexample rounds) is repeated from independent
+        initialisations of the new weights and the feasible result with the lowest training objective is kept
+        (identical for constrained and unconstrained methods; anchors found in any start are kept, they are valid).
+        """
+        k = max(1, int(self.cfg.n_starts))
+        if k == 1 or self.base == "ELM":
+            return self._step_once(n, X, y, prev, An)
+        obj, best = self._obj(X, y, n), None
+        for _ in range(k):
+            v, info = self._step_once(n, X, y, prev, An)
+            key = (not info["feasible"], obj(v)[0])
+            if best is None or key < best[0]:
+                best = (key, v, info)
+        return best[1], {**best[2], "starts": k}
+
+    def _step_once(self, n, X, y, prev=None, An=None):
         p = X.shape[1]
         if self.base == "ELM":
             return self._step_elm(n, X, y, An)
