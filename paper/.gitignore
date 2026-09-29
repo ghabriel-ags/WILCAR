@@ -11,3 +11,4 @@ build_docx/
 main_flat.tex
 main.pdf
 main.docx
+*.spl
