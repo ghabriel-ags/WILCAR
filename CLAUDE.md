@@ -79,6 +79,12 @@ algorithms/tables as images, equations native). Red `[TODO: ...]` / `[pending]` 
 datasets are complete for all of them; before that the figure is a placeholder. Floats are kept inside their section
 (`placeins`); the Word copy uses native tables sized from the text width (7–10 pt).
 
+## Pending before the next complete version (read `paper/NOTES_pre_submission.md`)
+Decided 2026-09-29: wait for the campaigns, then address the notes file: chances at NN and risks, Sartor et al. ICML
+2025 (missing SOTA), data-scarcity experiment, rigorous interval re-check of certificates, constructive-argument numbers,
+semi-infinite-programming paragraph, Fig. 1 caption, MCC before/after repair, and the open question of how the NCA
+paper defined the gain constraint (average vs. operating point).
+
 ## Analysis to produce when runs finish
 * Table: MCC / AUC / Brier mean ± sd per dataset × method (main + cegis + global), certified %, viol_domain, n*, time.
 * Friedman + Iman–Davenport + Nemenyi CD diagram over the 8 datasets; Holm vs best; Wilcoxon constrained vs free pairs.
