@@ -56,22 +56,20 @@
   city={Salvador}, state={BA}, country={Brazil}}
 
 \begin{abstract}
-In many classification problems the probability of the positive class is known to increase or decrease with some
-inputs. We study single-hidden-layer networks grown one hidden unit at a time under such \emph{partial} monotonicity
-requirements, and ask for models that are monotone on the whole input domain, not only on the training data. The gains
-$\partial p/\partial x_i$ and their gradients with respect to the weights are written in closed form and imposed as
-inequality constraints of a sequential quadratic program at every constructive step. We show that the average-gain
-constraint used in earlier work does not imply monotonicity, and that the classical sign constraints on the weights,
-which do imply it, cannot represent simple monotone targets with one hidden layer, whereas single-hidden-layer
-networks that are monotone on the domain are universal approximators of continuous partially monotone functions. To
-train such networks we combine point-wise constraints at anchors that grow with the violations found by an adversarial
-search, and a sound branch-and-bound certificate built on interval global optimisation, which becomes exact in
-pre-activation space. The returned network is always certified. Model size is selected by dynamic cross-validation,
-with one model per inner fold grown in lock-step. On synthetic targets with a known probability, the certified networks
-are as accurate as unconstrained ones and markedly better than sign-constrained ones. On eight real datasets, including
-the COMPAS, Heart Disease and Loan Defaulter benchmarks, evaluated by nested cross-validation against sixteen methods
-that include Min-Max, Constrained Monotonic and Lipschitz Monotonic networks, \todo{one-sentence result after the
-campaign}.
+The probability of the positive class is often known to increase or decrease with some inputs. We study
+single-hidden-layer networks grown one hidden unit at a time under such \emph{partial} monotonicity requirements and
+ask for models that are monotone on the whole input domain, not only on the training data. The gains
+$\partial p/\partial x_i$ and their weight gradients are written in closed form and imposed as constraints of a
+sequential quadratic program at every constructive step. We show that the average-gain constraint of earlier work
+does not imply monotonicity; that sign constraints on the weights, which do, fail on simple monotone targets with one
+hidden layer; and that single-hidden-layer networks monotone on the domain are universal approximators of
+continuous partially monotone functions. To find them, point-wise constraints are imposed at anchors that grow with
+the violations found by an adversarial search, and the result is checked by a sound branch-and-bound certificate based
+on interval global optimisation, exact in pre-activation space; the returned network is always certified. Model size
+is selected by dynamic cross-validation. On synthetic targets with a known probability, certified networks are as
+accurate as unconstrained ones and markedly better than sign-constrained ones. On eight datasets, including the COMPAS,
+Heart Disease and Loan Defaulter benchmarks, under nested cross-validation against sixteen methods including Min-Max,
+Constrained Monotonic and Lipschitz Monotonic networks, \todo{one-sentence result after the campaign}.
 \end{abstract}
 
 \begin{keyword}
@@ -107,7 +105,7 @@ covering of the domain \citep{PoloMolina2026cert}.
 answer a different question --- how many hidden units --- by growing the hidden layer until a validation criterion stops
 improving. Combining growth with monotonicity is not immediate. The natural structural choice for a single hidden layer,
 non-negative (sign-constrained) weights, is not universal for monotone functions \citep{DanielsVelikova2010,Gupta2016};
-we show in \cref{sec:expressive} that it fails on a simple two-input target however many units are added. Constraints
+in \cref{sec:expressive} its error on a simple two-input target stops decreasing after a few units. Constraints
 imposed only on the training data, on the other hand, may hold at every size on the data and fail elsewhere. In earlier
 work we imposed \emph{gain-sign} constraints --- on the sign of $\partial\hat y/\partial x_i$ --- on constructive
 networks for regression, through the sign of the average finite-difference gain \citep{Sa2026}; that constraint does not
@@ -288,9 +286,9 @@ The sign constraint pays for its guarantee with expressiveness: every hidden uni
 direction, in every constrained input. A single hidden layer of such units cannot approximate every monotone function
 \citep{DanielsVelikova2010,Gupta2016}. \Cref{fig:surfaces} shows a concrete case: the target
 $P(Y=1\mid x)=\sig\bigl(12(\min\{x_1,x_2\}-0.45)\bigr)$, increasing in both inputs, has an L-shaped decision boundary
-that a sum of sigmoids of non-negative combinations of $x_1$ and $x_2$ cannot bend; the error of the sign-constrained
-network stalls however many units are added (\cref{sec:synth}). The obstruction lies in the parametrisation, not in the
-single hidden layer:
+that sums of sigmoids of non-negative combinations of $x_1$ and $x_2$ approximate poorly: the error of the
+sign-constrained network stops decreasing after a few units, while that of the unconstrained network keeps falling
+(\cref{fig:capacity}). The obstruction lies in the parametrisation, not in the single hidden layer:
 
 \begin{theorem}[Universal approximation with a certificate margin]\label{thm:ua}
 Let $f:\B\to(0,1)$ be continuous and $s$-monotone on $\B$. For every $\varepsilon>0$ there is an SLFN \eqref{eq:slfn}
@@ -311,6 +309,14 @@ has the wrong sign. The unconstrained network is accurate but not monotone; the 
 cannot form the corner; the network trained with counterexample-guided constraints is both.}\label{fig:surfaces}
 \end{figure}
 
+\begin{figure}[t]\centering
+\IfFileExists{figures/fig_capacity.pdf}{\includegraphics[width=0.9\textwidth]{figures/fig_capacity.pdf}}{\fbox{figure \pend}}
+\caption{Mean absolute error against the true probability as a function of the number of hidden units, for the
+``and'' and ``wave'' targets (\ref{app:signals}; 2000 samples, fixed size; RIXM initialisation, best of three
+initialisations by training loss). Filled markers: networks
+certified monotone on $[0,1]^2$; open markers: networks with a counterexample.}\label{fig:capacity}
+\end{figure}
+
 \subsection{Counterexample-guided constraints}\label{sec:cegis}
 
 The \emph{cegis} mode searches the certified class of \cref{thm:ua} directly (\cref{alg:cegis}). At size $n$, the network
@@ -319,8 +325,8 @@ anchor constraints \eqref{eq:point}; starting from the unconstrained optimum avo
 reaches from a random, infeasible start. An adversarial search then minimises $h_i(\,\cdot\,;\theta)$ over $\B$ for each
 $i\in\I$ with a bound-constrained quasi-Newton method \citep{Byrd1995} from several starting points (random points and
 the training points with the smallest $h_i$), using $\nabla_x h_i(x)=\sum_j c_{ij}\,\sig''(z_j(x))\,w_j$. Every point
-with $h_i<0$ becomes an anchor and the network is re-solved from its current weights. With weight reuse (WILCAR-C), the
-anchors found at size $n$ are inherited at size $n+1$.
+with $h_i<0$ becomes an anchor and the network is re-solved from its current weights. The anchors found at size $n$
+are inherited at size $n+1$; with weight reuse (WILCAR-C) the network they constrain is also inherited.
 
 After the final refit, \cref{alg:bb} is run; its counterexamples are added to the anchors and the network re-solved
 (\emph{repair}). If the network is still not certified after $R_{\mathrm{rep}}$ repairs, it is projected onto the sign

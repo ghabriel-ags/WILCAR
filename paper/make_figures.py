@@ -87,6 +87,43 @@ def syn_errors():
     print("wrote fig_syn")
 
 
+def capacity(sizes=(1, 2, 3, 4, 6, 8, 12, 16), seed=0):
+    from revision.data import SYNTHETIC, load
+    from revision.methods import Model, Cfg
+    from revision import certify
+    fig, axs = plt.subplots(1, 2, figsize=(7.0, 2.5))
+    styles = {"unconstrained": ("RIXM", "mean", "tab:gray", "o"), "sign": ("RIXM-C", "global", "tab:blue", "s"),
+              "cegis": ("RIXM-C", "cegis", "tab:red", "^")}
+    for ax, key in zip(axs, ["syn_and", "syn_wave"]):
+        X, y, s = load(key); f = SYNTHETIC[key][2]
+        G = np.random.default_rng(1).random((20000, 2)); pt = f(G)
+        for name, (meth, mode, col, mk) in styles.items():
+            err, cert = [], []
+            for n in sizes:
+                best = None
+                for r in range(3):          # best of three initialisations by the TRAINING objective
+                    m = Model(meth, s, Cfg(constraint_mode=mode, max_reinit=5), seed=seed + 100 * r + n)
+                    An = m.anchors(X) if m.constrained else None
+                    th, _ = m.step(n, X, y, None, An)
+                    if mode == "cegis":
+                        th, _ = m.certify_and_repair(th, n, X, y, An)
+                    J = m._obj(X, y, n)(th)[0]
+                    if best is None or J < best[0]:
+                        best = (J, m, th)
+                _, m, th = best
+                err.append(np.abs(m.predict(th, G, n) - pt).mean())
+                cert.append(certify.certify(th, n, 2, s)[0] == "certified")
+            ax.plot(sizes, err, "-", color=col, lw=1, label=name)
+            for n_, e_, c_ in zip(sizes, err, cert):
+                ax.plot(n_, e_, mk, color=col, ms=4, mfc=col if c_ else "white")
+            print(key, name, np.round(err, 3), cert, flush=True)
+        ax.set_title(key.replace("syn_", "")); ax.set_xlabel("hidden units $n$"); ax.set_xscale("log", base=2)
+        ax.set_xticks(sizes); ax.set_xticklabels([str(v) for v in sizes])
+    axs[0].set_ylabel("MAE vs. true $P(Y=1\\mid x)$"); axs[0].legend(frameon=False, fontsize=7)
+    fig.tight_layout(); fig.savefig(OUT / "fig_capacity.pdf"); fig.savefig(OUT / "fig_capacity.png", dpi=300)
+    print("wrote fig_capacity")
+
+
 if __name__ == "__main__":
+    capacity()
     surfaces()
-    syn_errors()
