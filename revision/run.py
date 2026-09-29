@@ -40,6 +40,8 @@ def main():
     ap.add_argument("--datasets", nargs="*", default=list(ORIGINAL), choices=list(ALL))
     ap.add_argument("--methods", nargs="*", default=list(METHODS) + list(BASELINES))
     ap.add_argument("--dcv", action="store_true", help="also run DCV for WILCAR / WILCAR-C")
+    ap.add_argument("--dcv-methods", nargs="*", default=["WILCAR", "WILCAR-C"],
+                    help="methods that also get DCV selection (e.g. RIXM RIXM-C to test the weight-reuse claim)")
     ap.add_argument("--all", action="store_true", help="all datasets (incl. benchmarks), methods and DCV")
     ap.add_argument("--lit", action="store_true", help="benchmarks only, official train/test split, --reps seeds")
     ap.add_argument("--reps", type=int, default=5)
@@ -79,7 +81,7 @@ def main():
     jobs = []
     for ds in a.datasets:
         for m in a.methods:
-            sels = ["holdout"] + (["dcv"] if a.dcv and m.startswith("WILCAR") else [])
+            sels = ["holdout"] + (["dcv"] if a.dcv and m in a.dcv_methods else [])
             for sel in sels:
                 for rep in range(a.reps):
                     for fold in ([-1] if a.lit else range(a.folds)):
