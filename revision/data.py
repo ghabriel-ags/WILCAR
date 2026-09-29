@@ -33,8 +33,34 @@ BENCHMARKS = {
     "loan": ("loan", [-1, 1, -1, -1, 1] + [0] * 23, 20_000),
 }
 
+# ---------------------------------------------------------------- synthetic ground truth
+# P(Y=1|x) known and s-monotone; "and"-type targets need hidden units that are not monotone individually
+# (a single hidden layer with sign-constrained weights cannot represent them: Daniels & Velikova, 2010).
+def _sig(z):
+    return 1.0 / (1.0 + np.exp(-z))
+
+
+SYNTHETIC = {  # key: (p, signs, P(Y=1|x) on [0,1]^p)
+    "syn_and": (2, [1, 1], lambda X: _sig(12 * (np.minimum(X[:, 0], X[:, 1]) - 0.45))),
+    "syn_or": (2, [1, 1], lambda X: _sig(12 * (np.maximum(X[:, 0], X[:, 1]) - 0.55))),
+    "syn_prod": (2, [1, 1], lambda X: _sig(12 * (X[:, 0] * X[:, 1] - 0.25))),
+    "syn_and3": (3, [1, 1, 1], lambda X: _sig(12 * (X.min(axis=1) - 0.35))),
+    "syn_andfree": (3, [1, 1, 0], lambda X: _sig(12 * (np.minimum(X[:, 0], X[:, 1]) - 0.45)
+                                                 + 1.5 * np.sin(2 * np.pi * X[:, 2]))),
+    "syn_andneg": (2, [1, -1], lambda X: _sig(12 * (np.minimum(X[:, 0], 1 - X[:, 1]) - 0.45))),
+    # smooth, no min/max structure: gains 6 +- 4.5 cos(.) >= 1.5 > 0 in both inputs
+    "syn_wave": (2, [1, 1], lambda X: _sig(6 * (X[:, 0] + X[:, 1]) - 6 + 1.5 * np.sin(3 * (X[:, 0] - X[:, 1])))),
+}
+SYN_N = 2000
+
+
+def true_prob(key):
+    return SYNTHETIC[key][2]
+
+
 ORIGINAL = tuple(DATASETS)
 ALL = ORIGINAL + tuple(BENCHMARKS)
+SYN = tuple(SYNTHETIC)
 
 
 def _bench_frames(name):
@@ -61,6 +87,12 @@ def _bench_xy(df, signs):
 
 
 def load(key, split=False, seed=0):
+    if key in SYNTHETIC:
+        p, signs, f = SYNTHETIC[key]
+        rng = np.random.default_rng(12345)
+        X = rng.random((SYN_N, p))
+        y = (rng.random(SYN_N) < f(X)).astype(int)
+        return X, y, list(signs)
     if key in DATASETS:
         fname, header, signals = DATASETS[key]
         df = pd.read_csv(RAW / fname, sep=";", header=0 if header else None).dropna()

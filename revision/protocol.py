@@ -215,7 +215,8 @@ BASELINES = ("LR", "LR-C", "XGB", "XGB-C", "LGBM", "LGBM-C", "MLP") + MONO_BASEL
 CERTIFIED_BY_CONSTRUCTION = {"LR-C", "XGB-C", "LGBM-C", "MINMAX", "CMNN", "LMN"}
 
 
-def evaluate(Xtr_raw, ytr, Xte_raw, yte, signals, method, selection, seed, k_in=4, cfg: Cfg | None = None):
+def evaluate(Xtr_raw, ytr, Xte_raw, yte, signals, method, selection, seed, k_in=4, cfg: Cfg | None = None,
+             ptrue=None):
     """Scale on the training part, select, refit, evaluate once on the test part."""
     cfg = cfg or Cfg()
     sc = MinMaxScaler().fit(Xtr_raw)                   # scaler fitted on the training part only
@@ -246,11 +247,16 @@ def evaluate(Xtr_raw, ytr, Xte_raw, yte, signals, method, selection, seed, k_in=
            "certified": {"certified": 1.0, "by_construction": 1.0, "counterexample": 0.0}.get(st, float("nan")),
            **cert, **extra}
     row["cert_status"] = st
+    if ptrue is not None:        # synthetic data: error against the true P(Y=1|x) on uniform points of the input box
+        G = np.random.default_rng(99).random((20_000, Xtr_raw.shape[1]))
+        pt, ph = ptrue(G), np.clip(f(sc.transform(G)), 0, 1)
+        row["mae_true"] = float(np.mean(np.abs(ph - pt)))
+        row["rmse_true"] = float(np.sqrt(np.mean((ph - pt) ** 2)))
     return row
 
 
-def run_fold(X, y, signals, method, selection, rep, fold, k_out=5, k_in=4, cfg: Cfg | None = None):
+def run_fold(X, y, signals, method, selection, rep, fold, k_out=5, k_in=4, cfg: Cfg | None = None, ptrue=None):
     skf = StratifiedKFold(k_out, shuffle=True, random_state=rep)
     tr, te = list(skf.split(X, y))[fold]
-    row = evaluate(X[tr], y[tr], X[te], y[te], signals, method, selection, 1000 * rep + fold, k_in, cfg)
+    row = evaluate(X[tr], y[tr], X[te], y[te], signals, method, selection, 1000 * rep + fold, k_in, cfg, ptrue)
     return {**row, "rep": rep, "fold": fold}

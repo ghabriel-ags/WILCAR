@@ -53,11 +53,14 @@ class Cfg:
     time_budget: float = 3600.0        # seconds per constructive selection loop (0 = none)
     max_reinit: int = 100
     slsqp_maxiter: int = 1000
+    feas_tol: float = 1e-6             # constraint violation accepted as feasible (SLSQP ftol is 1e-6)
     zero_out: bool = False             # WILCAR: new neuron's output weight starts at 0
     optimizer: str = "lbfgs"           # unconstrained training: 'lbfgs' (quasi-Newton, like SLSQP) | 'gd' (dissertation)
     lbfgs_maxiter: int = 1000
     l2: float = 0.3                    # Gaussian-prior precision lambda0 on W1, W2 (MAP): mean BCE + (lambda0 / N) ||W||^2,
                                        # same in constrained and unconstrained objectives (= 1e-3 at N = 300)
+    constrained_init: str = "free"     # first SLSQP start: 'free' = unconstrained L-BFGS optimum from the usual init
+                                       # (then projected by SLSQP); 'plain' = the usual init (reuse / random)
     elm_bias: bool = True              # random hidden biases U(-1,1) + output bias (standard ELM); False = dissertation
 
 
@@ -299,7 +302,8 @@ class Model:
             theta = self._fit_free(self._init_theta(n, p, prev), X, y, n)
             return theta, {"feasible": True, "attempts": 1}
         obj = self._obj(X, y, n)
-        v, feasible, attempts = self._solve(n, p, obj, self._anchor_set(An), prev)
+        warm = self._fit_free(self._init_theta(n, p, prev), X, y, n) if self.cfg.constrained_init == "free" else None
+        v, feasible, attempts = self._solve(n, p, obj, self._anchor_set(An), prev, warm=warm)
         info = {"feasible": feasible, "attempts": attempts}
         if self.cegis and feasible:
             v, info = self._cegis_loop(v, n, p, obj, An, prev, info, X)
@@ -315,7 +319,7 @@ class Model:
             viol = max(0.0, -cfun(v).min())
             if viol < best_viol:
                 best, best_viol = v, viol
-            if viol <= 1e-8:
+            if viol <= self.cfg.feas_tol:
                 return v, True, a + 1
         return best, False, self.cfg.max_reinit
 
@@ -335,8 +339,13 @@ class Model:
             v = v2
         return v, {**info, "cegis_rounds": rounds, "n_anchors": len(self._anchor_set(An))}
 
-    def certify_and_repair(self, v, n, X, y, An, rounds=5):
-        """Final sound check (branch-and-bound); counterexamples are added as anchors and the model re-solved."""
+    def certify_and_repair(self, v, n, X, y, An, rounds=20):
+        """
+        Final sound check (branch-and-bound). In the cegis mode, counterexamples are added as anchors and the model is
+        re-solved (repair); if the network is still not certified, the method falls back to the sign-constrained
+        problem at the same size, warm-started at the projection of the current weights onto the sign constraints
+        (the offending products c_ij < 0 are zeroed). The returned network is therefore always certified.
+        """
         from . import certify
         p = X.shape[1]
         status, cex, nodes = certify.certify(v, n, p, self.s, budget=self.cfg.bb_budget)
@@ -351,7 +360,39 @@ class Model:
                     v, _ = self._cegis_loop(v, n, p, obj, An, None, {"feasible": True}, X)
                 status, cex, nd = certify.certify(v, n, p, self.s, budget=self.cfg.bb_budget)
                 nodes += nd
-        return v, {"cert_status": status, "cert_nodes": nodes, "cert_repairs": r}
+            if status != "certified":
+                v = self._sign_fallback(v, n, p, obj)
+                status2, _, nd = certify.certify(v, n, p, self.s, budget=self.cfg.bb_budget)
+                nodes += nd
+                return v, {"cert_status": status2, "cert_nodes": nodes, "cert_repairs": r, "cert_fallback": status}
+        return v, {"cert_status": status, "cert_nodes": nodes, "cert_repairs": r, "cert_fallback": ""}
+
+    def _sign_fallback(self, v, n, p, obj):
+        """Sign-constrained re-solve warm-started at the projection of v onto {c_ij >= 0}."""
+        W1, b1, W2, b2 = sfnn.unpack(v.copy(), n, p)
+        bad = (self.s[None, :] * W2[:, None] * W1) < 0          # (n, p); only constrained inputs can be negative
+        W1 = np.where(bad, 0.0, W1)
+        warm = sfnn.pack(W1, b1, W2, b2)
+        cons, cfun = self._global_constraints(n, p)
+        best, best_viol = None, np.inf
+        for a in range(self.cfg.max_reinit):
+            v0 = warm if a == 0 else sfnn.pack(*self._aligned_init(n, p))
+            v2 = self._slsqp(obj, v0, cons)
+            viol = max(0.0, -cfun(v2).min())
+            if viol < best_viol:
+                best, best_viol = v2, viol
+            if viol <= 1e-10:
+                break
+        # exact feasibility: zero any residual (numerically) negative products
+        W1, b1, W2, b2 = sfnn.unpack(best.copy(), n, p)
+        W1 = np.where((self.s[None, :] * W2[:, None] * W1) < 0, 0.0, W1)
+        return sfnn.pack(W1, b1, W2, b2)
+
+    def _aligned_init(self, n, p):
+        W1 = self.rng.normal(size=(n, p)) * np.sqrt(1.0 / p)
+        W2 = self.rng.normal(size=n) * np.sqrt(1.0 / n)
+        W1, W2 = self._align(W1, W2)
+        return W1, np.zeros(n), W2, 0.0
 
     def _step_elm(self, n, X, y, An):
         p = X.shape[1]
@@ -377,7 +418,7 @@ class Model:
                 return {"Win": Win, "b": b, "beta": beta, "linear": False}, {"feasible": True, "attempts": 1}
             cons, cfun = self._constraints(An, n, elm=(Win, b))
             beta = self._slsqp(obj, beta0, cons)
-            if -cfun(beta).min() <= 1e-8:
+            if -cfun(beta).min() <= self.cfg.feas_tol:
                 return {"Win": Win, "b": b, "beta": beta, "linear": False}, {"feasible": True, "attempts": a + 1}
         return {"Win": Win, "b": b, "beta": beta, "linear": False}, {"feasible": False, "attempts": self.cfg.max_reinit}
 

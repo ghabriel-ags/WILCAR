@@ -11,7 +11,7 @@ from dataclasses import asdict
 from pathlib import Path
 from joblib import Parallel, delayed
 
-from .data import ORIGINAL, ALL, BENCHMARKS, load
+from .data import ORIGINAL, ALL, BENCHMARKS, SYN, SYNTHETIC, load, true_prob
 from .methods import METHODS, Cfg
 from .protocol import run_fold, evaluate, BASELINES
 
@@ -25,7 +25,8 @@ def task(ds, method, sel, rep, fold, cfg, out):
             row = {**evaluate(Xtr, ytr, Xte, yte, s, method, sel, seed=rep, cfg=cfg), "rep": rep, "fold": fold}
         else:
             X, y, s = load(ds)
-            row = run_fold(X, y, s, method, sel, rep, fold, cfg=cfg)
+            row = run_fold(X, y, s, method, sel, rep, fold, cfg=cfg,
+                           ptrue=true_prob(ds) if ds in SYNTHETIC else None)
         row["dataset"] = ds
     except Exception as e:  # keep the campaign going; the error is logged
         row = {"dataset": ds, "method": method, "selection": sel, "rep": rep, "fold": fold,
@@ -37,12 +38,13 @@ def task(ds, method, sel, rep, fold, cfg, out):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--datasets", nargs="*", default=list(ORIGINAL), choices=list(ALL))
+    ap.add_argument("--datasets", nargs="*", default=list(ORIGINAL), choices=list(ALL) + list(SYN))
     ap.add_argument("--methods", nargs="*", default=list(METHODS) + list(BASELINES))
     ap.add_argument("--dcv", action="store_true", help="also run DCV for WILCAR / WILCAR-C")
     ap.add_argument("--dcv-methods", nargs="*", default=["WILCAR", "WILCAR-C"],
                     help="methods that also get DCV selection (e.g. RIXM RIXM-C to test the weight-reuse claim)")
     ap.add_argument("--all", action="store_true", help="all datasets (incl. benchmarks), methods and DCV")
+    ap.add_argument("--syn", action="store_true", help="synthetic ground-truth datasets only")
     ap.add_argument("--lit", action="store_true", help="benchmarks only, official train/test split, --reps seeds")
     ap.add_argument("--reps", type=int, default=5)
     ap.add_argument("--folds", type=int, default=5)
@@ -60,6 +62,8 @@ def main():
         a.dcv = True
         if a.datasets == list(ORIGINAL):
             a.datasets = list(ALL)
+    if a.syn:
+        a.datasets = list(SYN)
     if a.lit:
         a.datasets = [d for d in a.datasets if d in BENCHMARKS] or list(BENCHMARKS)
     for d in a.datasets:                 # fail fast (e.g. benchmarks not downloaded)

@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT))
 
 DS = [("algerian", "ALG"), ("breast_original", "BCO"), ("breast_diagnostic", "BCD"), ("heart_failure", "HF"),
       ("pima", "PIM"), ("heart_disease", "HD"), ("compas", "COM"), ("loan", "LOAN")]
-ROLES = ["main", "cegis", "global", "multi", "lit", "l2zero", "gd", "zeroout", "dcvall"]
+ROLES = ["main", "cegis", "global", "multi", "lit", "l2zero", "gd", "zeroout", "dcvall", "syn", "syn_cegis", "syn_global"]
 STAR = r"$^{\star}$"
 
 # (role, method, selection, display) -- rows of the main comparison
@@ -95,8 +95,8 @@ def table_datasets():
             "heart_failure": ("Heart failure records", "Cardiology", r"\citet{Ahmad2017}"),
             "pima": ("Pima Indians diabetes", "Endocrinology", r"\citet{Smith1988}"),
             "heart_disease": ("Heart disease (Cleveland)", "Cardiology", r"\citet{Detrano1989}"),
-            "compas": ("COMPAS recidivism", "Criminal justice", r"\citet{Angwin2016}"),
-            "loan": ("Loan defaulter", "Credit risk", r"\citet{LendingClub}")}
+            "compas": ("COMPAS recidivism", "Criminal justice", r"\citet{Dressel2018}"),
+            "loan": ("Loan defaulter", "Credit risk", r"\citet{Liu2020}")}
     lines = []
     for key, short in DS:
         name, dom, cite = info[key]
@@ -144,7 +144,7 @@ def table_main(dfs, metric="mcc", name="main_mcc.tex", caption_metric="MCC"):
         if disp.startswith("RIXM-C" + STAR) or disp == "RIXM" or disp == "ELM":
             lines.append(r"\midrule")
     pending = [role for role in {r[0] for r in avail} if dfs.get(role) is None]
-    note = (r"\par\smallskip\footnotesize\textit{Pending runs: " + ", ".join(sorted(pending)) + "}.") if pending else ""
+    note = (r"\par\smallskip\footnotesize\textit{Pending runs: " + ", ".join(sorted(pending)).replace("_", r"\_") + "}.") if pending else ""
     write(name, "\n".join([
         r"\begin{table*}[t]\centering",
         rf"\caption{{Test {caption_metric} (mean and standard deviation over the outer folds; $5\times5$-fold nested cross-validation, "
@@ -158,7 +158,7 @@ def table_main(dfs, metric="mcc", name="main_mcc.tex", caption_metric="MCC"):
     return M, ranks
 
 
-CERT_ROWS = [("main", "mean"), ("multi", "multi"), ("global", "global"), ("cegis", "cegis")]
+CERT_ROWS = [("main", "mean"), ("multi", "anchor"), ("global", "sign"), ("cegis", "cegis")]
 
 
 def table_cert(dfs):
@@ -175,9 +175,10 @@ def table_cert(dfs):
             mcc = d.groupby("dataset").mcc.mean().mean()
             st = d.get("cert_status", pd.Series(["none"] * len(d)))
             cert = 100 * np.mean(st.isin(["certified", "by_construction"]))
-            unk = 100 * np.mean(st == "unknown")
+            fb = d["cert_fallback"].fillna("") if "cert_fallback" in d else pd.Series([""] * len(d))
+            fbs = f"{100 * np.mean(fb != ''):.0f}" if mode == "cegis" else "--"
             lines.append(f"{mode} & {disp} & {mcc:.3f} & {100 * d.viol_test.mean():.2f} & {100 * d.viol_domain.mean():.2f} & "
-                         f"{cert:.0f} & {unk:.0f} & {d.n_star.mean():.1f} \\\\")
+                         f"{cert:.0f} & {fbs} & {d.n_star.mean():.1f} \\\\")
         lines.append(r"\midrule")
     df = dfs.get("main")
     for meth, sel, disp in [("WILCAR", "holdout", "WILCAR"), ("RIXM", "holdout", "RIXM"), ("MLP", "holdout", "MLP"),
@@ -197,10 +198,10 @@ def table_cert(dfs):
         r"\caption{Monotonicity by constraint mode, pooled over datasets and outer folds. MCC: mean over datasets; "
         r"viol.: share of (point, constrained input) pairs with the wrong gain sign on test points and on $10^4$ uniform points of $[0,1]^p$; "
         r"cert.: share of final models certified monotone on $[0,1]^p$ by Algorithm~\ref{alg:bb} (ELM-C: by construction in the global and cegis modes); "
-        r"unk.: budget exhausted; $n^\ast$: selected hidden units.}",
+        r"fallb.: cegis networks returned by the sign-constrained fallback (certified by \cref{prop:sign}); $n^\ast$: selected hidden units.}",
         r"\label{tab:cert}",
         r"\resizebox{\textwidth}{!}{\begin{tabular}{llrrrrrr}\toprule",
-        r"Mode & Method & MCC & viol.\ test (\%) & viol.\ domain (\%) & cert.\ (\%) & unk.\ (\%) & $n^\ast$ \\\midrule",
+        r"Mode & Method & MCC & viol.\ test (\%) & viol.\ domain (\%) & cert.\ (\%) & fallb.\ (\%) & $n^\ast$ \\\midrule",
         *(lines[:-1] if lines[-1] == r"\midrule" else lines),
         r"\bottomrule\end{tabular}}\end{table}"]))
 
@@ -262,6 +263,54 @@ def table_ablation(dfs):
         *lines, r"\bottomrule\end{tabular}}\end{table}"]))
 
 
+SYN_ROWS = [("syn_cegis", "WILCAR-C", "dcv", "WILCAR-C" + STAR + " (DCV)"), ("syn_cegis", "RIXM-C", "holdout", "RIXM-C" + STAR),
+            ("syn_global", "WILCAR-C", "dcv", "WILCAR-C sign (DCV)"), ("syn_global", "RIXM-C", "holdout", "RIXM-C sign"),
+            ("syn", "WILCAR-C", "dcv", "WILCAR-C mean (DCV)"), ("syn", "WILCAR", "dcv", "WILCAR (DCV)"),
+            ("syn", "RIXM", "holdout", "RIXM"), ("syn", "MLP", "holdout", "MLP"), ("syn", "LR-C", "holdout", "LR-C"),
+            ("syn", "XGB-C", "holdout", "XGB-C"), ("syn", "LGBM-C", "holdout", "LGBM-C"),
+            ("syn", "MINMAX", "holdout", "Min-Max"), ("syn", "CMNN", "holdout", "CMNN"), ("syn", "LMN", "holdout", "LMN")]
+SYN_DS = [("syn_and", "and"), ("syn_or", "or"), ("syn_prod", "prod"), ("syn_and3", "and3"),
+          ("syn_andfree", "andfree"), ("syn_andneg", "andneg"), ("syn_wave", "wave")]
+SYN_BREAKS = ("RIXM-C" + STAR, "RIXM-C sign", "WILCAR-C mean (DCV)")
+
+
+def table_syn(dfs):
+    M = pd.DataFrame(index=[r[3] for r in SYN_ROWS], columns=[k for k, _ in SYN_DS], dtype=float)
+    cert = {}
+    for role, meth, sel, disp in SYN_ROWS:
+        df = dfs.get(role)
+        ok = df is not None and "mae_true" in df
+        for key, _ in SYN_DS:
+            m, _ = cell_stats(df, meth, sel, key, "mae_true") if ok else (None, None)
+            M.loc[disp, key] = np.nan if m is None else m
+        if ok and "cert_status" in df:
+            d = df[(df.method == meth) & (df.selection == sel) & df.dataset.isin([k for k, _ in SYN_DS])]
+            if len(d) and (d.cert_status != "none").any():
+                cert[disp] = f"{100 * np.mean(d.cert_status.isin(['certified', 'by_construction'])):.0f}"
+    lines = []
+    for disp in M.index:
+        cells = []
+        for key, _ in SYN_DS:
+            v = M.loc[disp, key]; col = M[key].dropna()
+            t = "--" if np.isnan(v) else f"{v:.3f}"
+            cells.append(rf"\textbf{{{t}}}" if len(col) and not np.isnan(v) and v == col.min() else t)
+        lines.append(disp + " & " + " & ".join(cells) + f" & {cert.get(disp, '--')} \\\\")
+        if disp in SYN_BREAKS:
+            lines.append(r"\midrule")
+    pending = [r for r in ("syn", "syn_cegis", "syn_global") if dfs.get(r) is None]
+    note = (r"\par\smallskip\footnotesize\textit{Pending runs: " + ", ".join(pending).replace("_", r"\_") + "}.") if pending else ""
+    write("synthetic.tex", "\n".join([
+        r"\begin{table}[t]\centering\small",
+        r"\caption{Synthetic targets (\ref{app:signals}): mean absolute error between the fitted and the true "
+        r"$P(Y=1\mid x)$ on $2\times10^4$ uniform points, averaged over the outer folds; cert.: share of final models "
+        r"that are monotone on $[0,1]^p$ (certified by \cref{alg:bb} or by construction); $\star$: cegis; sign: sign "
+        r"constraints; mean: average-gain constraint. Best value per target in bold.}",
+        r"\label{tab:synth}",
+        r"\resizebox{\textwidth}{!}{\begin{tabular}{l" + "c" * (len(SYN_DS) + 1) + r"}\toprule",
+        "Method & " + " & ".join(n for _, n in SYN_DS) + r" & cert.\ (\%) \\\midrule",
+        *lines, r"\bottomrule\end{tabular}}", note, r"\end{table}"]))
+
+
 def numbers(dfs, M, ranks):
     def mac(name, val):
         return f"\\newcommand{{\\{name}}}{{{val}}}"
@@ -269,8 +318,9 @@ def numbers(dfs, M, ranks):
     ce = dfs.get("cegis")
     if ce is not None and "cert_status" in ce:
         d = ce[ce.method.isin(["WILCAR-C", "RIXM-C"])]
-        out.append(mac("CegisCertified", f"{100 * np.mean(d.cert_status == 'certified'):.1f}\\%"))
-        out.append(mac("CegisUnknown", f"{100 * np.mean(d.cert_status == 'unknown'):.1f}\\%"))
+        fb = (d["cert_fallback"].fillna("") != "") if "cert_fallback" in d else pd.Series(False, index=d.index)
+        out.append(mac("CegisBB", f"{100 * np.mean((d.cert_status == 'certified') & ~fb):.1f}\\%"))
+        out.append(mac("CegisFallback", f"{100 * np.mean(fb):.1f}\\%"))
     mn = dfs.get("main")
     if mn is not None and "cert_status" in mn:
         d = mn[mn.method.isin(["WILCAR-C", "RIXM-C"])]
@@ -298,6 +348,7 @@ def main():
     table_cert(dfs)
     table_lit(dfs)
     table_ablation(dfs)
+    table_syn(dfs)
     numbers(dfs, M, ranks)
 
 

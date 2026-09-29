@@ -85,34 +85,67 @@ def adversarial(theta, n, p, signals, rng, starts=16, X0=None, tol=0.0):
     return np.array(out).reshape(-1, p)
 
 
+def _d2(z):
+    sg = sfnn.sigmoid(z)
+    return sg * (1 - sg) * (1 - 2 * sg)
+
+
+def _d2_range(zl, zu):
+    """Range [lo, hi] of sigma'' on [zl, zu] (sigma'' is odd, maximal at -t*, minimal at +t*)."""
+    a, b = _d2(zl), _d2(zu)
+    lo, hi = np.minimum(a, b), np.maximum(a, b)
+    lo = np.where((zl <= _ZPK) & (zu >= _ZPK), -_D2MAX, lo)
+    hi = np.where((zl <= -_ZPK) & (zu >= -_ZPK), _D2MAX, hi)
+    return lo, hi
+
+
+def _box_bounds(l, u, W1, b1, c, absW, K):
+    """Bounds of h on a batch of boxes: natural interval extension, gradient enclosure, mean-value form."""
+    mid, rad = (l + u) / 2, (u - l) / 2
+    zc = mid @ W1.T + b1; zr = rad @ absW.T
+    zl, zu = zc - zr, zc + zr
+    dl, du = _dsig(zl), _dsig(zu)
+    LB = np.where(c >= 0, c * np.minimum(dl, du), c * _dsig(np.clip(0.0, zl, zu))).sum(axis=1)
+    lo, hi = _d2_range(zl, zu)                                          # (B, n)
+    t1, t2 = K[None] * lo[:, :, None], K[None] * hi[:, :, None]          # (B, n, p)
+    Glo, Ghi = np.minimum(t1, t2).sum(axis=1), np.maximum(t1, t2).sum(axis=1)   # enclosure of dh/dx_d on the box
+    hc = _dsig(zc) @ c
+    LB = np.maximum(LB, hc - (np.maximum(np.abs(Glo), np.abs(Ghi)) * rad).sum(axis=1))
+    return LB, hc, mid, Glo, Ghi
+
+
 def _bb_one(W1, b1, c, p, budget, batch=4096):
+    """
+    Input-space branch and bound (interval global optimisation, cf. Hansen & Walster): natural interval extension and
+    mean-value form with an enclosure of the gradient; monotonicity test -- if dh/dx_d has a fixed sign on a box, the
+    minimum lies on the corresponding face and the box collapses along d.
+    """
     if np.all(c >= 0):
         return "certified", None, 1
     absW = np.abs(W1)
-    sens = np.abs(c) @ absW                                     # (p,) sensitivity of z-weighted h
+    K = c[:, None] * W1                                                # (n, p): coefficients of sigma''_j in dh/dx_d
     L = np.zeros((1, p)); U = np.ones((1, p)); nodes = 0
     while len(L):
         take = min(batch, len(L))
-        l, u = L[-take:], U[-take:]; L, U = L[:-take], U[:-take]
+        l, u = L[-take:].copy(), U[-take:].copy(); L, U = L[:-take], U[:-take]
         nodes += take
-        mid, rad = (l + u) / 2, (u - l) / 2
-        zc = mid @ W1.T + b1; zr = rad @ absW.T
-        zl, zu = zc - zr, zc + zr
-        dl, du = _dsig(zl), _dsig(zu)
-        dmin = np.minimum(dl, du); dmax = _dsig(np.clip(0.0, zl, zu))
-        LB = np.where(c >= 0, c * dmin, c * dmax).sum(axis=1)       # natural interval extension
-        hc = _dsig(zc) @ c
-        G = (np.abs(c) * _d2abs_max(zl, zu)) @ absW                   # bound on |dh/dx_d| over the box
-        LB = np.maximum(LB, hc - (G * rad).sum(axis=1))                # mean-value form
+        # monotonicity test (applied twice: collapsing some coordinates tightens the enclosure of the others)
+        for _ in range(2):
+            _, _, _, Glo, Ghi = _box_bounds(l, u, W1, b1, c, absW, K)
+            inc, dec = Glo > 0, Ghi < 0                                # h increasing / decreasing in x_d on the box
+            u = np.where(inc, l, u); l = np.where(dec, u, l)
+        LB, hc, mid, Glo, Ghi = _box_bounds(l, u, W1, b1, c, absW, K)
         open_ = LB < 0
         if not open_.any():
             continue
         l, u, mid, hc = l[open_], u[open_], mid[open_], hc[open_]
+        Glo, Ghi = Glo[open_], Ghi[open_]
         if (hc < 0).any():
             return "counterexample", mid[np.argmin(hc)], nodes
         if nodes > budget:
             return "unknown", None, nodes
-        d = np.argmax((u - l) * sens, axis=1)
+        width = (u - l) * np.maximum(np.abs(Glo), np.abs(Ghi))
+        d = np.argmax(width, axis=1)
         r = np.arange(len(l)); m = (l[r, d] + u[r, d]) / 2
         l2, u1 = l.copy(), u.copy(); u1[r, d] = m; l2[r, d] = m
         L = np.vstack([L, l, l2]); U = np.vstack([U, u1, u])

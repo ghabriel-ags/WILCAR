@@ -134,3 +134,29 @@ def test_certify_zspace_sound():
             if st == "counterexample":
                 assert certify.h_value(x, W1, b1, C[a]) < 0 and (0 <= x).all() and (x <= 1).all()
     assert {"certified", "counterexample"} <= seen
+
+def test_bb_certifies_mixed_sign_monotone_net():
+    """Two identical units with output weights 1 and -0.5: h = 0.5 sigma' > 0 although one c_j < 0."""
+    from revision import certify
+    p = 4; n = 2
+    w = np.array([1.5, -0.7, 0.3, 2.0]); b = 0.2
+    W1 = np.vstack([w, w]); b1 = np.array([b, b]); W2 = np.array([1.0, -0.5])
+    th = sfnn.pack(W1, b1, W2, 0.1)
+    st, cex, _ = certify.certify(th, n, p, [1, -1, 0, 1])
+    assert st == "certified"
+    st, cex, _ = certify.certify(th, n, p, [-1, 0, 0, 0])          # wrong sign for x_1: must be refuted
+    assert st == "counterexample"
+
+def test_cegis_fallback_always_certified():
+    """A non-monotone network handed to certify_and_repair with no repair rounds must come back certified (fallback)."""
+    from revision.methods import Model, Cfg
+    from revision import certify
+    X = rng.random((200, 2)); y = ((np.minimum(X[:, 0], X[:, 1]) + 0.1 * rng.normal(size=200)) > 0.45).astype(float)
+    s = [1, 1]
+    free = Model("RIXM", s, Cfg(), seed=5)
+    th, _ = free.step(8, X, y)
+    m = Model("RIXM-C", s, Cfg(constraint_mode="cegis", max_reinit=3), seed=5)
+    An = m.anchors(X)
+    th2, info = m.certify_and_repair(th, 8, X, y, An, rounds=0)
+    assert info["cert_status"] == "certified"
+    assert certify.certify(th2, 8, 2, s)[0] == "certified"

@@ -28,6 +28,21 @@ Baselines (same outer folds, hyper-parameters on the same validation split):
 * monotone neural networks (all certified by construction): `MINMAX` (Sill, 1997), `CMNN` (Runje & Shankaranarayana, ICML 2023,
   authors' `mononet`), `LMN` (Nolte et al., ICLR 2023, authors' `monotonicnetworks`).
 
+## Changes of 2026-09-29 (affect every constrained SLFN: WILCAR-C, RIXM-C in all modes)
+
+* **Initialisation of the constrained problems** (`Cfg.constrained_init="free"`): SLSQP starts from the unconstrained L-BFGS
+  optimum (from the method's usual initialisation) instead of the raw initialisation. From a random, infeasible start SLSQP
+  often stopped in poor local minima (e.g. anchor mode on a synthetic target: error 0.107 vs 0.040).
+* **Feasibility tolerance** `feas_tol=1e-6` (was 1e-8, tighter than SLSQP's own tolerance): feasible solutions were declared
+  infeasible and re-initialised, wasting restarts and breaking the cegis loop.
+* **Certificate**: gradient enclosure + monotonicity test of interval global optimisation (Hansen & Walster) in the input-space
+  branch and bound; cegis repair rounds 20 and a **sign-constrained fallback**, so every cegis network is certified
+  (`cert_fallback` records when the fallback was used).
+* **Synthetic ground-truth datasets** `syn_*` (`--syn`), metric `mae_true` against the known probability.
+
+Results of constrained methods computed before these changes must be recomputed:
+`python -m revision.purge --tag <tag> --methods WILCAR-C RIXM-C ELM-C`, then rerun the same command.
+
 ## The `cegis` mode (candidate main contribution)
 
 For a sigmoid SLFN, `s_i ∂p/∂x_i = σ'(z₂) · h_i(x)` with `h_i(x) = Σ_j c_ij σ'(w_j·x + b_j)`, `c_ij = s_i W2_j W1_ji`.

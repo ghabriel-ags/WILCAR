@@ -23,7 +23,7 @@ partly superseded by this file): https://claude.ai/code/artifact/f94f43e2-5731-4
 * Always: `export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1`; `--jobs 14`; long runs inside `tmux`
   (session `wilcar`) with `2>&1 | tee <tag>.log`. Windows sleep must be off and a WSL window kept open.
 * First-time setup: `pip install --pre -r revision/requirements.txt` (torch CPU, monotonicnetworks, mononet),
-  `python -m revision.fetch_benchmarks`, `python -m pytest -q tests_revision` (expect 10 passed).
+  `python -m revision.fetch_benchmarks`, `python -m pytest -q tests_revision` (expect 12 passed).
 * Check `python -m revision.fetch_benchmarks` output: heart_disease positive rate and column names must match
   `BENCHMARKS` in `data.py` (loader asserts the monotone columns exist).
 
@@ -43,6 +43,15 @@ partly superseded by this file): https://claude.ai/code/artifact/f94f43e2-5731-4
 | 10 | dcvall | `--methods RIXM RIXM-C --dcv --dcv-methods RIXM RIXM-C --reps 5 --tag dcvall` | tests the paper's claim that DCV needs weight reuse (RIXM restarts at every size) |
 Monitor: `wc -l results/revision/results_<tag>.jsonl`, `grep -c '"error"' ...`, `grep budget_hit` (selection loops stopped by
 the 3600 s budget), `tail <tag>.log`. On errors read the `trace` field of the JSON line, fix, add a test, rerun.
+
+## UPDATE 2026-09-29 — read before continuing the queue
+Constrained training changed (see `revision/README.md`, "Changes of 2026-09-29"): `git pull`, run the tests (12 passed),
+then for every tag already (partly) run: `python -m revision.purge --tag <tag> --methods WILCAR-C RIXM-C ELM-C` and rerun
+the same command (unconstrained methods and baselines are unaffected and are kept). New queue items:
+| 11 | syn | `--syn --dcv --reps 5 --tag syn` | synthetic ground truth, all methods (mean mode) |
+| 12 | syn_cegis | `--syn --methods WILCAR-C RIXM-C --dcv --mode cegis --reps 5 --tag syn_cegis` | |
+| 13 | syn_global | `--syn --methods WILCAR-C RIXM-C --dcv --mode global --reps 5 --tag syn_global` | |
+Priority: 0–3 (main, cegis), then 11–13, then 4–10. Paper figures: `python paper/make_figures.py`.
 
 ## Key facts established so far (fast-config pilots, in `revision/README.md`)
 * With L-BFGS + L2 prior (λ₀ = 0.3, penalty λ₀/N) the dissertation's WILCAR > RIXM advantage disappears (it was a GD effect) → WILCAR's argument must be
