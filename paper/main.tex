@@ -60,10 +60,11 @@ The probability of the positive class is often known to increase or decrease wit
 single-hidden-layer networks grown one hidden unit at a time under such \emph{partial} monotonicity requirements and
 ask for models that are monotone on the whole input domain, not only on the training data. The gains
 $\partial p/\partial x_i$ and their weight gradients are written in closed form and imposed as constraints of a
-sequential quadratic program at every constructive step. We show that the average-gain constraint of earlier work
-does not imply monotonicity; that sign constraints on the weights, which do, fail on simple monotone targets with one
-hidden layer; and that single-hidden-layer networks monotone on the domain are universal approximators of
-continuous partially monotone functions. To find them, point-wise constraints are imposed at anchors that grow with
+sequential quadratic program at every constructive step. Earlier work constrained the sign of the average gain, the
+global effect of each input; we extend it to point-wise monotonicity on the whole domain. We show that sign constraints
+on the weights, which guarantee monotonicity, fail on simple monotone targets with one hidden layer, and that
+single-hidden-layer networks monotone on the domain are universal approximators of continuous partially monotone
+functions. To find them, point-wise constraints are imposed at anchors that grow with
 the violations found by an adversarial search, and the result is checked by a sound branch-and-bound certificate based
 on interval global optimisation, exact in pre-activation space; the returned network is always certified. Model size
 is selected by dynamic cross-validation. On synthetic targets with a known probability, certified networks are as
@@ -107,9 +108,12 @@ improving. Combining growth with monotonicity is not immediate. The natural stru
 non-negative (sign-constrained) weights, is not universal for monotone functions \citep{DanielsVelikova2010,Gupta2016};
 in \cref{sec:expressive} its error on a simple two-input target stops decreasing after a few units. Constraints
 imposed only on the training data, on the other hand, may hold at every size on the data and fail elsewhere. In earlier
-work we imposed \emph{gain-sign} constraints --- on the sign of $\partial\hat y/\partial x_i$ --- on constructive
-networks for regression, through the sign of the average finite-difference gain \citep{Sa2026}; that constraint does not
-imply monotonicity either.
+work we introduced \emph{gain-sign} constraints for constructive networks in regression \citep{Sa2026}: the average
+finite-difference gain $\partial\hat y/\partial x_i$ of each input must have the sign given by domain knowledge. This is
+a condition on the average derivative, an established measure of the global effect of an input
+\citep{HardleStoker1989,SobolKucherenko2009}, and it produced physically consistent models at a small cost in
+accuracy. Here we take the next step, from the sign of the average effect to the sign of the effect at every point of
+the domain --- monotonicity in the sense of \cref{def:mono} --- and we make that guarantee verifiable.
 
 \paragraph{Contributions}
 \begin{enumerate}
@@ -131,8 +135,7 @@ by the aggregated validation loss, inside an outer loop never used for selection
 \item \emph{A controlled evaluation} (\cref{sec:setup}): synthetic targets with a known probability, eight real datasets
 including the three classification benchmarks of the monotonic-network literature, nested cross-validation, sixteen
 methods, certification rates in addition to accuracy, and ablations that separate the effect of the constraints from
-that of the optimiser --- one of them shows that the advantage of weight reuse over random re-initialisation reported
-in our earlier constructive work is largely an optimiser effect.
+those of the optimiser and of weight reuse.
 \end{enumerate}
 
 \Cref{sec:related} reviews related work, \cref{sec:problem} fixes notation, \cref{sec:method} presents the method and
@@ -178,7 +181,8 @@ random units whose output weights are solved in closed form \citep{HuangChenSiew
 add random units subject to a supervisory inequality \citep{WangLi2017,Huang2021scn,Nan2024}. Constructive classifiers
 were reviewed by \citet{Parekh2000}, and quasi-Newton training inside a construction algorithm was proposed by
 \citet{SetionoHui1995}. Weight initialisation by linearisation around the optimal linear model, combined with growth and
-weight reuse (WILCAR), was proposed for regression and multiclass classification \citep{Sa2022,Fontes2021}. Model size
+weight reuse (WILCAR), was proposed for regression and multiclass classification \citep{Sa2022,Fontes2021} and combined
+with gain-sign constraints for regression \citep{Sa2026}. Model size
 has been selected with a static hold-out set \citep{Setiono2001}, with cross-validation over candidate architectures
 \citep{Aran2009} and with early-stopping criteria \citep{Prechelt1998nn}. Selecting hyper-parameters on the data used to
 report performance biases the estimate \citep{VarmaSimon2006,CawleyTalbot2010}, and warm starting from previously trained
@@ -264,10 +268,14 @@ constraints, where $\A\subset\B$ is a finite set of \emph{anchors}:
 \text{sign:}\quad & c_{ij}=s_i\,v_j\,W_{ji}\ \ge\ 0, && i\in\I,\ j=1,\dots,n. \label{eq:sign}
 \end{align}
 The mean constraint \eqref{eq:mean}, with $\A$ the training inputs (a random subset of 1000 of them when there are more),
-is the constraint of our earlier work \citep{Sa2026}, with the finite-difference gain replaced by the exact one. It does not imply monotonicity: an average of $g_i$ can be positive while $g_i$ is negative on a region
-of positive measure, and a finite-sample average says nothing about $\B\setminus\A$. The anchor constraint
-\eqref{eq:point}, with $k$-means centres as anchors, is stronger but still covers only $\A$. The sign constraint is
-sufficient everywhere:
+is the constraint of our earlier work \citep{Sa2026}, with the exact gain in place of the finite difference. It fixes
+the sign of the average derivative of each input, that is, of its global effect \citep{HardleStoker1989}, and this is
+what the Signal Conformity Rate of that work measures. Point-wise monotonicity is a stronger requirement: an average of
+$g_i$ can be positive while $g_i$ is negative on a region of positive measure, and a finite-sample average says nothing
+about $\B\setminus\A$. Conversely, point-wise monotonicity implies the average condition (with $\varepsilon_m=0$) for
+any set of points, so every network certified in this paper also satisfies the criterion of the earlier work: the two
+notions are nested, and the present one refines the earlier one. The anchor constraint \eqref{eq:point}, with $k$-means
+centres as anchors, is point-wise but covers only $\A$. The sign constraint is sufficient everywhere:
 
 \begin{proposition}[Sign constraints]\label{prop:sign}
 If \eqref{eq:sign} holds, $p_\theta$ is $s$-monotone on $\R^p$.
@@ -590,11 +598,12 @@ $+0.0001$ MCC on ALG and $+0.0045$ on BCO (Wilcoxon signed-rank $p=0.81$ and $0.
 $p=0.99$ and $0.53$), RIXM-C and RIXM by $-0.001$ and $+0.004$, and on BCO the constrained single-hidden-layer networks
 have the highest MCC of all sixteen methods (0.936, against 0.935 for LightGBM and 0.925--0.932 for Min-Max, CMNN and
 LMN). On ALG gradient-boosted trees are ahead of every neural model (XGBoost 0.967; SLFNs 0.90--0.91, CMNN 0.937,
-Min-Max 0.911, LMN 0.894), and monotone constraints change little for them. The one clear loss so far is caused by the
-mean-gain constraint of our earlier work on BCD, where 27 of the 30 inputs are constrained: WILCAR-C falls to 0.891
-against 0.953 for WILCAR (Wilcoxon $p_{\mathrm{Holm}}=0.01$; corrected $t$-test $p=0.35$). Requiring an average gain of
-at least $\varepsilon_m=0.05$ forces each of the 27 inputs to have a sizeable effect, which is a stronger assumption than
-monotonicity; the anchor and cegis constraints ask only for the sign ($\varepsilon_p=10^{-3}$).
+Min-Max 0.911, LMN 0.894), and monotone constraints change little for them. The one clear loss so far appears with the
+mean constraint on BCD, where 27 of the 30 inputs are constrained: WILCAR-C reaches 0.891 against 0.953 for WILCAR
+(Wilcoxon $p_{\mathrm{Holm}}=0.01$; corrected $t$-test $p=0.35$). The cause is the margin rather than the sign: requiring
+an average gain of at least $\varepsilon_m=0.05$, the value used in the regression setting of the earlier work, asks each
+of the 27 correlated cell-nucleus measurements to carry a sizeable effect of its own. The anchor and cegis constraints
+ask only for the sign ($\varepsilon_p=10^{-3}$).
 
 \begin{figure}[t]\centering
 \IfFileExists{../results/revision/main/cd_diagram.pdf}{\includegraphics[width=0.8\textwidth]{../results/revision/main/cd_diagram.pdf}}{\fbox{\parbox{0.8\textwidth}{\centering\vspace{2em}critical-difference diagram \pend\vspace{2em}}}}
@@ -609,15 +618,17 @@ of every gain, and with strongly correlated fire-weather indices the fit gives o
 the wrong sign everywhere (14\% of the (point, input) pairs of the domain). On BCD all 25 unconstrained WILCAR networks
 have counterexamples, with 17--18\% of wrong-sign pairs; on BCO 2 of 25 do. The one-hidden-layer MLP, with its own
 hyper-parameter grid, shows the same picture (11\% and 2\% of wrong-sign pairs on ALG and BCO). Networks trained with the
-mean-gain constraint are certified in every fold of ALG and BCO, where the selected networks are small, but not on BCD
-(one fold of 23 has a counterexample): the constraint helps, but guarantees nothing. \todo{Complete with
+mean constraint of the earlier work are certified monotone in every fold of ALG and BCO: in practice the average-gain
+condition already yields monotone networks there. On BCD one fold of 23 has a counterexample, and without a certificate
+there is no way to know which; making this verifiable, and then guaranteed, is what the certificate and the cegis mode
+add. \todo{Complete with
 \cref{tab:cert} once the anchor, sign and cegis runs finish: certification by branch and bound (\CegisBB{}) and by the
 fallback (\CegisFallback{}), counterexample rounds, anchors and certificate time.}
 
 \IfFileExists{tables/cert_bench.tex}{\input{tables/cert_bench.tex}}{}
 \Cref{tab:certbench} isolates the certificate. Unconstrained networks are usually not monotone (counterexamples in
-71\% of them) and networks trained with the mean-gain constraint of our earlier work still violate the prescribed signs
-in about one case in five; in both populations every network is decided at once, because violations are large and
+71\% of them), whereas networks trained with the mean constraint of the earlier work are monotone in four cases out of
+five, although not always; in both populations every network is decided at once, because violations are large and
 monotone networks have comfortable margins. Networks produced by a cegis step are the hard case: they are monotone
 (dense sampling finds no violation), but by a thin margin, since the anchor constraints hold with
 $\varepsilon_p=10^{-3}$. There each component matters: the natural interval extension decides 75\% of them, the
@@ -632,8 +643,9 @@ ours are all five seeds.}
 
 \subsection{Ablations}\label{sec:ablation}
 \IfFileExists{tables/ablation.tex}{\input{tables/ablation.tex}}{}
-\todo{Describe \cref{tab:ablation}: (i) with full-batch gradient descent (dissertation setting) RIXM is under-trained and
-WILCAR appears superior; with L-BFGS the gap closes; (ii) prior precision $\lambda_0$; (iii) zero initialisation of the
+\todo{Describe \cref{tab:ablation}: (i) optimiser: with full-batch gradient descent, as in the earlier constructive work,
+weight reuse is what lets the constructive path converge (WILCAR well ahead of RIXM); with L-BFGS both converge and the
+contribution of reuse shifts to cost and to smooth selection curves; (ii) prior precision $\lambda_0$; (iii) zero initialisation of the
 new unit; (iv) DCV without weight reuse.}
 
 \subsection{Model size and cost}\label{sec:cost}
@@ -651,9 +663,13 @@ with DCV, but 870 seconds per fold on BCD with the hold-out split, where each SL
 \section{Discussion}\label{sec:discussion}
 
 \paragraph{What each constraint guarantees}
-Constraining the average gain over the training data is a single inequality per input, but it does not constrain the
-sign of the gain at any particular point, let alone between the points; any claim of monotonicity must rest on a
-guarantee over the domain. Sign constraints provide it through the parameters alone, at the price shown by
+The constraint families form a hierarchy. The average-gain constraint of the earlier work fixes the sign of the global
+effect of each input with one inequality per input; anchor constraints fix the sign of the local effect at chosen
+points; sign and cegis constraints fix it everywhere, and each level implies the previous ones. In practice the
+average-gain constraint already produced monotone networks in most cases (every fold of ALG and BCO; four networks in
+five in \cref{tab:certbench}), which is consistent with the physically coherent behaviour reported in the earlier work;
+what it could not provide is a guarantee, and a guarantee is what a claim of monotonicity requires. Sign constraints
+provide it through the parameters alone, at the price shown by
 \cref{fig:surfaces} and \cref{thm:ua}: they exclude monotone functions that a single hidden layer can otherwise represent.
 The cegis mode obtains the guarantee through verification and keeps the flexibility. \todo{quantify with the final
 numbers.}
@@ -665,9 +681,9 @@ constructive path, and the certificate is cheapest for the small networks that t
 pre-activation formulation works in dimension $n$. \todo{support with the counts of rounds/anchors by size.}
 
 \paragraph{Weight reuse}
-\todo{Interpret the optimiser ablation: warm starting accumulates optimisation across sizes and compensates for a weak
-optimiser; with a quasi-Newton optimiser its benefit is cost, smooth selection curves (DCV) and stable constrained
-growth, not accuracy. Relate to \citet{AshAdams2020}.}
+\todo{Interpret the optimiser ablation: weight reuse accumulates optimisation along the constructive path, which is why
+it made first-order constructive training effective in the earlier work; with a quasi-Newton optimiser its value lies in
+cost, smooth selection curves (DCV) and stable constrained growth. Relate to \citet{AshAdams2020}.}
 
 \paragraph{Limitations}
 The certificate is specific to single-hidden-layer networks: separability in pre-activation space does not survive a
