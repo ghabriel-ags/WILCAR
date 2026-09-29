@@ -1,0 +1,26 @@
+\begin{table*}[t]\centering
+\caption{Test Brier score (mean and standard deviation over the outer folds; $5\times5$-fold nested cross-validation, $5\times2$ for COM and LOAN). $\star$: counterexample-guided constraints with branch-and-bound certificate (Section~\ref{sec:cegis}). Best value per dataset in bold; last column: average rank over the datasets with complete results (Friedman ranks).}
+\label{tab:main_brier}
+\resizebox{\textwidth}{!}{\begin{tabular}{lccccccccc}\toprule
+Method & ALG & BCO & BCD & HF & PIM & HD & COM & LOAN & Rank \\\midrule
+WILCAR-C$^{\star}$ (DCV) & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+WILCAR-C$^{\star}$ & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+RIXM-C$^{\star}$ & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+WILCAR-C (mean) & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+WILCAR (DCV) & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+WILCAR & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+RIXM & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+ELM & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+MLP & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+LR-C & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+XGB-C & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+LGBM-C & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+Min-Max & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+CMNN & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+LMN & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\bottomrule\end{tabular}}
+\par\smallskip\footnotesize\textit{Pending runs: cegis, main}.
+\end{table*}

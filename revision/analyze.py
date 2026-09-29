@@ -7,7 +7,8 @@ Outputs (results/revision/<tag>/):
   summary.csv          mean ± std over the 25 outer folds, per dataset × method(selection)
   ranks.csv            average MCC rank per method (Friedman over datasets)
   friedman.txt         Friedman chi² and Iman–Davenport F, Holm-corrected pairwise tests vs. the best method
-  wilcoxon_pairs.csv   constrained vs. unconstrained counterpart, paired over folds, per dataset (Holm)
+  wilcoxon_pairs.csv   constrained vs. unconstrained counterpart, paired over folds, per dataset: Wilcoxon and the
+                       corrected resampled t-test of Nadeau & Bengio (2003), both Holm-corrected
   cd_diagram.png       critical-difference diagram (Nemenyi, alpha = 0.05)
 """
 import argparse, json
@@ -17,6 +18,7 @@ import pandas as pd
 from scipy import stats
 
 ROOT = Path(__file__).resolve().parents[1] / "results" / "revision"
+K_OUT = 5
 PAIRS = [("WILCAR", "WILCAR-C"), ("RIXM", "RIXM-C"), ("ELM", "ELM-C"), ("LR", "LR-C"),
          ("XGB", "XGB-C"), ("LGBM", "LGBM-C"), ("MLP", "MINMAX"), ("MLP", "CMNN"), ("MLP", "LMN"),
          ("WILCAR-C", "CMNN"), ("WILCAR-C", "LMN")]
@@ -92,11 +94,16 @@ def main():
                 p = stats.wilcoxon(diff, zero_method="zsplit").pvalue
             except ValueError:
                 p = 1.0
+            # corrected resampled t-test (Nadeau & Bengio, 2003): variance inflated by n_test/n_train = 1/(k-1)
+            J, sd = len(diff), diff.std(ddof=1)
+            t = diff.mean() / np.sqrt((1 / J + 1 / (K_OUT - 1)) * sd ** 2) if sd > 0 else 0.0
+            p_nb = 2 * (1 - stats.t.cdf(abs(t), J - 1)) if sd > 0 else 1.0
             recs.append({"dataset": ds, "pair": f"{c} vs {u}", "mean_diff": diff.mean(), "median_diff": np.median(diff),
-                         "wins": int((diff > 0).sum()), "losses": int((diff < 0).sum()), "p": p})
+                         "wins": int((diff > 0).sum()), "losses": int((diff < 0).sum()), "p": p, "p_nb": p_nb})
     w = pd.DataFrame(recs)
     if len(w):
         w["p_holm"] = holm(w["p"].values)
+        w["p_nb_holm"] = holm(w["p_nb"].values)
         w.round(4).to_csv(out / "wilcoxon_pairs.csv", index=False); print(w.round(4).to_string())
 
     # ---- CD diagram

@@ -1,0 +1,27 @@
+\begin{table}[t]\centering\small
+\caption{Test accuracy (\%) on the official train/test splits of the monotonicity benchmarks. Upper block: values reported in the cited papers (mean and standard deviation of the best five of ten runs for CMNN). Lower block: this work, five seeds, hyper-parameters selected on a validation split of the official training set; ``(ours)'' marks our runs of the published architectures under the same protocol.}
+\label{tab:lit}
+\resizebox{\textwidth}{!}{\begin{tabular}{lccc}\toprule
+Method & COMPAS & Heart Disease & Loan Defaulter \\\midrule
+XGBoost \citep{Runje2023} & 68.5 (0.1) & -- & 63.7 (0.1) \\
+Min-Max Net \citep{Runje2023} & 67.8 (0.1) & 75 (4) & 64.9 (0.1) \\
+DLN \citep{Runje2023} & 67.9 (0.3) & 86 (2) & 65.1 (0.2) \\
+Certified MNN \citep{Liu2020} & 68.8 (0.2) & -- & 65.2 (0.1) \\
+COMET \citep{Sivaraman2020} & -- & 86 (3) & -- \\
+LMN \citep{Nolte2023} & 69.3 (0.1) & 89.6 (1.9) & 65.44 (0.03) \\
+CMNN \citep{Runje2023} & 69.2 (0.2) & 89 (0) & 65.3 (0.01) \\
+\midrule
+WILCAR-C$^{\star}$ (DCV) & -- & -- & -- \\
+WILCAR-C$^{\star}$ & -- & -- & -- \\
+RIXM-C$^{\star}$ & -- & -- & -- \\
+WILCAR & -- & -- & -- \\
+RIXM & -- & -- & -- \\
+MLP & -- & -- & -- \\
+XGB-C & -- & -- & -- \\
+LGBM-C & -- & -- & -- \\
+Min-Max (ours) & -- & -- & -- \\
+CMNN (ours) & -- & -- & -- \\
+LMN (ours) & -- & -- & -- \\
+\bottomrule\end{tabular}}
+\par\smallskip\footnotesize\textit{Pending run: lit}.
+\end{table}

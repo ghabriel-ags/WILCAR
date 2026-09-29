@@ -1,0 +1,648 @@
+\documentclass[preprint,12pt,authoryear]{elsarticle}
+% Neural Networks (Elsevier) -- manuscript source. Build: latexmk -pdf main.tex
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs,graphicx,xcolor}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage[capitalise,nameinlink]{cleveref}
+\usepackage{lineno}
+\usepackage{float}
+
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{remark}{Remark}
+\crefname{algorithm}{Algorithm}{Algorithms}
+
+% drafting helpers (remove before submission)
+\newcommand{\todo}[1]{\textcolor{red!70!black}{\textbf{[TODO:} #1\textbf{]}}}
+\newcommand{\pend}{\textcolor{red!70!black}{[pending]}}
+\IfFileExists{tables/numbers.tex}{\input{tables/numbers.tex}}{}
+\providecommand{\CegisCertified}{\pend}
+\providecommand{\CegisUnknown}{\pend}
+\providecommand{\MeanCertified}{\pend}
+\providecommand{\MeanViolDomain}{\pend}
+\providecommand{\FreeViolDomain}{\pend}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\B}{\mathcal{B}}
+\newcommand{\I}{\mathcal{I}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\sig}{\sigma}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\clip}{clip}
+
+\journal{Neural Networks}
+
+\begin{document}
+\linenumbers
+
+\begin{frontmatter}
+
+\title{Constructive neural networks with certified partial monotonicity for binary classification}
+
+\author[ufba]{Ghabriel A. G. de S\'a\corref{cor}}
+\ead{ghabriel\_ags@hotmail.com}
+\author[ufba]{Cristiano H. O. Fontes}
+\ead{cfontes@ufba.br}
+\author[ufba]{Marcelo Embiru\c{c}u}
+\ead{embirucu@ufba.br}
+\cortext[cor]{Corresponding author.}
+\affiliation[ufba]{organization={Programa de Pós-Graduação em Engenharia Industrial, Escola Politécnica, Universidade Federal da Bahia},
+  city={Salvador}, state={BA}, country={Brazil}}
+
+\begin{abstract}
+Prior knowledge that the probability of an outcome must increase or decrease with some inputs --- risk with age,
+malignancy with tumour size, default with debt-to-income ratio --- is common in high-stakes classification, yet
+standard networks violate it freely, and most constrained networks either fix the architecture in advance or
+restrict every weight to a sign. We study constructive single-hidden-layer networks, which grow their hidden layer
+one unit at a time, under \emph{partial} monotonicity: only the inputs with a known direction are constrained. The
+gains $\partial p/\partial x_i$ and their gradients with respect to all weights are written in closed form and
+imposed as inequality constraints of a sequential quadratic program at every constructive step. We show that the
+constraint on the average gain used in earlier work does not imply monotonicity, and we replace it with a
+counterexample-guided scheme: point-wise constraints at a growing set of anchors, an adversarial search for
+violations over the whole input domain, and a sound branch-and-bound certificate that exploits the structure of the
+network --- in input space with interval and mean-value bounds, or in pre-activation space, where the bound is exact
+and a linear program discards unreachable regions. Model size is selected by Dynamic Cross-Validation, which advances
+one model per inner fold in lock-step. On eight datasets, including the COMPAS, Heart Disease and Loan Defaulter
+monotonicity benchmarks, under nested cross-validation against sixteen methods, including the Min-Max, Constrained
+Monotonic and Lipschitz Monotonic networks, \CegisCertified{} of the final models are certified monotone on the
+entire input domain, against \MeanCertified{} with the average-gain constraint, with \todo{accuracy statement after
+the campaign}.
+\end{abstract}
+
+\begin{keyword}
+Monotonic neural networks \sep Partial monotonicity \sep Constructive neural networks \sep Formal verification \sep
+Counterexample-guided learning \sep Dynamic cross-validation
+\end{keyword}
+
+\end{frontmatter}
+
+% =====================================================================================================
+\section{Introduction}\label{sec:intro}
+
+In many classification problems the direction of the effect of some inputs is known before any data are seen. The
+probability of death after heart failure should not decrease as the ejection fraction falls; the probability that
+a tumour is malignant should not decrease as its radius grows; the probability of default should not decrease as the
+debt-to-income ratio increases. A model that violates such relations may still score well on a test set, but its
+predictions cannot be defended to a clinician, a regulator or a customer, and its violations tend to appear exactly
+where data are scarce \citep{Sill1997,Cano2019,Liu2020}. \emph{Monotonic} neural networks enforce these relations;
+\emph{partially} monotonic networks enforce them only for the inputs whose direction is known and leave the others
+free \citep{DanielsVelikova2010,You2017}.
+
+Existing approaches fall into three families. \emph{Soft} approaches penalise violations at sampled points
+\citep{SillAbuMostafa1996} and give no guarantee outside the sample. \emph{Structural} approaches make monotonicity a
+property of the architecture: non-negative weights \citep{ArcherWang1993,DanielsVelikova2010}, min-max networks
+\citep{Sill1997}, lattices \citep{Gupta2016,You2017}, integral networks \citep{Wehenkel2019}, constrained activations
+\citep{Runje2023} or Lipschitz-bounded residual networks \citep{Nolte2023}; they are monotone by construction but fix
+a specialised topology in advance. \emph{Certified} approaches train an ordinary network and verify it afterwards,
+with mixed-integer programming \citep{Liu2020} or SMT solvers \citep{Sivaraman2020}; they are flexible but tied to
+piecewise-linear networks and to general-purpose solvers.
+
+\emph{Constructive} networks \citep{Ash1989,Fahlman1990,KwokYeung1997,Lehtokangas1999} address a different question
+--- how many hidden units --- by growing the hidden layer until a validation criterion stops improving. Constructive
+growth and monotonicity have not been combined, and doing so is not immediate: a structural constraint limits
+expressiveness at every size \citep{DanielsVelikova2010}, whereas a constraint imposed only on the training data may
+hold at every size on the data and still fail elsewhere. In earlier work we imposed \emph{gain-sign} constraints
+--- constraints on the sign of $\partial \hat y/\partial x_i$ --- on constructive networks for regression
+\citep{Sa2026}, enforcing the sign of the average finite-difference gain. Here we show that this constraint does not
+imply monotonicity and develop a version that does, for binary classification.
+
+\paragraph{Contributions}
+\begin{enumerate}
+\item \emph{Analytic gain constraints for constructive classifiers.} For a sigmoid single-hidden-layer network the gain
+$\partial p/\partial x_i$ and its gradient with respect to every weight have closed forms (\cref{sec:gains}); we impose
+them as inequality constraints of a sequential quadratic program \citep{Kraft1988} at each constructive step, with
+three constraint families of increasing strength (average, point-wise and sign constraints).
+\item \emph{Counterexample-guided training with a sound certificate} (\cref{sec:cegis,sec:certificate}). Point-wise
+constraints are imposed at a set of anchors that grows with the violations found by an adversarial search over the
+whole input domain; the final model is checked by a branch-and-bound procedure that is sound by construction
+(\cref{thm:sound}). Unlike sign constraints, the scheme lets individual hidden units be non-monotone as long as their
+combination is, and unlike MILP or SMT verification it needs no external solver: the bounds exploit the fact that the
+sign of a gain is the sign of a positive combination of $\sigma'$ terms, which is separable in pre-activation space.
+\item \emph{Dynamic Cross-Validation} (DCV, \cref{sec:dcv}): one model per inner fold is grown in lock-step and the size
+is chosen by the aggregated validation loss, inside an outer cross-validation loop that is never used for selection.
+\item \emph{A rigorous comparison} (\cref{sec:setup}): eight datasets, including the three classification benchmarks of
+the monotonic-network literature, nested cross-validation, sixteen methods including Min-Max, Constrained Monotonic and
+Lipschitz Monotonic networks, certificate rates in addition to accuracy, and ablations that separate the effect of the
+constraints from that of the optimiser. One of them shows that the advantage of weight reuse over random
+re-initialisation reported in our earlier constructive work is, to a large extent, an optimiser effect
+(\cref{sec:ablation}).
+\end{enumerate}
+
+\Cref{sec:related} reviews related work, \cref{sec:problem} fixes notation, \cref{sec:method} presents the method,
+\cref{sec:setup} the experimental protocol, \cref{sec:results} the results, \cref{sec:discussion} discusses them and
+\cref{sec:conclusion} concludes. Proofs are in \ref{app:proofs}.
+
+% =====================================================================================================
+\section{Related work}\label{sec:related}
+
+\paragraph{Monotonic networks}
+\citet{ArcherWang1993} constrained back-propagation weights to be non-negative for two-group classification;
+\citet{SillAbuMostafa1996} introduced monotonicity hints, penalties on violations at sampled pairs of points; and
+\citet{Sill1997} proposed min-max networks, monotone by construction and universal for monotone functions.
+\citet{DanielsVelikova2010} proved universal approximation for partially monotone networks with non-negative weights and
+sigmoid units in the constrained paths. Lattice models \citep{Gupta2016,You2017} interpolate monotone look-up tables;
+UMNN \citep{Wehenkel2019} integrates a positive network. Constrained Monotonic Neural Networks \citep{Runje2023} replace
+the single convex activation implied by non-negative weights with a mixture of convex, concave and saturated units,
+removing the expressiveness limitation of earlier constructions; Lipschitz Monotonic Networks \citep{Nolte2023} add a
+linear monotone term to a network whose Lipschitz constant is bounded by weight normalisation; Scalable Monotonic
+Networks \citep{KimLee2024} separate monotone and free paths. For extreme learning machines, \citet{Zhu2017} solved a
+quadratic program on the output weights of a fixed random layer. All of these fix the architecture in advance.
+
+\paragraph{Certified monotonicity}
+\citet{Liu2020} train ReLU networks with a monotonicity regulariser and certify the result by mixed-integer linear
+programming, increasing the penalty until certification succeeds; \citet{Sivaraman2020} (COMET) use an SMT solver to
+find counterexamples, augment the training data with them and compute monotone envelopes at prediction time. Both
+target piecewise-linear networks and general-purpose solvers. Our certificate is closer in spirit to interval methods
+\citep{Moore2009} and interval bound propagation \citep{Gowal2018} used for robustness verification
+\citep{Katz2017,Tjeng2019}, specialised to the gain of a smooth single-hidden-layer network, and our training loop to
+counterexample-guided inductive synthesis \citep{SolarLezama2008}: a learner that satisfies the constraints on a finite
+set and a verifier that either proves them everywhere or returns a point that enters the set.
+
+\paragraph{Constructive networks and model selection}
+Constructive algorithms add hidden units one at a time \citep{Ash1989,Fahlman1990,Platt1991,KwokYeung1997}, either
+freezing the existing units \citep{Fahlman1990} or retraining all weights \citep{Lehtokangas1999}. Weight
+initialisation by linearisation around the optimal linear model, combined with growth and weight reuse (WILCAR), was
+proposed for regression and multiclass classification \citep{Sa2022,Fontes2021}; extreme learning machines
+\citep{Huang2006} are a common constructive baseline because each size is solved in closed form. Model size has been
+chosen with a static hold-out set \citep{Setiono2001} and with cross-validation over candidate architectures
+\citep{Aran2009}. Selecting hyper-parameters on the data used to report performance biases the estimate
+\citep{VarmaSimon2006,CawleyTalbot2010}; our protocol keeps an outer loop that is never used for selection. Warm
+starting from previously trained weights can hurt generalisation \citep{AshAdams2020}, which makes weight reuse in
+constructive networks a question to test rather than assume.
+
+% =====================================================================================================
+\section{Problem setting}\label{sec:problem}
+
+Let $x\in\R^p$ be scaled by min-max normalisation fitted on the training data, so that the training inputs lie in the
+box $\B=[0,1]^p$, and let $y\in\{0,1\}$. A single-hidden-layer feedforward network (SLFN) with $n$ sigmoid units models
+\begin{equation}\label{eq:slfn}
+p_\theta(x)=\sig\bigl(z_o(x)\bigr),\qquad z_o(x)=\sum_{j=1}^{n} v_j\,\sig\bigl(z_j(x)\bigr)+c,\qquad z_j(x)=w_j^\top x+b_j ,
+\end{equation}
+with $\theta=(W,b,v,c)$, $W\in\R^{n\times p}$ with rows $w_j^\top$, and $\sig(t)=1/(1+e^{-t})$; $p_\theta(x)$ estimates
+$P(Y=1\mid x)$ and the class is assigned at threshold $0.5$.
+
+Prior knowledge is encoded in a \emph{signal vector} $s\in\{-1,0,+1\}^p$: $s_i=+1$ ($-1$) states that $P(Y=1\mid x)$
+does not decrease (increase) with $x_i$ when the other inputs are fixed, and $s_i=0$ leaves $x_i$ unconstrained. Let
+$\I=\{i: s_i\neq0\}$.
+
+\begin{definition}[Partial monotonicity]\label{def:mono}
+$p_\theta$ is \emph{$s$-monotone on $\B$} if, for every $i\in\I$, $x\in\B$ and $t\ge0$ with $x+te_i\in\B$,
+$s_i\bigl(p_\theta(x+te_i)-p_\theta(x)\bigr)\ge0$. Since $p_\theta$ is smooth, this holds if and only if the
+\emph{gains} $g_i(x;\theta)=\partial p_\theta(x)/\partial x_i$ satisfy $s_i\,g_i(x;\theta)\ge0$ for all $x\in\B$,
+$i\in\I$.
+\end{definition}
+
+The guarantee is stated on $\B$, the region covered by the training data after scaling; test points outside it are
+extrapolations, for which no data-driven model can be certified without further assumptions.
+
+% =====================================================================================================
+\section{Method}\label{sec:method}
+
+\subsection{Constructive networks}\label{sec:constructive}
+
+A constructive method trains a sequence of networks $\theta_1,\theta_2,\dots$ with $n=1,2,\dots$ hidden units, stopping
+when a validation criterion has not improved for a number of steps (the \emph{patience}) and returning the best size
+$n^\ast$. We study three members of this family and their constrained variants.
+
+\emph{WILCAR} \citep{Sa2022,Fontes2021} initialises the first unit by linearising the network around the mean input so
+that it matches the least-squares linear model, and \emph{reuses weights}: the network with $n$ units starts from the
+trained network with $n-1$ units plus one new unit, so that successive networks form a continuous path.
+\emph{RIXM} re-initialises all weights at every size with Glorot initialisation \citep{Glorot2010}; successive networks
+are unrelated. \emph{ELM} \citep{Huang2006} draws the hidden layer at random (ReLU units, weights and biases uniform in
+$[-1,1]$) and solves the output layer by least squares. The constrained variants are WILCAR-C, RIXM-C and ELM-C.
+
+WILCAR and RIXM minimise the regularised cross-entropy
+\begin{equation}\label{eq:loss}
+J(\theta)=-\frac1N\sum_{k=1}^{N}\bigl[y_k\log p_\theta(x_k)+(1-y_k)\log\bigl(1-p_\theta(x_k)\bigr)\bigr]
++\frac{\lambda_0}{N}\bigl(\|W\|_F^2+\|v\|_2^2\bigr),
+\end{equation}
+the negative log-posterior (per sample) under a Gaussian prior of precision $\lambda_0$ on the weights. Unconstrained
+networks are trained with L-BFGS \citep{LiuNocedal1989} and constrained ones with SLSQP \citep{Kraft1988}, both
+quasi-Newton methods using the analytic gradient of \eqref{eq:loss}, so that differences between a method and its
+constrained variant are due to the constraints and not to the optimiser (\cref{sec:ablation}). The logistic output of
+ELM-C is fitted by SLSQP on the output weights, with the hidden layer fixed.
+
+\subsection{Closed-form gains}\label{sec:gains}
+
+\begin{lemma}[Gains]\label{lem:gain}
+For the network \eqref{eq:slfn},
+\begin{equation}\label{eq:gain}
+g_i(x;\theta)=\sig'\bigl(z_o(x)\bigr)\sum_{j=1}^{n}v_j\,\sig'\bigl(z_j(x)\bigr)\,W_{ji},
+\qquad \sig'(t)=\sig(t)\bigl(1-\sig(t)\bigr),
+\end{equation}
+and, with $c_{ij}=s_i\,v_j\,W_{ji}$ and $h_i(x;\theta)=\sum_{j=1}^{n}c_{ij}\,\sig'(z_j(x))$,
+$s_i\,g_i(x;\theta)=\sig'(z_o(x))\,h_i(x;\theta)$. Since $\sig'>0$, $s_i g_i(x;\theta)\ge0 \iff h_i(x;\theta)\ge0$.
+\end{lemma}
+
+The derivatives of $g_i$ with respect to every weight follow by differentiating \eqref{eq:gain} and are given in
+\ref{app:gradients}; SLSQP therefore receives exact constraint Jacobians instead of finite differences. The quantity
+$h_i$ carries the whole sign information and is used by the certificate.
+
+\subsection{Constraint families}\label{sec:constraints}
+
+At every constructive step the constrained methods solve $\min_\theta J(\theta)$ subject to one of the following sets of
+constraints, where $\A\subset\B$ is a finite set of \emph{anchors}:
+\begin{align}
+\text{(mean)}\quad & \frac{1}{|\A|}\sum_{a\in\A}s_i\,g_i(a;\theta)\ \ge\ \varepsilon_{m}, && i\in\I, \label{eq:mean}\\
+\text{(point-wise)}\quad & s_i\,g_i(a;\theta)\ \ge\ \varepsilon_{p}, && i\in\I,\ a\in\A, \label{eq:point}\\
+\text{(sign)}\quad & c_{ij}=s_i\,v_j\,W_{ji}\ \ge\ 0, && i\in\I,\ j=1,\dots,n. \label{eq:sign}
+\end{align}
+The mean constraint \eqref{eq:mean}, with $\A$ the training inputs, is the constraint of our earlier work
+\citep{Sa2026}. It does not imply monotonicity: an average of $g_i$ can be positive while $g_i$ is negative on a region
+of positive measure, and the finite-sample average says nothing about $\B\setminus\A$. The point-wise constraint
+\eqref{eq:point} with $k$-means centres as anchors is stronger but still only covers $\A$. The sign constraint is
+sufficient everywhere:
+
+\begin{proposition}[Sign constraints]\label{prop:sign}
+If \eqref{eq:sign} holds, $p_\theta$ is $s$-monotone on $\R^p$.
+\end{proposition}
+
+\Cref{prop:sign} is the classical non-negative-weight construction \citep{ArcherWang1993,DanielsVelikova2010} written
+for partial monotonicity. It forces every hidden unit to be monotone in every constrained input with the prescribed
+sign, which excludes, for instance, sums of a bump and a ramp that are monotone overall; it is the price of guaranteeing
+monotonicity through the parameters alone. For ELM-C, whose hidden layer is fixed, \eqref{eq:sign} is linear in the
+output weights; we draw the hidden weights of constrained inputs with the prescribed sign so that \eqref{eq:sign}
+reduces to non-negative output weights (a monotone ELM).
+
+If SLSQP ends at an infeasible point, the step is restarted from a new random initialisation, up to $R$ times; a size
+at which no feasible network is found counts as a non-improving step.
+
+\subsection{Counterexample-guided constraints}\label{sec:cegis}
+
+The \emph{cegis} mode keeps the flexibility of \eqref{eq:point} and obtains the guarantee of \eqref{eq:sign} by
+growing the anchor set with violations (\cref{alg:cegis}). After each feasible solution, an adversarial search minimises
+$h_i(\,\cdot\,;\theta)$ over $\B$ for each $i\in\I$ with a bound-constrained quasi-Newton method \citep{Byrd1995} from
+several starting points (random points and the training points with the smallest $h_i$), using the closed-form gradient
+$\nabla_x h_i(x)=\sum_j c_{ij}\,\sig''(z_j(x))\,w_j$. Every point with $h_i<0$ becomes an anchor and the network is
+re-solved from its current weights. After the final refit, the certificate of \cref{sec:certificate} is run; any
+counterexample it returns is added to $\A$ and the model re-solved (``repair'').
+
+\begin{algorithm}[t]
+\caption{Constructive step $n$ in the \emph{cegis} mode.}\label{alg:cegis}
+\begin{algorithmic}[1]
+\Require data $(X,y)$, signal vector $s$, anchors $\A$ ($k$-means centres, plus counterexamples found at earlier sizes),
+initial weights $\theta^{(0)}$ (WILCAR: previous network plus one unit; RIXM: random)
+\State $\theta\gets$ SLSQP: $\min J$ s.t.\ \eqref{eq:point} on $\A$, from $\theta^{(0)}$; restart from random weights while infeasible (at most $R$ times)
+\For{$r=1,\dots,R_{\mathrm{cex}}$}
+  \State $C\gets\emptyset$
+  \For{$i\in\I$}
+    \State $\hat x_i\gets$ multi-start L-BFGS-B on $\min_{x\in\B}h_i(x;\theta)$
+    \If{$h_i(\hat x_i;\theta)<0$} $C\gets C\cup\{\hat x_i\}$ \EndIf
+  \EndFor
+  \If{$C=\emptyset$} \textbf{break} \EndIf
+  \State $\A\gets\A\cup C$; \ $\theta\gets$ SLSQP on the enlarged $\A$, warm-started at $\theta$
+\EndFor
+\State \Return $\theta$, $\A$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{A sound certificate}\label{sec:certificate}
+
+By \cref{lem:gain}, $p_\theta$ is $s$-monotone on $\B$ if and only if $\min_{x\in\B}h_i(x;\theta)\ge0$ for every
+$i\in\I$. \Cref{alg:bb} decides this by branch and bound, for one $i$ at a time, with $c_j=c_{ij}$ and
+$h(x)=\sum_j c_j\sig'(w_j^\top x+b_j)$. If $c_j\ge0$ for every $j$, the root is certified immediately
+(\cref{prop:sign}). The bounds rely on two elementary facts: $\sig'$ is even, increasing on $(-\infty,0]$ and
+decreasing on $[0,\infty)$; and $|\sig''|$ is even, increasing on $[0,t^\ast]$ and decreasing on $[t^\ast,\infty)$, with
+$t^\ast=\ln(2+\sqrt3)$ and $|\sig''(t^\ast)|=\sqrt3/18$.
+
+\paragraph{Input-space bounds}
+For a box $Q=[l,u]\subseteq\B$ with centre $m$ and radius $r=(u-l)/2$, each pre-activation ranges exactly over
+$[\alpha_j,\beta_j]=[w_j^\top m+b_j-|w_j|^\top r,\ w_j^\top m+b_j+|w_j|^\top r]$. With
+$\underline{d}_j=\min\{\sig'(\alpha_j),\sig'(\beta_j)\}$, $\overline{d}_j=\sig'(\clip(0;\alpha_j,\beta_j))$ and
+$\kappa_j=\max_{t\in[\alpha_j,\beta_j]}|\sig''(t)|$ (equal to $\sqrt3/18$ if $\pm t^\ast\in[\alpha_j,\beta_j]$ and to
+the larger endpoint value otherwise),
+\begin{equation}\label{eq:lbx}
+L(Q)=\max\Bigl\{\sum_{c_j\ge0}c_j\underline{d}_j+\sum_{c_j<0}c_j\overline{d}_j,\ \ h(m)-\sum_{d=1}^{p}r_d\sum_{j}|c_j|\,\kappa_j\,|W_{jd}|\Bigr\}.
+\end{equation}
+The first term is the natural interval extension \citep{Moore2009}; the second is a mean-value form, which becomes
+tight as boxes shrink.
+
+\paragraph{Pre-activation-space bounds}
+When $n<p$, $h=\varphi\circ(Wx+b)$ with $\varphi(z)=\sum_j c_j\sig'(z_j)$ \emph{separable}. On a box
+$R=[\zeta^l,\zeta^u]\subset\R^n$ its minimum is therefore exact:
+\begin{equation}\label{eq:lbz}
+\min_{z\in R}\varphi(z)=\sum_{c_j\ge0}c_j\min\{\sig'(\zeta^l_j),\sig'(\zeta^u_j)\}+\sum_{c_j<0}c_j\,\sig'\bigl(\clip(0;\zeta^l_j,\zeta^u_j)\bigr).
+\end{equation}
+The pre-activations reachable from $\B$ form the zonotope $Z=\{Wx+b:x\in\B\}$; a box with $R\cap Z=\emptyset$ can be
+discarded, and this is decided by a linear program in $x$. The search starts from the bounding box of $Z$, splits the
+box with the most negative bound first, and, for boxes that meet $Z$, evaluates $h$ at the solution of the linear
+program (minimising the linearisation of $\varphi$ at the centre of $R$), which yields counterexamples.
+
+\begin{algorithm}[t]
+\caption{Branch-and-bound certificate for input $i$ ($h=h_i$).}\label{alg:bb}
+\begin{algorithmic}[1]
+\If{$c_j\ge0$ for all $j$} \Return \textsc{certified} \EndIf
+\State $\mathcal{Q}\gets\{\B\}$ \Comment{input space; pre-activation space when $n<p$ and the input-space search exhausts $N/4$ nodes}
+\While{$\mathcal{Q}\neq\emptyset$}
+  \State remove a box $Q$ from $\mathcal{Q}$
+  \If{$L(Q)\ge0$ (\eqref{eq:lbx}; \eqref{eq:lbz} in pre-activation space) \textbf{or} $Q$ does not meet $Z$} \textbf{continue} \EndIf
+  \State $\hat x\gets$ centre of $Q$ (pre-activation space: point returned by the linear program)
+  \If{$h(\hat x)<0$} \Return \textsc{counterexample} $\hat x$ \EndIf
+  \If{more than $N$ boxes processed} \Return \textsc{unknown} \EndIf
+  \State split $Q$ in half along $\argmax_d (u_d-l_d)\sum_j|c_j||W_{jd}|$ (pre-activation space: $\argmax_j(\zeta^u_j-\zeta^l_j)|c_j|$); add both halves to $\mathcal{Q}$
+\EndWhile
+\State \Return \textsc{certified}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}[Soundness]\label{thm:sound}
+If \cref{alg:bb} returns \textsc{certified} for every $i\in\I$, then $p_\theta$ is $s$-monotone on $\B$. If it returns
+\textsc{counterexample} $\hat x$, then $\hat x\in\B$ and $s_i\,g_i(\hat x;\theta)<0$.
+\end{theorem}
+
+\begin{proposition}[Termination]\label{prop:term}
+If $\min_{\B}h_i\neq0$ and boxes are processed in breadth-first order, the input-space search terminates after
+finitely many boxes when $N=\infty$.
+\end{proposition}
+
+The only undecided case is a minimum exactly at zero, where the network is monotone but touches the boundary; the
+search then stops at the budget with \textsc{unknown}, which we report separately. The certificate is exact up to
+floating-point rounding; directed rounding \citep{Moore2009} would make it rigorous in that sense too and is left
+for an implementation concerned with adversarial use. \Cref{thm:sound} holds for any SLFN, so we also certify the
+networks trained with the mean and point-wise constraints and the unconstrained ones, which measures how often their
+monotonicity holds without a guarantee.
+
+\subsection{Dynamic cross-validation}\label{sec:dcv}
+
+\Cref{alg:dcv} selects the number of units inside a training set. The inner training set is split into $K$ stratified
+folds, one model per fold is created, and all $K$ models are grown in lock-step; at size $n$ the criterion is the sum of
+the $K$ validation cross-entropies. Growth stops when the criterion has not improved for the patience, and the final
+network is retrained on the whole training set with the selected size $n^\ast$ (for WILCAR, along the constructive
+path $1,\dots,n^\ast$). The criterion is informative only if the $K$ curves are smooth functions of $n$, which weight
+reuse provides and random re-initialisation does not; we test this by also running DCV for RIXM
+(\cref{sec:ablation}). The alternative selection is a stratified 80/20 hold-out split with the validation MCC as
+criterion.
+
+\begin{algorithm}[t]
+\caption{Dynamic cross-validation (DCV) inside a training set $T$.}\label{alg:dcv}
+\begin{algorithmic}[1]
+\State split $T$ into $K$ stratified folds $(T_k^{\mathrm{tr}},T_k^{\mathrm{va}})$; initialise one model $M_k$ per fold on $T_k^{\mathrm{tr}}$
+\State $J^\ast\gets\infty$, $w\gets0$
+\For{$n=1,2,\dots,n_{\max}$}
+  \For{$k=1,\dots,K$} \State $M_k\gets$ constructive step $n$ of $M_k$ on $T_k^{\mathrm{tr}}$ (warm start from $M_k$ at $n-1$ if the method reuses weights) \EndFor
+  \State $J(n)\gets\sum_k \mathrm{BCE}\bigl(M_k;T_k^{\mathrm{va}}\bigr)$ \ ($J(n)=\infty$ if some $M_k$ is infeasible)
+  \If{$J(n)<J^\ast$} $J^\ast\gets J(n)$, $n^\ast\gets n$, $w\gets0$ \Else\ $w\gets w+1$; \textbf{if} $w=$ patience \textbf{break} \EndIf
+\EndFor
+\State \Return network retrained on $T$ with $n^\ast$ units
+\end{algorithmic}
+\end{algorithm}
+
+% =====================================================================================================
+\section{Experimental setup}\label{sec:setup}
+
+\subsection{Datasets and signal vectors}
+\Cref{tab:datasets} lists the eight datasets. The first five come from the UCI repository \citep{UCI}; their signal
+vectors, derived from domain knowledge, are given in \ref{app:signals}. The last three are the classification
+benchmarks of the monotonic-network literature \citep{Liu2020,Sivaraman2020,Nolte2023,Runje2023}, used with the
+preprocessing, train/test split and monotone features of their public release \citep{Runje2023data}. COMPAS and Heart
+Disease are small enough for full nested cross-validation; Loan Defaulter is subsampled (stratified) to 20\,000 rows for
+cross-validation, because each constrained step solves a dense quadratic program.
+
+\IfFileExists{tables/datasets.tex}{\input{tables/datasets.tex}}{}
+
+\subsection{Protocol}
+Performance is estimated by nested cross-validation \citep{VarmaSimon2006,CawleyTalbot2010}: an outer stratified 5-fold
+split repeated five times with different seeds (twice for COMPAS and Loan Defaulter), the outer test fold used exactly
+once. Inside each outer training set, inputs are scaled to $[0,1]$ with statistics of that set, the model size (or the
+hyper-parameters of the baselines) is selected on a stratified 80/20 split or by DCV with $K=4$, and the final model is
+refitted on the whole outer training set. All methods see the same outer and inner splits. For the three benchmarks we
+additionally train on the official training set and test on the official test set with five seeds (\cref{sec:lit}),
+which is the protocol of the published results.
+
+\subsection{Methods and hyper-parameters}
+Constructive networks: WILCAR, RIXM and ELM (unconstrained; $n_{\max}=300$, patience 30) and WILCAR-C, RIXM-C and ELM-C
+($n_{\max}=50$, patience 15) with the mean, point-wise, sign and cegis constraints; $\varepsilon_m=0.05$,
+$\varepsilon_p=10^{-3}$, ten $k$-means anchors, $R=100$ restarts, $\lambda_0=0.3$, at most 1000 iterations of SLSQP
+and L-BFGS, $R_{\mathrm{cex}}=10$ counterexample rounds with 16 starts, and certificate budgets of $2\times10^5$ boxes
+(input space) and 3000 linear programs (pre-activation space). Each selection loop has a budget of one hour.
+Baselines, with hyper-parameters chosen on the same validation split and refitted on training plus validation data:
+logistic regression, free and with sign-bounded coefficients (LR, LR-C); XGBoost \citep{ChenGuestrin2016} and LightGBM
+\citep{Ke2017}, free and with monotone constraints (XGB, XGB-C, LGBM, LGBM-C); a one-hidden-layer MLP
+\citep{Pedregosa2011}; Min-Max networks \citep{Sill1997}; Constrained Monotonic Neural Networks \citep{Runje2023} and
+Lipschitz Monotonic Networks \citep{Nolte2023}, both from their authors' packages. The last three are monotone by
+construction and trained with Adam \citep{KingmaBa2015} and early stopping. The grids are listed in
+\ref{app:hyper}.
+
+\subsection{Metrics and statistics}
+The primary metric is the Matthews correlation coefficient \citep{Matthews1975,ChiccoJurman2020}; we also report the
+area under the ROC curve and the Brier score \citep{Brier1950}. Monotonicity is measured by (i) the share of
+(point, constrained input) pairs whose finite-difference gain has the wrong sign, on the test points and on $10^4$
+uniform points of $\B$, and (ii) the result of \cref{alg:bb} on the final model (certified, counterexample or unknown).
+Methods are compared over datasets with the Friedman test, the Iman--Davenport correction and the Nemenyi critical
+difference \citep{Demsar2006,ImanDavenport1980}, with Holm's correction \citep{Holm1979} for comparisons with the best
+method, and paired within datasets with the Wilcoxon signed-rank test \citep{Wilcoxon1945} and the corrected resampled
+$t$-test of \citet{NadeauBengio2003}, which accounts for the overlap between
+repeated cross-validation folds.
+
+\subsection{Implementation}
+Everything is implemented in Python with NumPy, SciPy \citep{Virtanen2020} (SLSQP, L-BFGS-B, HiGHS linear programs) and
+scikit-learn \citep{Pedregosa2011}; the baselines use PyTorch and the packages \texttt{mononet} and
+\texttt{monotonicnetworks}. Experiments ran on a 16-thread workstation, one task per core. Code, signal vectors and
+raw results are available at \todo{public repository URL}.
+
+% =====================================================================================================
+\section{Results}\label{sec:results}
+
+\subsection{Predictive performance}\label{sec:perf}
+\IfFileExists{tables/main_mcc.tex}{\input{tables/main_mcc.tex}}{}
+\todo{Describe \cref{tab:main_mcc}: Friedman/Iman--Davenport result, CD diagram (\cref{fig:cd}), where the certified
+networks rank relative to the free SLFNs and to CMNN/LMN/Min-Max/XGB-C/LGBM-C; AUC and Brier tables in the
+supplementary material.}
+
+\begin{figure}[t]\centering
+\IfFileExists{../results/revision/main/cd_diagram.png}{\includegraphics[width=0.8\textwidth]{../results/revision/main/cd_diagram.png}}{\fbox{\parbox{0.8\textwidth}{\centering\vspace{2em}critical-difference diagram \pend\vspace{2em}}}}
+\caption{Average MCC ranks over the eight datasets and Nemenyi critical difference ($\alpha=0.05$).}\label{fig:cd}
+\end{figure}
+
+\subsection{Monotonicity and certification}\label{sec:cert}
+\IfFileExists{tables/certification.tex}{\input{tables/certification.tex}}{}
+\todo{Describe \cref{tab:cert}: violation rates of free networks (\FreeViolDomain{} of domain points), residual
+violations and certification rate of the mean mode (\MeanCertified{}), point-wise mode, sign mode (certified by
+construction, accuracy cost) and cegis (\CegisCertified{} certified, \CegisUnknown{} unknown); number of counterexample
+rounds and anchors; certificate time.}
+
+\subsection{Comparison with published results}\label{sec:lit}
+\IfFileExists{tables/literature.tex}{\input{tables/literature.tex}}{}
+\todo{Describe \cref{tab:lit}. Note that published numbers are best-five-of-ten runs with tuned hyper-parameters;
+ours are all five seeds.}
+
+\subsection{Ablations}\label{sec:ablation}
+\IfFileExists{tables/ablation.tex}{\input{tables/ablation.tex}}{}
+\todo{Describe \cref{tab:ablation}: (i) optimiser: with full-batch gradient descent (dissertation setting) RIXM is
+under-trained and WILCAR appears superior; with L-BFGS the gap closes -- report numbers; (ii) prior precision
+$\lambda_0$; (iii) zero initialisation of the new unit; (iv) DCV without weight reuse.}
+
+\subsection{Model size and cost}\label{sec:cost}
+\todo{$n^\ast$ by method and selection; time per outer fold; WILCAR vs RIXM cost (warm start); cost of cegis
+rounds and of the certificate.}
+
+% =====================================================================================================
+\section{Discussion}\label{sec:discussion}
+
+\paragraph{What the mean-gain constraint guarantees}
+Constraining the average gain over the training data is attractive because it is a single inequality per input, but
+\cref{tab:cert} shows that it leaves point-wise violations that the certificate detects. The failure is structural:
+an average over a finite sample constrains neither the sign of the gain at each sample point nor its sign between
+them. Any claim of ``physical consistency'' must rest on a guarantee over the domain, which only the sign and cegis
+modes provide. \todo{quantify with the final numbers.}
+
+\paragraph{Sign constraints versus certified flexibility}
+\todo{Compare sign (global) and cegis: accuracy, $n^\ast$, cost; interpret in terms of the hidden units that cegis
+lets be non-monotone.}
+
+\paragraph{Weight reuse}
+\todo{Interpret the optimiser ablation: warm starting accumulates optimisation across sizes and compensates for a weak
+optimiser; with a quasi-Newton optimiser its benefit is cost, smooth selection curves (DCV) and stable constrained
+growth, not accuracy. Relate to \citet{AshAdams2020}.}
+
+\paragraph{Limitations}
+The certificate is specific to single-hidden-layer networks: separability of $\varphi$ in pre-activation space does not
+survive a second hidden layer, where the same scheme would need bound propagation through the layers
+\citep{Gowal2018}. Branch and bound is exponential in the worst case; the pre-activation formulation reduces the
+dimension from $p$ to $n$, which is small for the selected networks, and undecided cases are reported rather than
+hidden. The guarantee is on the training box $\B$, categorical inputs encoded as indicators are treated as
+continuous (a conservative choice), and the quadratic programs limit the constrained networks to tens of units and
+the training sets to tens of thousands of rows.
+
+% =====================================================================================================
+\section{Conclusions}\label{sec:conclusion}
+We combined constructive growth of single-hidden-layer networks with partial monotonicity constraints written in
+closed form, replaced the average-gain constraint of earlier work --- which does not imply monotonicity --- with a
+counterexample-guided scheme whose output is certified on the whole input domain by a solver-free branch-and-bound
+procedure, and selected model size with dynamic cross-validation inside a nested protocol. \todo{Summarise the
+results.} Extensions to deeper constructive networks and to multiclass problems with monotone class orderings are
+natural next steps.
+
+% =====================================================================================================
+\section*{CRediT authorship contribution statement}
+\todo{confirm.} \textbf{Ghabriel A. G. de S\'a:} Conceptualization, Methodology, Software, Investigation, Formal
+analysis, Writing -- original draft. \textbf{Cristiano H. O. Fontes:} Conceptualization, Supervision, Writing --
+review \& editing. \textbf{Marcelo Embiru\c{c}u:} Supervision, Writing -- review \& editing.
+
+\section*{Declaration of competing interest}
+The authors declare that they have no known competing financial interests or personal relationships that could have
+appeared to influence the work reported in this paper.
+
+\section*{Declaration of generative AI and AI-assisted technologies in the writing process}
+\todo{confirm wording.} During the preparation of this work the authors used Claude (Anthropic) to assist with code
+development and with drafting and editing the text. After using this tool, the authors reviewed and edited the content
+as needed and take full responsibility for the content of the publication.
+
+\section*{Data availability}
+All datasets are public (\cref{tab:datasets}). Code and results: \todo{repository URL}.
+
+\section*{Funding}
+\todo{funding statement or ``This research did not receive any specific grant from funding agencies in the public,
+commercial, or not-for-profit sectors.''}
+
+\appendix
+% =====================================================================================================
+\section{Proofs}\label{app:proofs}
+
+\paragraph{\Cref{lem:gain}}
+By the chain rule,
+\[
+\frac{\partial p_\theta}{\partial x_i}=\sig'(z_o)\,\frac{\partial z_o}{\partial x_i},\qquad
+\frac{\partial z_o}{\partial x_i}=\sum_j v_j\sig'(z_j)W_{ji}.
+\]
+Multiplying by $s_i$ gives $s_ig_i=\sig'(z_o)\sum_j s_iv_jW_{ji}\sig'(z_j)=\sig'(z_o)h_i$, and $\sig'(z_o)>0$.
+
+\paragraph{\Cref{prop:sign}}
+If $c_{ij}\ge0$ for all $j$, $h_i(x)=\sum_jc_{ij}\sig'(z_j(x))\ge0$ for every $x\in\R^p$ because $\sig'>0$; conclude
+with \cref{lem:gain} and \cref{def:mono}.
+
+\paragraph{Bounds}
+(a) For $x\in Q$, $w_j^\top x+b_j=w_j^\top m+b_j+w_j^\top(x-m)$ with $|w_j^\top(x-m)|\le|w_j|^\top r$, attained at a
+vertex, so $z_j(Q)=[\alpha_j,\beta_j]$. Since $\sig'$ is even and unimodal with its maximum at $0$, its minimum over
+an interval is attained at an endpoint and its maximum at the point of the interval closest to $0$. Hence
+$c_j\sig'(z_j(x))\ge c_j\underline d_j$ when $c_j\ge0$ and $\ge c_j\overline d_j$ when $c_j<0$; summing gives the first
+term of \eqref{eq:lbx}. (b) $\partial h/\partial x_d=\sum_jc_j\sig''(z_j)W_{jd}$ and $|\sig''(z_j(x))|\le\kappa_j$ on
+$Q$ by the unimodality of $|\sig''|$ on each half-line (if the interval contains $\pm t^\ast$ the bound is the global
+maximum; otherwise $|\sig''|$ is monotone on each part of the interval on either side of $0$, where it vanishes, and the
+maximum is at an endpoint). The mean value theorem gives $h(x)\ge h(m)-\sum_d|x_d-m_d|\sup_Q|\partial_dh|\ge
+h(m)-\sum_dr_d\sum_j|c_j|\kappa_j|W_{jd}|$. (c) $\varphi$ is a sum of functions of one coordinate each, so its minimum
+over a product of intervals is the sum of the one-dimensional minima, which are given by the unimodality of $\sig'$ as
+in (a).
+
+\paragraph{\Cref{thm:sound}}
+Every point of $\B$ belongs to a box of the initial partition, and every box is either split into two boxes that cover it
+or discarded. A box is discarded only if $L(Q)\ge0$, which by the bounds implies $h\ge0$ on $Q$; or, in pre-activation
+space, if $\min_R\varphi\ge0$, which implies $h(x)=\varphi(Wx+b)\ge0$ for every $x$ with $Wx+b\in R$; or if $R$ does not
+meet $Z$, in which case no $x\in\B$ maps into $R$. If the search ends with an empty list, every point of $\B$ lies in a
+discarded region where $h\ge0$, so $\min_\B h_i\ge0$ and, by \cref{lem:gain}, $s_ig_i\ge0$ on $\B$. A counterexample is
+returned only after evaluating $h(\hat x)<0$ at a point $\hat x\in\B$ (the centre of a sub-box of $\B$, or the solution of
+a linear program with bounds $0\le x\le1$).
+
+\paragraph{\Cref{prop:term}}
+Inputs with $\sum_j|c_j||W_{jd}|=0$ do not affect $h$ and are never split; along every other coordinate the splitting
+rule halves the largest weighted width, so the radius of every box at depth $k$ tends to zero with $k$. Let
+$G=\sum_d\sum_j|c_j|(\sqrt3/18)|W_{jd}|$. If $\min_\B h=\delta>0$, the mean-value term of \eqref{eq:lbx} is at least
+$\delta-G\max_dr_d$, positive once $\max_dr_d<\delta/G$, so every branch is discarded at finite depth. If
+$\min_\B h<0$, continuity gives a box $Q^\ast\subseteq\B$ on which $h<0$; boxes containing a point of $Q^\ast$ are never
+discarded (their lower bound is negative), and at finite depth one of them lies inside $Q^\ast$, whose centre is then a
+counterexample. In both cases the tree is finite.
+
+\section{Gradients of the gains}\label{app:gradients}
+Write $a_j=\sig(z_j)$, $\sig_j'=a_j(1-a_j)$, $\sig_j''=\sig_j'(1-2a_j)$, $o=\sig(z_o)$, $\sig_o'=o(1-o)$,
+$\sig_o''=\sig_o'(1-2o)$ and $u_i=\sum_jv_j\sig_j'W_{ji}$, so that $g_i=\sig_o'u_i$. Then, for $k=1,\dots,n$ and
+$l=1,\dots,p$,
+\begin{align*}
+\frac{\partial g_i}{\partial W_{kl}}&=\sig_o''\,v_k\sig_k'x_l\,u_i+\sig_o'\bigl(v_k\sig_k''x_lW_{ki}+v_k\sig_k'\,[i=l]\bigr),\\
+\frac{\partial g_i}{\partial b_k}&=\sig_o''\,v_k\sig_k'\,u_i+\sig_o'\,v_k\sig_k''W_{ki},\\
+\frac{\partial g_i}{\partial v_k}&=\sig_o''\,a_k\,u_i+\sig_o'\,\sig_k'W_{ki},\\
+\frac{\partial g_i}{\partial c}&=\sig_o''\,u_i ,
+\end{align*}
+where $[i=l]$ is 1 if $i=l$ and 0 otherwise.
+These expressions are checked against finite differences in the test suite of the code.
+
+\section{Signal vectors}\label{app:signals}
+\begin{table}[H]\centering\small
+\caption{Expected gain signs. $+$: $P(Y=1\mid x)$ non-decreasing in the input; $-$: non-increasing; $0$: unconstrained.
+The signs of the five original datasets were derived from domain knowledge (supplementary material); those of the
+benchmarks are the ones used in the literature \citep{Liu2020,Sivaraman2020,Runje2023}.}\label{tab:signals}
+\begin{tabular}{lp{0.8\textwidth}}\toprule
+ID & Inputs (sign) \\\midrule
+ALG & temperature ($+$), relative humidity ($-$), wind speed (0), rain ($-$), FFMC, DMC, DC, ISI, BUI, FWI ($+$) \\
+BCO & clump thickness, uniformity of cell size, uniformity of cell shape, marginal adhesion, single epithelial cell size,
+bare nuclei, bland chromatin, normal nucleoli, mitoses (all $+$) \\
+BCD & mean, standard error and worst value of radius, texture, perimeter, area, smoothness, compactness, concavity,
+concave points and symmetry ($+$); fractal dimension (0) \\
+HF & age ($+$), anaemia ($+$), creatinine phosphokinase (0), diabetes (0), ejection fraction ($-$), high blood pressure
+($+$), platelets (0), serum creatinine ($+$), serum sodium ($-$), sex (0), smoking (0), follow-up time ($-$) \\
+PIM & pregnancies ($+$), glucose ($+$), blood pressure (0), skin thickness ($+$), insulin (0), BMI ($+$), diabetes
+pedigree function ($+$), age ($+$) \\
+HD & resting blood pressure ($+$), serum cholesterol ($+$); the other eleven inputs (0) \\
+COM & prior adult convictions, juvenile felonies, juvenile misdemeanours, other juvenile counts ($+$); age, race and sex
+indicators (0) \\
+LOAN & credit score, length of employment, annual income ($-$); public-record bankruptcies, debt-to-income ratio ($+$);
+23 other inputs (0) \todo{confirm the order of the first five features in the Zenodo release} \\
+\bottomrule\end{tabular}
+\end{table}
+
+\section{Hyper-parameter grids}\label{app:hyper}
+\begin{table}[H]\centering\small
+\caption{Hyper-parameter grids of the baselines.}\label{tab:hyper}
+\resizebox{\textwidth}{!}{\begin{tabular}{ll}\toprule
+Method & Grid (selected on the validation split) \\\midrule
+LR, LR-C & $L_2$ penalty $\in\{10^{-4},10^{-3},10^{-2},10^{-1}\}$; LR-C: coefficient signs bounded by $s$ \\
+XGB(-C) & depth $\in\{2,3,4\}$, trees $\in\{100,300\}$, learning rate 0.05, subsample 0.9 \\
+LGBM(-C) & leaves $\in\{4,8,16\}$, trees $\in\{100,300\}$, learning rate 0.05, subsample 0.9 \\
+MLP & one hidden layer of $\{1,2,4,\dots,64\}$ logistic units \\
+Min-Max & $K$ groups of $K$ hyperplanes, $K\in\{2,4,8\}$ \\
+CMNN & width $\in\{8,16,32\}$, two monotone layers, ELU-based activations \\
+LMN & width $\in\{16,32\}$, Lipschitz constant $\lambda\in\{2,8,32\}$, GroupSort \\
+Min-Max, CMNN, LMN & Adam, learning rate $5\times10^{-3}$, batch 256, early stopping (patience 50, at most 1000 epochs) \\
+\bottomrule\end{tabular}}
+\end{table}
+
+\bibliographystyle{elsarticle-harv}
+\bibliography{refs}
+
+\end{document}

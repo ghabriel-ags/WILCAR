@@ -1,0 +1,31 @@
+\begin{table}[t]\centering\small
+\caption{Monotonicity by constraint mode, pooled over datasets and outer folds. MCC: mean over datasets; viol.: share of (point, constrained input) pairs with the wrong gain sign on test points and on $10^4$ uniform points of $[0,1]^p$; cert.: share of final models certified monotone on $[0,1]^p$ by Algorithm~\ref{alg:bb} (ELM-C: by construction in the global and cegis modes); unk.: budget exhausted; $n^\ast$: selected hidden units.}
+\label{tab:cert}
+\resizebox{\textwidth}{!}{\begin{tabular}{llrrrrrr}\toprule
+Mode & Method & MCC & viol.\ test (\%) & viol.\ domain (\%) & cert.\ (\%) & unk.\ (\%) & $n^\ast$ \\\midrule
+mean & WILCAR-C (DCV) & -- & -- & -- & -- & -- & -- \\
+mean & WILCAR-C & -- & -- & -- & -- & -- & -- \\
+mean & RIXM-C & -- & -- & -- & -- & -- & -- \\
+mean & ELM-C & -- & -- & -- & -- & -- & -- \\
+\midrule
+multi & WILCAR-C (DCV) & -- & -- & -- & -- & -- & -- \\
+multi & WILCAR-C & -- & -- & -- & -- & -- & -- \\
+multi & RIXM-C & -- & -- & -- & -- & -- & -- \\
+multi & ELM-C & -- & -- & -- & -- & -- & -- \\
+\midrule
+global & WILCAR-C (DCV) & -- & -- & -- & -- & -- & -- \\
+global & WILCAR-C & -- & -- & -- & -- & -- & -- \\
+global & RIXM-C & -- & -- & -- & -- & -- & -- \\
+global & ELM-C & -- & -- & -- & -- & -- & -- \\
+\midrule
+cegis & WILCAR-C (DCV) & -- & -- & -- & -- & -- & -- \\
+cegis & WILCAR-C & -- & -- & -- & -- & -- & -- \\
+cegis & RIXM-C & -- & -- & -- & -- & -- & -- \\
+cegis & ELM-C & -- & -- & -- & -- & -- & -- \\
+\midrule
+free & WILCAR & -- & -- & -- & -- & -- & -- \\
+free & RIXM & -- & -- & -- & -- & -- & -- \\
+free & MLP & -- & -- & -- & -- & -- & -- \\
+free & XGB & -- & -- & -- & -- & -- & -- \\
+free & LGBM & -- & -- & -- & -- & -- & -- \\
+\bottomrule\end{tabular}}\end{table}
