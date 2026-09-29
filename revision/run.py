@@ -42,15 +42,19 @@ def main():
     ap.add_argument("--jobs", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--mode", default="mean", choices=["mean", "multi", "global"])
     ap.add_argument("--zero-out", action="store_true")
+    ap.add_argument("--optimizer", default="lbfgs", choices=["lbfgs", "gd"], help="unconstrained training")
+    ap.add_argument("--l2", type=float, default=1e-3, help="weight decay for WILCAR/RIXM (both variants)")
+    ap.add_argument("--elm-no-bias", action="store_true", help="dissertation ELM (zero hidden biases, no output bias)")
     ap.add_argument("--tag", default="main")
     ap.add_argument("--fast", action="store_true", help="short configuration for smoke tests")
     a = ap.parse_args()
     if a.all:
         a.dcv = True
-    cfg = Cfg(constraint_mode=a.mode, zero_out=a.zero_out)
+    base = dict(constraint_mode=a.mode, zero_out=a.zero_out, optimizer=a.optimizer, elm_bias=not a.elm_no_bias, l2=a.l2)
+    cfg = Cfg(**base)
     if a.fast:
-        cfg = Cfg(constraint_mode=a.mode, zero_out=a.zero_out, max_neurons=40, patience=10,
-                  max_neurons_c=10, patience_c=4, epochs=600, es_patience=100, max_reinit=10)
+        cfg = Cfg(**base, max_neurons=40, patience=10, max_neurons_c=10, patience_c=4, epochs=600,
+                  es_patience=100, max_reinit=10, lbfgs_maxiter=300)
     OUT.mkdir(parents=True, exist_ok=True)
     out = OUT / f"results_{a.tag}.jsonl"
     done = set()

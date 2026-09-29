@@ -11,7 +11,14 @@ Differences from src/ (documented in revision/README.md):
 * optional zero initialisation of the new neuron's output weight (WILCAR only),
   which makes the n+1 network start exactly at the n network;
 * ELM-C uses a sigmoid output with BCE (logistic ELM); the dissertation version
-  applied BCE to a clipped linear output.
+  applied BCE to a clipped linear output;
+* unconstrained networks are trained with L-BFGS on the analytic gradient (same
+  quasi-Newton family as the SLSQP used for the constrained ones), so that
+  constrained vs. unconstrained comparisons are not confounded by the optimiser;
+  the dissertation's full-batch gradient descent remains available (optimizer='gd');
+* ELM uses random hidden biases and an output bias (standard ELM);
+* in 'global' mode, hidden weights of constrained inputs are drawn sign-aligned
+  (ELM-C: monotone ELM, beta >= 0; WILCAR-C / RIXM-C: feasible starting point).
 """
 from __future__ import annotations
 
@@ -42,6 +49,10 @@ class Cfg:
     max_reinit: int = 100
     slsqp_maxiter: int = 1000
     zero_out: bool = False             # WILCAR: new neuron's output weight starts at 0
+    optimizer: str = "lbfgs"           # unconstrained training: 'lbfgs' (quasi-Newton, like SLSQP) | 'gd' (dissertation)
+    lbfgs_maxiter: int = 1000
+    l2: float = 1e-3                   # weight decay on W1, W2 (same for constrained and unconstrained objectives)
+    elm_bias: bool = True              # random hidden biases U(-1,1) + output bias (standard ELM); False = dissertation
 
 
 METHODS = ("WILCAR", "WILCAR-C", "RIXM", "RIXM-C", "ELM", "ELM-C")
@@ -124,12 +135,24 @@ class Model:
         self.first = best
 
     # ------------------------------------------------------------------ initial parameters
+    @property
+    def _aligned(self):
+        return self.constrained and self.cfg.constraint_mode == "global" and len(self.idx) > 0
+
+    def _align(self, W1, W2):
+        """Sign-align hidden weights of constrained inputs and make output weights >= 0 (feasible for 'global')."""
+        W1 = np.array(W1, dtype=float, ndmin=2); W2 = np.abs(np.atleast_1d(W2).astype(float))
+        W1[:, self.idx] = np.abs(W1[:, self.idx]) * self.s[self.idx]
+        return W1, W2
+
     def _init_theta(self, n, p, prev):
         rng = self.rng
         if self.reuse and prev is not None and n > 1:
             W1, b1, W2, b2 = sfnn.unpack(prev, n - 1, p)
             w_new = rng.normal(size=(1, p)) * np.sqrt(1.0 / p)
             o_new = 0.0 if self.cfg.zero_out else rng.normal() * np.sqrt(1.0 / n)
+            if self._aligned:
+                w_new, o_new = self._align(w_new, o_new); o_new = o_new[0]
             return sfnn.pack(np.vstack([W1, w_new]), np.append(b1, 0.0), np.append(W2, o_new), b2)
         W1 = rng.normal(size=(n, p)) * np.sqrt(1.0 / p)
         b1 = np.zeros(n)
@@ -137,9 +160,31 @@ class Model:
         if self.base == "WILCAR" and self.first is not None:
             W1[0] = self.first[:-1]
             b1[0] = self.first[-1]
+        if self._aligned:
+            W1, W2 = self._align(W1, W2)
         return sfnn.pack(W1, b1, W2, 0.0)
 
     # ------------------------------------------------------------------ unconstrained training
+    def _obj(self, X, y, n):
+        """BCE (+ l2 * ||[W1, W2]||^2) and its gradient."""
+        lam = self.cfg.l2
+        if lam <= 0:
+            return lambda v: sfnn.bce_grad(v, X, y, n)
+        p = X.shape[1]
+        mask = np.zeros(sfnn.n_params(n, p)); mask[:n * p] = 1; mask[n * p + n:n * p + 2 * n] = 1
+        def f(v):
+            l, g = sfnn.bce_grad(v, X, y, n)
+            w = v * mask
+            return l + lam * float(w @ w), g + 2 * lam * w
+        return f
+
+    def _fit_free(self, theta, X, y, n):
+        if self.cfg.optimizer == "gd":
+            return self._backprop(theta, X, y, n)
+        r = minimize(self._obj(X, y, n), theta, jac=True, method="L-BFGS-B",
+                     options={"maxiter": self.cfg.lbfgs_maxiter})
+        return r.x
+
     def _backprop(self, theta, X, y, n):
         c = self.cfg
         lr, best, wait = c.lr, np.inf, 0
@@ -224,13 +269,13 @@ class Model:
         if self.base == "ELM":
             return self._step_elm(n, X, y, An)
         if not self.constrained:
-            theta = self._backprop(self._init_theta(n, p, prev), X, y, n)
+            theta = self._fit_free(self._init_theta(n, p, prev), X, y, n)
             return theta, {"feasible": True, "attempts": 1}
         if not len(self.idx):
-            theta = self._backprop(self._init_theta(n, p, prev), X, y, n)
+            theta = self._fit_free(self._init_theta(n, p, prev), X, y, n)
             return theta, {"feasible": True, "attempts": 1}
         cons, cfun = self._constraints(An, n)
-        obj = lambda v: sfnn.bce_grad(v, X, y, n)
+        obj = self._obj(X, y, n)
         best, best_viol = None, np.inf
         for a in range(self.cfg.max_reinit):
             v = self._slsqp(obj, self._init_theta(n, p, prev), cons)
@@ -244,13 +289,18 @@ class Model:
     def _step_elm(self, n, X, y, An):
         p = X.shape[1]
         for a in range(self.cfg.max_reinit if self.constrained else 1):
-            Win = self.rng.uniform(-1, 1, (p, n)); b = np.zeros(n)
+            Win = self.rng.uniform(-1, 1, (p, n))
+            b = self.rng.uniform(-1, 1, n) if self.cfg.elm_bias else np.zeros(n)
+            if self._aligned:                            # monotone ELM: sign-aligned hidden weights, beta >= 0
+                Win[self.idx] = np.abs(Win[self.idx]) * self.s[self.idx][:, None]
             H = sfnn.elm_hidden(X, Win, b)
-            if not self.constrained:
-                beta = pinv(H) @ y                       # original ELM: linear output, MSE
-                return {"Win": Win, "b": b, "beta": np.append(beta, 0.0), "linear": True}, {"feasible": True, "attempts": 1}
             Hb = np.column_stack([H, np.ones(len(H))])
+            if not self.constrained:                     # original ELM: linear output, least squares
+                beta = pinv(Hb) @ y if self.cfg.elm_bias else np.append(pinv(H) @ y, 0.0)
+                return {"Win": Win, "b": b, "beta": beta, "linear": True}, {"feasible": True, "attempts": 1}
             beta0 = pinv(Hb) @ (4.0 * (y - 0.5))         # logit linearisation of the target
+            if self._aligned:
+                beta0[:-1] = np.abs(beta0[:-1])
             def obj(bt):
                 z = Hb @ bt; o = sfnn.sigmoid(z); oc = np.clip(o, 1e-12, 1 - 1e-12)
                 loss = -np.mean(y * np.log(oc) + (1 - y) * np.log(1 - oc))

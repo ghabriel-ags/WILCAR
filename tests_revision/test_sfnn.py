@@ -67,3 +67,23 @@ def test_global_mode_certifies_monotonicity():
     assert info["feasible"]
     mono = monotonicity(lambda Z: m.predict(th, Z, 3), s, X, n_uniform=2000)
     assert mono["viol_domain"] == 0.0 and mono["viol_test"] == 0.0
+
+def test_global_elm_c_is_feasible_and_monotone():
+    from revision.methods import Model, Cfg
+    from revision.protocol import monotonicity
+    X = rng.random((150, 4)); y = ((X[:, 0] - X[:, 1] + 0.3 * rng.normal(size=150)) > 0).astype(float)
+    s = [1, -1, 0, 1]
+    m = Model("ELM-C", s, Cfg(constraint_mode="global", max_reinit=5), seed=2)
+    st, info = m.step(20, X, y, None, X)
+    assert info["feasible"]
+    mono = monotonicity(lambda Z: m.predict(st, Z, 20), s, X, n_uniform=2000)
+    assert mono["viol_domain"] == 0.0
+    acc = np.mean((m.predict(st, X, 20) >= 0.5) == y)
+    assert acc > 0.75
+
+def test_lbfgs_unconstrained_fits():
+    from revision.methods import Model, Cfg
+    X = rng.random((200, 3)); y = ((X[:, 0] + X[:, 1] > 1.0)).astype(float)
+    m = Model("RIXM", [0, 0, 0], Cfg(), seed=3)
+    th, _ = m.step(2, X, y)
+    assert np.mean((m.predict(th, X, 2) >= 0.5) == y) > 0.9

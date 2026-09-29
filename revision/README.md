@@ -13,6 +13,10 @@ protocol planned for the *Neural Networks* submission. The dissertation code in 
 | Gains in SLSQP | finite differences, numerical Jacobian | closed-form gains and closed-form gradient (`sfnn.gains_and_grad`) |
 | Constraint | mean gain over the training data ≥ 0.05 | `--mode mean` (same), `multi` (gain ≥ 1e-3 at 10 k-means anchors), `global` (s_i·W2_j·W1_ji ≥ 0 for all j: **certified** monotonicity) |
 | ELM-C output | BCE on a clipped linear output | sigmoid output + BCE (logistic ELM) |
+| Optimiser (unconstrained) | full-batch gradient descent, lr 0.1 | L-BFGS on the analytic gradient (same quasi-Newton family as SLSQP); `--optimizer gd` restores the dissertation |
+| Regularisation | none (implicit, early stopping of GD) | weight decay 1e-3 on W1, W2 in **both** constrained and unconstrained objectives (`--l2`) |
+| ELM | zero hidden biases, no output bias | random hidden biases U(-1,1) + output bias (standard ELM); `--elm-no-bias` restores the dissertation |
+| `global` mode init | — | hidden weights of constrained inputs sign-aligned, output weights >= 0 (feasible start); ELM-C becomes a monotone ELM (beta >= 0) |
 | New neuron (WILCAR) | output weight ~ N(0, 1/n) | same by default; `--zero-out` starts it at 0 (n+1 network = n network) |
 | Evaluation | accuracy, F1, MCC, SCR at the mean | + AUC, Brier, violation rate of the expected signs on test points and on 10 000 uniform points of the domain |
 | Replicates | 5-fold, seed 0 | 5-fold × 5 repetitions (25 outer folds), Friedman / Holm / Wilcoxon |
@@ -36,6 +40,9 @@ python -m revision.run --methods WILCAR-C RIXM-C ELM-C --dcv --mode multi  --rep
 python -m revision.run --methods WILCAR-C RIXM-C ELM-C --dcv --mode global --reps 5 --jobs 18 --tag global
 # weight-reuse / zero-init ablation
 python -m revision.run --methods WILCAR WILCAR-C --dcv --zero-out --reps 5 --jobs 18 --tag zeroout
+# sensitivity: no weight decay, and the dissertation optimiser (GD)
+python -m revision.run --methods WILCAR WILCAR-C RIXM RIXM-C --dcv --l2 0 --reps 5 --jobs 18 --tag l2zero
+python -m revision.run --methods WILCAR RIXM --dcv --optimizer gd --l2 0 --reps 5 --jobs 18 --tag gd
 
 python -m revision.analyze --tag main                    # summary, ranks, Friedman/Holm, Wilcoxon, CD diagram
 ```
@@ -44,6 +51,14 @@ Every task appends one JSON line to `results/revision/results_<tag>.jsonl`; reru
 finished tasks, so an interrupted campaign can be resumed.
 
 ## Notes for the manuscript
+
+* **Pilot (fast config, 4 datasets x 10 folds, WILCAR / RIXM):** mean MCC with GD 0.724 / 0.407, with L-BFGS
+  0.703 / 0.698 (l2 = 0) and 0.729 / 0.731 (l2 = 1e-3); l2 = 1e-2 collapses to the majority class. Under GD, RIXM
+  (random restart at every size) is badly under-trained, while WILCAR's weight reuse accumulates optimisation steps
+  across sizes. **The dissertation's WILCAR > RIXM gap is therefore largely an optimiser effect.** With a proper
+  optimiser, WILCAR's case must rest on (i) cost per size (warm start), (ii) robustness to a weak optimiser, (iii) the
+  constrained setting. The `gd` ablation documents this honestly. l2 = 1e-3 was fixed from this pilot (reps 0-1) and
+  is reported with the `l2zero` sensitivity run.
 
 * `mean` mode reproduces the dissertation constraint. It constrains the **average** gain, so point-wise
   violations remain possible; the smoke test on Heart Failure shows them (`viol_test` > 0). Report this honestly
