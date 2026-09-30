@@ -1,17 +1,15 @@
 \begin{table*}[!tbp]\centering
-\caption{Selected number of hidden units $n^\ast$ and, in parentheses, time per outer fold (selection, refit and certificate), means over the outer folds. DCV: size minimising the summed validation cross-entropy; DCV-1SE: smallest size within one standard error of that minimum.}
+\caption{Selected number of hidden units $n^\ast$ and, in parentheses, time per outer fold (selection, refit and certificate), means over the outer folds; selection loops stopped by the one-hour budget are included as they are.}
 \label{tab:size}
 \resizebox{\linewidth}{!}{\begin{tabular}{lllcccccccc}\toprule
 Model & Constraint & Selection & ALG & BCO & BCD & HF & PIM & HD & COM & LOAN \\\midrule
-WILCAR & none & hold-out & 1.1\,{\scriptsize(1\,s)} & 2.0\,{\scriptsize(1\,s)} & 1.1\,{\scriptsize(1\,s)} & -- & -- & -- & -- & -- \\
-WILCAR & none & DCV & 149.5\,{\scriptsize(25\,s)} & 18.6\,{\scriptsize(8\,s)} & 71.0\,{\scriptsize(23\,s)} & -- & -- & -- & -- & -- \\
-WILCAR & none & DCV-1SE & -- & -- & -- & -- & -- & -- & -- & -- \\
-RIXM & none & hold-out & 1.1\,{\scriptsize(3\,s)} & 2.0\,{\scriptsize(3\,s)} & -- & -- & -- & -- & -- & -- \\
-WILCAR & mean & hold-out & 1.0\,{\scriptsize(5\,s)} & 1.7\,{\scriptsize(7\,s)} & 1.7\,{\scriptsize(867\,s)} & -- & -- & -- & -- & -- \\
-WILCAR & mean & DCV & 33.6\,{\scriptsize(77\,s)} & 20.6\,{\scriptsize(111\,s)} & -- & -- & -- & -- & -- & -- \\
-RIXM & mean & hold-out & 1.0\,{\scriptsize(3\,s)} & 1.7\,{\scriptsize(10\,s)} & -- & -- & -- & -- & -- & -- \\
-WILCAR & cegis & hold-out & -- & -- & -- & -- & -- & -- & -- & -- \\
-WILCAR & cegis & DCV & -- & -- & -- & -- & -- & -- & -- & -- \\
-WILCAR & cegis & DCV-1SE & -- & -- & -- & -- & -- & -- & -- & -- \\
-RIXM & cegis & hold-out & -- & -- & -- & -- & -- & -- & -- & -- \\
+WILCAR & none & DCV & 149.5\,{\scriptsize(25\,s)} & 18.6\,{\scriptsize(8\,s)} & 71.0\,{\scriptsize(23\,s)} & 123.6\,{\scriptsize(35\,s)} & 4.1\,{\scriptsize(5\,s)} & 5.4\,{\scriptsize(4\,s)} & 17.7\,{\scriptsize(159\,s)} & 2.5\,{\scriptsize(472\,s)} \\
+WILCAR & none & hold-out & 1.1\,{\scriptsize(1\,s)} & 2.0\,{\scriptsize(1\,s)} & 1.1\,{\scriptsize(1\,s)} & 2.2\,{\scriptsize(1\,s)} & 1.7\,{\scriptsize(1\,s)} & 2.8\,{\scriptsize(1\,s)} & 2.4\,{\scriptsize(12\,s)} & 12.1\,{\scriptsize(319\,s)} \\
+RIXM & none & hold-out & 1.1\,{\scriptsize(3\,s)} & 2.0\,{\scriptsize(3\,s)} & 2.0\,{\scriptsize(7\,s)} & 2.5\,{\scriptsize(4\,s)} & 3.4\,{\scriptsize(7\,s)} & 2.0\,{\scriptsize(3\,s)} & 2.6\,{\scriptsize(82\,s)} & 17.8\,{\scriptsize(1391\,s)} \\
+WILCAR & mean & DCV & 33.6\,{\scriptsize(77\,s)} & 20.6\,{\scriptsize(111\,s)} & 21.4\,{\scriptsize(4889\,s)} & 33.1\,{\scriptsize(163\,s)} & 2.7\,{\scriptsize(13\,s)} & 2.6\,{\scriptsize(10\,s)} & 16.2\,{\scriptsize(176\,s)} & 2.2\,{\scriptsize(463\,s)} \\
+WILCAR & sign & DCV & 46.0\,{\scriptsize(33\,s)} & 14.9\,{\scriptsize(9\,s)} & 20.4\,{\scriptsize(786\,s)} & 42.0\,{\scriptsize(69\,s)} & 2.6\,{\scriptsize(8\,s)} & 2.8\,{\scriptsize(6\,s)} & 12.1\,{\scriptsize(59\,s)} & 2.4\,{\scriptsize(577\,s)} \\
+WILCAR & anchor & DCV & 4.5\,{\scriptsize(61\,s)} & 15.0\,{\scriptsize(13\,s)} & 8.4\,{\scriptsize(4281\,s)} & 43.0\,{\scriptsize(64\,s)} & 4.0\,{\scriptsize(7\,s)} & 2.9\,{\scriptsize(5\,s)} & 12.9\,{\scriptsize(54\,s)} & 2.2\,{\scriptsize(281\,s)} \\
+WILCAR & cegis & DCV & 5.2\,{\scriptsize(84\,s)} & 15.3\,{\scriptsize(15\,s)} & 5.4\,{\scriptsize(4518\,s)} & 42.4\,{\scriptsize(73\,s)} & 3.8\,{\scriptsize(11\,s)} & 3.2\,{\scriptsize(5\,s)} & 15.5\,{\scriptsize(89\,s)} & 3.1\,{\scriptsize(3469\,s)} \\
+WILCAR & cegis & hold-out & 1.0\,{\scriptsize(31\,s)} & 1.0\,{\scriptsize(3\,s)} & 2.9\,{\scriptsize(2460\,s)} & 1.6\,{\scriptsize(6\,s)} & 1.7\,{\scriptsize(3\,s)} & 1.7\,{\scriptsize(2\,s)} & 5.9\,{\scriptsize(15\,s)} & 8.1\,{\scriptsize(2897\,s)} \\
+RIXM & cegis & hold-out & 1.0\,{\scriptsize(1\,s)} & 1.0\,{\scriptsize(1\,s)} & 1.9\,{\scriptsize(145\,s)} & 1.7\,{\scriptsize(1\,s)} & 3.1\,{\scriptsize(3\,s)} & 2.1\,{\scriptsize(1\,s)} & 3.7\,{\scriptsize(25\,s)} & 8.0\,{\scriptsize(1731\,s)} \\
 \bottomrule\end{tabular}}\end{table*}

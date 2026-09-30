@@ -1,5 +1,5 @@
 \begin{table*}[!tbp]\centering\small
-\caption{Test accuracy (\%) on the official train/test splits of the monotonicity benchmarks. Upper block: values reported in the cited papers (mean and standard deviation of the best five of ten runs for CMNN). Lower block: this work, five seeds, hyper-parameters selected on a validation split of the official training set; ``our runs'' are the published architectures trained under the same protocol.}
+\caption{Test accuracy (\%) on the official train/test splits of the benchmarks, mean (standard deviation). Upper block: values reported in the cited papers, each under its own protocol (e.g.\ best five of ten runs for CMNN). Lower block: this work, five seeds, one common protocol (hyper-parameters selected on a validation split of the official training set); ``our runs'': the published architectures trained under that protocol.}
 \label{tab:lit}
 \resizebox{\linewidth}{!}{\begin{tabular}{lccc}\toprule
 Method & COMPAS & Heart Disease & Loan Defaulter \\\midrule
@@ -10,19 +10,17 @@ Certified MNN \citep{Liu2020} & 68.8 (0.2) & -- & 65.2 (0.1) \\
 COMET \citep{Sivaraman2020} & -- & 86 (3) & -- \\
 LMN \citep{Nolte2023} & 69.3 (0.1) & 89.6 (1.9) & 65.44 (0.03) \\
 CMNN \citep{Runje2023} & 69.2 (0.2) & 89 (0) & 65.3 (0.01) \\
+Activation-switch MNN \citep{Sartor2025} & 69.5 (0.1) & 94 (1) & 65.4 (0.1) \\
 \midrule
-WILCAR, cegis, DCV-1SE & -- & -- & -- \\
-WILCAR, cegis, DCV & -- & -- & -- \\
-WILCAR, cegis, hold-out & -- & -- & -- \\
-RIXM, cegis, hold-out & -- & -- & -- \\
-WILCAR, unconstrained & -- & -- & -- \\
-RIXM, unconstrained & -- & -- & -- \\
-MLP & -- & -- & -- \\
-XGBoost, monotone & -- & -- & -- \\
-LightGBM, monotone & -- & -- & -- \\
-Min-Max (our runs) & -- & -- & -- \\
-CMNN (our runs) & -- & -- & -- \\
-LMN (our runs) & -- & -- & -- \\
+WILCAR, cegis, DCV & 67.9 (0.2) & 82.0 (0.0) & 65.0 (0.0) \\
+RIXM, cegis, hold-out & 68.2 (0.3) & 80.3 (0.0) & 65.0 (0.0) \\
+WILCAR, unconstrained, DCV & 67.8 (0.1) & 82.0 (0.0) & 65.1 (0.0) \\
+LR, sign & 68.1 (0.0) & 82.0 (0.0) & 64.7 (0.1) \\
+XGBoost, monotone & 68.6 (0.4) & 85.6 (0.7) & 65.2 (0.1) \\
+LightGBM, monotone & 68.8 (0.3) & 85.9 (2.2) & 65.1 (0.1) \\
+Min-Max (our runs) & 67.6 (0.5) & 80.3 (2.3) & 64.8 (0.1) \\
+CMNN (our runs) & 67.8 (0.2) & 80.7 (0.7) & 65.0 (0.1) \\
+LMN (our runs) & 67.7 (0.6) & 83.6 (1.6) & 64.7 (0.5) \\
 \bottomrule\end{tabular}}
-\par\smallskip\footnotesize\textit{Pending run: lit}.
+
 \end{table*}

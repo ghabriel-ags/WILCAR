@@ -35,16 +35,18 @@ def lab(method, constraint, sel):
     return f"{MODEL.get(method, method)} & {constraint} & {SELNAME.get(sel, sel)}"
 
 
-# groups of the main comparison: (title, [(role, method, selection, constraint)])
+# full comparison (Supplementary Material): (title, [(role, method, selection, constraint)])
 MAIN_GROUPS = [
-    ("Certified SLFNs (this work)", [("cegis", "WILCAR-C", "dcv1se", "cegis"), ("cegis", "WILCAR-C", "dcv", "cegis"),
-                                     ("cegis", "WILCAR-C", "holdout", "cegis"), ("cegis", "RIXM-C", "holdout", "cegis")]),
+    ("Certified SLFNs, counterexample-guided (this work)", [("cegis", "WILCAR-C", "dcv", "cegis"), ("cegis", "WILCAR-C", "holdout", "cegis"),
+                                                            ("cegis", "RIXM-C", "holdout", "cegis")]),
+    ("SLFNs with sign constraints", [("global", "WILCAR-C", "dcv", "sign"), ("global", "WILCAR-C", "holdout", "sign"),
+                                     ("global", "RIXM-C", "holdout", "sign")]),
+    ("SLFNs with anchor constraints", [("multi", "WILCAR-C", "dcv", "anchor"), ("multi", "WILCAR-C", "holdout", "anchor"),
+                                       ("multi", "RIXM-C", "holdout", "anchor")]),
     ("SLFNs with the average-gain constraint of \\citet{Sa2026}",
-     [("main", "WILCAR-C", "dcv1se", "mean"), ("main", "WILCAR-C", "dcv", "mean"), ("main", "WILCAR-C", "holdout", "mean"),
-      ("main", "RIXM-C", "holdout", "mean")]),
-    ("Unconstrained SLFNs", [("main", "WILCAR", "dcv1se", "none"), ("main", "WILCAR", "dcv", "none"),
-                             ("main", "WILCAR", "holdout", "none"), ("main", "RIXM", "holdout", "none"),
-                             ("main", "ELM", "holdout", "none"), ("main", "MLP", "holdout", "none")]),
+     [("main", "WILCAR-C", "dcv", "mean"), ("main", "WILCAR-C", "holdout", "mean"), ("main", "RIXM-C", "holdout", "mean")]),
+    ("Unconstrained SLFNs", [("main", "WILCAR", "dcv", "none"), ("main", "WILCAR", "holdout", "none"),
+                             ("main", "RIXM", "holdout", "none"), ("main", "ELM", "holdout", "none"), ("main", "MLP", "holdout", "none")]),
     ("Monotone baselines", [("main", "LR-C", "holdout", "sign"), ("main", "XGB-C", "holdout", "monotone"),
                             ("main", "LGBM-C", "holdout", "monotone"), ("main", "MINMAX", "holdout", "structural"),
                             ("main", "CMNN", "holdout", "structural"), ("main", "LMN", "holdout", "structural")]),
@@ -52,6 +54,16 @@ MAIN_GROUPS = [
                                  ("main", "LGBM", "holdout", "none")]),
 ]
 MAIN_ROWS = [(r, m, se, lab(m, c, se)) for _, rows in MAIN_GROUPS for (r, m, se, c) in rows]
+
+# compact comparison of the article: one or two representatives per family
+COMPACT_GROUPS = [
+    ("Certified SLFNs (this work)", [("cegis", "WILCAR-C", "dcv", "cegis"), ("cegis", "RIXM-C", "holdout", "cegis")]),
+    ("Other SLFNs", [("global", "WILCAR-C", "dcv", "sign"), ("main", "WILCAR-C", "dcv", "mean"), ("main", "WILCAR", "dcv", "none"),
+                     ("main", "RIXM", "holdout", "none"), ("main", "MLP", "holdout", "none")]),
+    ("Monotone baselines", [("main", "LR-C", "holdout", "sign"), ("main", "XGB-C", "holdout", "monotone"),
+                            ("main", "LGBM-C", "holdout", "monotone"), ("main", "MINMAX", "holdout", "structural"),
+                            ("main", "CMNN", "holdout", "structural"), ("main", "LMN", "holdout", "structural")]),
+]
 
 # published test accuracies (%) on the official splits
 PUBLISHED = {  # method: (COMPAS, Heart Disease, Loan) ; source key
@@ -62,6 +74,7 @@ PUBLISHED = {  # method: (COMPAS, Heart Disease, Loan) ; source key
     "COMET": (None, ("86", "3"), None, "Sivaraman2020"),
     "LMN": (("69.3", "0.1"), ("89.6", "1.9"), ("65.44", "0.03"), "Nolte2023"),
     "CMNN": (("69.2", "0.2"), ("89", "0"), ("65.3", "0.01"), "Runje2023"),
+    "Activation-switch MNN": (("69.5", "0.1"), ("94", "1"), ("65.4", "0.1"), "Sartor2025"),
 }
 
 
@@ -144,10 +157,12 @@ def _ranks(M, lower_better):
     return sub.rank(axis=0, ascending=lower_better).mean(axis=1), cols
 
 
-def table_main(dfs, metric="mcc", name="main_mcc.tex", caption_metric="MCC", star=True, supp=False):
-    M = pd.DataFrame(index=[r[3] for r in MAIN_ROWS], columns=[k for k, _ in DS], dtype=float)
+def table_main(dfs, metric="mcc", name="main_mcc.tex", caption_metric="MCC", supp=True, groups=None):
+    groups = groups or MAIN_GROUPS
+    rows_all = [(r, m, se, lab(m, c, se)) for _, rows in groups for (r, m, se, c) in rows]
+    M = pd.DataFrame(index=[r[3] for r in rows_all], columns=[k for k, _ in DS], dtype=float)
     S = M.copy()
-    for role, meth, sel, disp in MAIN_ROWS:
+    for role, meth, sel, disp in rows_all:
         for key, _ in DS:
             m, sd = cell_stats(dfs.get(role), meth, sel, key, metric)
             M.loc[disp, key] = np.nan if m is None else m
@@ -156,7 +171,7 @@ def table_main(dfs, metric="mcc", name="main_mcc.tex", caption_metric="MCC", sta
     ranks, rcols = _ranks(M, low)
     ncol = 3 + len(DS) + 1
     lines = []
-    for title, rows in MAIN_GROUPS:
+    for title, rows in groups:
         lines.append(rf"\multicolumn{{{ncol}}}{{l}}{{\textit{{{title}}}}} \\")
         for (role, meth, sel, c) in rows:
             disp = lab(meth, c, sel)
@@ -165,87 +180,65 @@ def table_main(dfs, metric="mcc", name="main_mcc.tex", caption_metric="MCC", sta
                 m, sd = M.loc[disp, key], S.loc[disp, key]
                 col = M[key].dropna()
                 best = key in rcols and len(col) and not np.isnan(m) and (m == (col.min() if low else col.max()))
-                t = fmt(None if np.isnan(m) else m, sd)
+                t = fmt(None if np.isnan(m) else m, sd if supp else None)
                 cells.append(rf"\textbf{{{t}}}" if best else t)
             r = "--" if ranks is None or disp not in ranks.index else f"{ranks[disp]:.1f}"
             lines.append(disp + " & " + " & ".join(cells) + f" & {r} \\\\")
         lines.append(r"\midrule")
-    done = [sn for k, sn in DS if M[k].notna().sum() >= len(M) // 2]
-    status = ("Datasets complete so far: " + ", ".join(done) + ". " if len(done) < len(DS) else "")
-    pend = sorted({r for r, *_ in MAIN_ROWS if dfs.get(r) is None})
-    status += ("Pending campaigns: " + ", ".join(pend) + "." if pend else "")
+    if supp:
+        cap = (rf"\caption{{Test {caption_metric} on the real datasets, all methods: mean and, in parentheses, standard deviation over "
+               r"the outer folds. Conventions as in Table~\ref{M-tab:main_mcc} of the article; best value per dataset in bold; "
+               r"rank: average rank over the eight datasets.}")
+    else:
+        cap = (rf"\caption{{Test {caption_metric} on the real datasets, mean over the outer folds ($5\times5$-fold nested cross-validation; "
+               r"$5\times2$ for LOAN). Constraints as in \cref{sec:gains}; monotone: monotone splits of the tree ensembles; structural: "
+               r"monotone by architecture. Selection of the number of hidden units by DCV or on a hold-out split. Best value per dataset "
+               r"in bold; rank: average rank over the eight datasets. All methods and standard deviations: Supplementary "
+               r"\cref{S-tab:main_mcc_full}.}")
     write(name, "\n".join([
         r"\begin{table*}[!tbp]\centering",
-        (rf"\caption{{Test {caption_metric} on the real datasets (mean and, in parentheses, standard deviation over the outer folds). "
-         r"Rows, groups and conventions as in Table~\ref{M-tab:main_mcc} of the main article; rank over the datasets with complete results.}"
-         if supp else
-        rf"\caption{{Test {caption_metric} on the real datasets: mean and, in parentheses, standard deviation over the outer folds "
-        r"($5\times5$-fold nested cross-validation; $5\times2$ for COM and LOAN). Constraint: cegis --- counterexample-guided, certified "
-        r"(\cref{sec:cegis}); mean --- average-gain constraint (\cref{eq:mean}); sign --- sign-bounded coefficients; monotone --- "
-        r"monotone splits of the tree ensembles; structural --- monotone by architecture. Selection of the number of hidden units: "
-        r"hold-out split, DCV or DCV-1SE (\cref{sec:dcv}); the baselines select their hyper-parameters on the hold-out split. "
-        r"WILCAR, RIXM and ELM with a constraint are called WILCAR-C, RIXM-C and ELM-C in the text. "
-        + "Best value per dataset in bold (datasets with complete results only). "
-        + r"Rank: average rank over the datasets with complete results"
-        + (" (" + ", ".join(sn for k, sn in DS if k in rcols) + ")" if rcols else "") + r".}"),
+        cap,
         rf"\label{{tab:{name.split('.')[0]}}}",
         r"\resizebox{\linewidth}{!}{\begin{tabular}{lll" + "c" * len(DS) + r"c}\toprule",
         "Model & Constraint & Selection & " + " & ".join(sn for _, sn in DS) + r" & Rank \\\midrule",
         *(lines[:-1] if lines and lines[-1] == r"\midrule" else lines),
         r"\bottomrule\end{tabular}}",
-        (r"\par\smallskip\footnotesize\textit{" + status.replace("_", r"\_") + "}") if status else "",
         r"\end{table*}"]))
     return M, ranks
 
 
-CERT_GROUPS = [
-    ("none", "main", [("WILCAR", "holdout"), ("RIXM", "holdout"), ("MLP", "holdout")]),
-    ("mean", "main", [("WILCAR-C", "holdout"), ("RIXM-C", "holdout")]),
-    ("anchor", "multi", [("WILCAR-C", "holdout"), ("RIXM-C", "holdout")]),
-    ("sign", "global", [("WILCAR-C", "holdout"), ("RIXM-C", "holdout")]),
-    ("cegis", "cegis", [("WILCAR-C", "holdout"), ("WILCAR-C", "dcv1se"), ("RIXM-C", "holdout")]),
-    ("by construction", "main", [("LR-C XGB-C LGBM-C MINMAX CMNN LMN", "holdout")]),
-]
+MODES = [("none", "main", "WILCAR", "--- ", "none"),
+         ("mean", "main", "WILCAR-C", r"average gain $\ge\varepsilon_m$ on the training inputs, \eqref{eq:mean}", "sign of the average effect"),
+         ("anchor", "multi", "WILCAR-C", r"gain $\ge\varepsilon_p$ at $k$-means anchors, \eqref{eq:point}", "none between anchors"),
+         ("sign", "global", "WILCAR-C", r"$s_iv_jW_{ji}\ge0$, \eqref{eq:sign}", r"monotone (\cref{prop:sign})"),
+         ("cegis", "cegis", "WILCAR-C", r"gain $\ge\varepsilon_p$ at anchors grown by counterexamples + certificate", r"monotone (\cref{prop:always})")]
 
 
-def table_cert(dfs):
+def table_modes(dfs):
+    """Constraint families: what they impose and guarantee, and what they deliver on the real data (WILCAR, DCV)."""
     lines = []
-    for mode, role, rows in CERT_GROUPS:
+    for mode, role, meth, cond, guar in MODES:
         df = dfs.get(role)
-        for k, (meth, sel) in enumerate(rows):
-            first = mode if k == 0 else ""
-            meths = meth.split()
-            name = MODEL.get(meth, meth) if len(meths) == 1 else "six monotone baselines"
-            d = None if df is None else df[(df.method.isin(meths)) & (df.selection == sel)]
-            if d is None or not len(d):
-                lines.append(f"{first} & {name} & {SELNAME[sel]} & -- & -- & -- & -- & -- & -- & -- \\\\"); continue
-            nds = d.dataset.nunique()
-            mcc = d.groupby("dataset").mcc.mean().mean()
-            st = d["cert_status"] if "cert_status" in d else pd.Series(["none"] * len(d), index=d.index)
-            if (st == "none").all():
-                cert = "--"
-            else:
-                cert = f"{100 * np.mean(st.isin(['certified', 'by_construction'])):.0f}"
-            fb = d["cert_fallback"].fillna("") if "cert_fallback" in d else pd.Series([""] * len(d), index=d.index)
-            fbs = f"{100 * np.mean(fb != ''):.0f}" if mode == "cegis" else "--"
-            ns = "--" if d.n_star.isna().all() else f"{d.n_star.mean():.1f}"
-            lines.append(f"{first} & {name} & {SELNAME[sel]} & {nds} & {mcc:.3f} & {100 * d.viol_test.mean():.2f} & "
-                         f"{100 * d.viol_domain.mean():.2f} & {cert} & {fbs} & {ns} \\\\")
-        lines.append(r"\midrule")
-    write("certification.tex", "\n".join([
+        d = None if df is None else df[(df.method == meth) & (df.selection == "dcv")]
+        if d is None or not len(d):
+            lines.append(f"{mode} & {cond} & {guar} & -- & -- & -- & -- \\\\"); continue
+        mcc = d.groupby("dataset").mcc.mean().mean()
+        if mode == "sign":
+            cert = "100"                                    # by construction (Proposition 1)
+        else:
+            cert = f"{100 * np.mean(d.cert_status.isin(['certified', 'by_construction'])):.0f}"
+        viol = 0.0 if mode in ("sign", "cegis") else 100 * d.viol_domain.mean()
+        lines.append(f"{mode} & {cond} & {guar} & {mcc:.3f} & {viol:.1f} & {cert} & {d.time_s.median():.0f} \\\\")
+    write("modes.tex", "\n".join([
         r"\begin{table*}[!tbp]\centering\small",
-        r"\caption{Monotonicity on the real data by constraint, pooled over datasets and outer folds. $D$: datasets with results so far; "
-        r"MCC: mean over those datasets; viol.: share of (point, constrained input) pairs whose gain has the wrong sign, on the test "
-        r"points and on $10^4$ uniform points of $[0,1]^p$; cert.: share of final models proved monotone on $[0,1]^p$ by "
-        r"\cref{alg:bb} or monotone by construction (last row: LR-C, XGBoost and LightGBM with monotone constraints, Min-Max, CMNN "
-        r"and LMN, pooled); fallb.: cegis networks returned by the sign-constrained fallback of \cref{prop:always}; $n^\ast$: "
-        r"selected hidden units; ``--'': not applicable or not run yet. Networks selected by DCV behave as those selected on the "
-        r"hold-out split (Supplementary \cref{S-tab:size}).}",
-        r"\label{tab:cert}",
-        r"\resizebox{\linewidth}{!}{\begin{tabular}{lllrrrrrrr}\toprule",
-        r"Constraint & Model & Selection & $D$ & MCC & viol.\ test (\%) & viol.\ domain (\%) & cert.\ (\%) & fallb.\ (\%) & $n^\ast$ \\\midrule",
-        *(lines[:-1] if lines and lines[-1] == r"\midrule" else lines),
-        r"\bottomrule\end{tabular}}\end{table*}"]))
+        r"\caption{Constraint families and what they deliver on the real data (WILCAR with DCV, 185 outer folds over eight datasets). "
+        r"Guarantee: what holds on the whole domain $\B$. MCC: mean over datasets; viol.: share of (point, constrained input) pairs "
+        r"with a wrong-sign gain on $10^4$ uniform points of $\B$; cert.: networks proved monotone by the certificate or by "
+        r"construction; time: median per outer fold (selection, refit and certificate).}",
+        r"\label{tab:modes}",
+        r"\resizebox{\linewidth}{!}{\begin{tabular}{lllrrrr}\toprule",
+        r"Mode & Condition imposed & Guarantee on $\B$ & MCC & viol.\ (\%) & cert.\ (\%) & time (s) \\\midrule",
+        *lines, r"\bottomrule\end{tabular}}\end{table*}"]))
 
 
 def table_lit(dfs):
@@ -256,10 +249,9 @@ def table_lit(dfs):
         cells = [("--" if v is None else f"{v[0]} ({v[1]})") for v in (c, h, l)]
         lines.append(f"{name} \\citep{{{src}}} & " + " & ".join(cells) + r" \\")
     lines.append(r"\midrule")
-    ours = [("WILCAR-C", "dcv1se", "WILCAR, cegis, DCV-1SE"), ("WILCAR-C", "dcv", "WILCAR, cegis, DCV"),
-            ("WILCAR-C", "holdout", "WILCAR, cegis, hold-out"), ("RIXM-C", "holdout", "RIXM, cegis, hold-out"),
-            ("WILCAR", "holdout", "WILCAR, unconstrained"), ("RIXM", "holdout", "RIXM, unconstrained"),
-            ("MLP", "holdout", "MLP"), ("XGB-C", "holdout", "XGBoost, monotone"), ("LGBM-C", "holdout", "LightGBM, monotone"),
+    ours = [("WILCAR-C", "dcv", "WILCAR, cegis, DCV"), ("RIXM-C", "holdout", "RIXM, cegis, hold-out"),
+            ("WILCAR", "dcv", "WILCAR, unconstrained, DCV"), ("LR-C", "holdout", "LR, sign"),
+            ("XGB-C", "holdout", "XGBoost, monotone"), ("LGBM-C", "holdout", "LightGBM, monotone"),
             ("MINMAX", "holdout", "Min-Max (our runs)"), ("CMNN", "holdout", "CMNN (our runs)"), ("LMN", "holdout", "LMN (our runs)")]
     for meth, sel, disp in ours:
         cells = []
@@ -269,9 +261,10 @@ def table_lit(dfs):
         lines.append(f"{disp} & " + " & ".join(cells) + r" \\")
     write("literature.tex", "\n".join([
         r"\begin{table*}[!tbp]\centering\small",
-        r"\caption{Test accuracy (\%) on the official train/test splits of the monotonicity benchmarks. Upper block: values reported in the cited papers "
-        r"(mean and standard deviation of the best five of ten runs for CMNN). Lower block: this work, five seeds, hyper-parameters selected on a validation split "
-        r"of the official training set; ``our runs'' are the published architectures trained under the same protocol.}",
+        r"\caption{Test accuracy (\%) on the official train/test splits of the benchmarks, mean (standard deviation). Upper block: "
+        r"values reported in the cited papers, each under its own protocol (e.g.\ best five of ten runs for CMNN). Lower block: "
+        r"this work, five seeds, one common protocol (hyper-parameters selected on a validation split of the official training set); "
+        r"``our runs'': the published architectures trained under that protocol.}",
         r"\label{tab:lit}",
         r"\resizebox{\linewidth}{!}{\begin{tabular}{lccc}\toprule",
         r"Method & " + " & ".join(n for _, n in keys) + r" \\\midrule",
@@ -280,48 +273,15 @@ def table_lit(dfs):
         r"\end{table*}"]))
 
 
-def table_ablation(dfs):
-    orig = [k for k, _ in DS[:5]]
-    rows = [("main", "L-BFGS, $\\lambda_0=0.3$ (default)", {}), ("l2zero", "L-BFGS, $\\lambda_0=0$", {}),
-            ("gd", "gradient descent, $\\lambda_0=0$ (dissertation)", {}), ("zeroout", "new unit starts at $v_{n}=0$", {}),
-            ("dcvall", "DCV without weight reuse", {})]
-    lines = []
-    for role, disp, _ in rows:
-        df = dfs.get(role)
-        cells = []
-        for meth, sel in [("WILCAR", "holdout"), ("WILCAR", "dcv"), ("RIXM", "holdout"), ("RIXM", "dcv"),
-                          ("WILCAR-C", "holdout"), ("RIXM-C", "holdout")]:
-            if df is None:
-                cells.append("--"); continue
-            d = df[(df.method == meth) & (df.selection == sel) & (df.dataset.isin(orig))]
-            cnt = d.groupby("dataset").mcc.size()
-            full = cnt[cnt >= 20].index                         # 5x5 outer folds (tolerate a few missing)
-            d = d[d.dataset.isin(full)]
-            k = len(full)
-            cells.append("--" if not k else f"{d.groupby('dataset').mcc.mean().mean():.3f}" + ("" if k == len(orig) else f"\\textsuperscript{{{k}}}"))
-        lines.append(disp + " & " + " & ".join(cells) + r" \\")
-    write("ablation.tex", "\n".join([
-        r"\begin{table*}[!tbp]\centering\small",
-        r"\caption{Ablations on the five original datasets: test MCC averaged over datasets (constrained variants with the average-gain "
-        r"constraint). H: hold-out selection; DCV: dynamic cross-validation. A superscript gives the number of datasets averaged when "
-        r"fewer than five are complete; ``--'': not run yet.}",
-        r"\label{tab:ablation}",
-        r"\resizebox{\linewidth}{!}{\begin{tabular}{lcccccc}\toprule",
-        r"Setting & WILCAR (H) & WILCAR (DCV) & RIXM (H) & RIXM (DCV) & WILCAR-C (H) & RIXM-C (H) \\\midrule",
-        *lines, r"\bottomrule\end{tabular}}\end{table*}"]))
-
-
-SYN_ROWS = [("syn_cegis", "WILCAR-C", "dcv", lab("WILCAR-C", "cegis", "dcv")), ("syn_cegis", "RIXM-C", "holdout", lab("RIXM-C", "cegis", "holdout")),
-            ("syn_global", "WILCAR-C", "dcv", lab("WILCAR-C", "sign", "dcv")), ("syn_global", "RIXM-C", "holdout", lab("RIXM-C", "sign", "holdout")),
+SYN_ROWS = [("syn_cegis", "WILCAR-C", "dcv", lab("WILCAR-C", "cegis", "dcv")),
+            ("syn_global", "WILCAR-C", "dcv", lab("WILCAR-C", "sign", "dcv")),
             ("syn", "WILCAR-C", "dcv", lab("WILCAR-C", "mean", "dcv")), ("syn", "WILCAR", "dcv", lab("WILCAR", "none", "dcv")),
-            ("syn", "RIXM", "holdout", lab("RIXM", "none", "holdout")), ("syn", "MLP", "holdout", lab("MLP", "none", "holdout")),
             ("syn", "LR-C", "holdout", lab("LR-C", "sign", "holdout")), ("syn", "XGB-C", "holdout", lab("XGB-C", "monotone", "holdout")),
             ("syn", "LGBM-C", "holdout", lab("LGBM-C", "monotone", "holdout")), ("syn", "MINMAX", "holdout", lab("MINMAX", "structural", "holdout")),
             ("syn", "CMNN", "holdout", lab("CMNN", "structural", "holdout")), ("syn", "LMN", "holdout", lab("LMN", "structural", "holdout"))]
 SYN_DS = [("syn_and", "and"), ("syn_or", "or"), ("syn_prod", "prod"), ("syn_and3", "and3"),
           ("syn_andfree", "andfree"), ("syn_andneg", "andneg"), ("syn_wave", "wave")]
-SYN_BREAKS = (lab("RIXM-C", "cegis", "holdout"), lab("RIXM-C", "sign", "holdout"), lab("WILCAR-C", "mean", "dcv"),
-              lab("MLP", "none", "holdout"))
+SYN_BREAKS = (lab("WILCAR", "none", "dcv"),)
 
 
 def table_syn(dfs):
@@ -344,6 +304,10 @@ def table_syn(dfs):
             v = M.loc[disp, key]; col = M[key].dropna()
             t = "--" if np.isnan(v) else f"{v:.3f}"
             cells.append(rf"\textbf{{{t}}}" if len(col) and not np.isnan(v) and v == col.min() else t)
+        av = M.loc[disp].mean() if M.loc[disp].notna().all() else np.nan
+        colav = M.mean(axis=1).dropna()
+        ta = "--" if np.isnan(av) else f"{av:.3f}"
+        cells.append(rf"\textbf{{{ta}}}" if len(colav) and not np.isnan(av) and av == colav.min() else ta)
         lines.append(disp + " & " + " & ".join(cells) + f" & {cert.get(disp, '--')} \\\\")
         if disp in SYN_BREAKS:
             lines.append(r"\midrule")
@@ -352,12 +316,12 @@ def table_syn(dfs):
     write("synthetic.tex", "\n".join([
         r"\begin{table*}[!tbp]\centering\small",
         r"\caption{Synthetic targets (Supplementary \cref{S-tab:synthdef}): mean absolute error between the fitted and the true "
-        r"$P(Y=1\mid x)$ on $2\times10^4$ uniform points, averaged over the outer folds; cert.: share of final models "
-        r"that are monotone on $[0,1]^p$ (certified by \cref{alg:bb} or by construction). Constraints as in \cref{tab:modes}; "
+        r"$P(Y=1\mid x)$ on $2\times10^4$ uniform points, averaged over the 25 outer folds; mean: over the seven targets; cert.: share of final models "
+        r"that are monotone on $[0,1]^p$ (certified by the certificate of \cref{sec:certificate} or by construction). Constraints as in \cref{sec:gains}; "
         r"every SLFN uses the best of three initialisations per constructive step. Best value per target in bold.}",
         r"\label{tab:synth}",
-        r"\resizebox{\linewidth}{!}{\begin{tabular}{lll" + "c" * (len(SYN_DS) + 1) + r"}\toprule",
-        "Model & Constraint & Selection & " + " & ".join(n for _, n in SYN_DS) + r" & cert.\ (\%) \\\midrule",
+        r"\resizebox{\linewidth}{!}{\begin{tabular}{lll" + "c" * (len(SYN_DS) + 2) + r"}\toprule",
+        "Model & Constraint & Selection & " + " & ".join(n for _, n in SYN_DS) + r" & mean & cert.\ (\%) \\\midrule",
         *lines, r"\bottomrule\end{tabular}}", note, r"\end{table*}"]))
 
 
@@ -399,12 +363,12 @@ def table_cert_bench():
 
 def table_size(dfs):
     """Selected size n* and time per outer fold (mean), by dataset: hold-out vs DCV vs DCV-1SE."""
-    rows = [("main", "WILCAR", "holdout", lab("WILCAR", "none", "holdout")), ("main", "WILCAR", "dcv", lab("WILCAR", "none", "dcv")),
-            ("main", "WILCAR", "dcv1se", lab("WILCAR", "none", "dcv1se")), ("main", "RIXM", "holdout", lab("RIXM", "none", "holdout")),
-            ("main", "WILCAR-C", "holdout", lab("WILCAR-C", "mean", "holdout")), ("main", "WILCAR-C", "dcv", lab("WILCAR-C", "mean", "dcv")),
-            ("main", "RIXM-C", "holdout", lab("RIXM-C", "mean", "holdout")),
-            ("cegis", "WILCAR-C", "holdout", lab("WILCAR-C", "cegis", "holdout")), ("cegis", "WILCAR-C", "dcv", lab("WILCAR-C", "cegis", "dcv")),
-            ("cegis", "WILCAR-C", "dcv1se", lab("WILCAR-C", "cegis", "dcv1se")), ("cegis", "RIXM-C", "holdout", lab("RIXM-C", "cegis", "holdout"))]
+    rows = [("main", "WILCAR", "dcv", lab("WILCAR", "none", "dcv")), ("main", "WILCAR", "holdout", lab("WILCAR", "none", "holdout")),
+            ("main", "RIXM", "holdout", lab("RIXM", "none", "holdout")),
+            ("main", "WILCAR-C", "dcv", lab("WILCAR-C", "mean", "dcv")), ("global", "WILCAR-C", "dcv", lab("WILCAR-C", "sign", "dcv")),
+            ("multi", "WILCAR-C", "dcv", lab("WILCAR-C", "anchor", "dcv")),
+            ("cegis", "WILCAR-C", "dcv", lab("WILCAR-C", "cegis", "dcv")), ("cegis", "WILCAR-C", "holdout", lab("WILCAR-C", "cegis", "holdout")),
+            ("cegis", "RIXM-C", "holdout", lab("RIXM-C", "cegis", "holdout"))]
     lines = []
     for role, meth, sel, disp in rows:
         cells = []
@@ -416,8 +380,7 @@ def table_size(dfs):
     write("size.tex", "\n".join([
         r"\begin{table*}[!tbp]\centering",
         r"\caption{Selected number of hidden units $n^\ast$ and, in parentheses, time per outer fold (selection, refit and certificate), "
-        r"means over the outer folds. DCV: size minimising the summed validation cross-entropy; DCV-1SE: smallest size within one "
-        r"standard error of that minimum.}",
+        r"means over the outer folds; selection loops stopped by the one-hour budget are included as they are.}",
         r"\label{tab:size}",
         r"\resizebox{\linewidth}{!}{\begin{tabular}{lll" + "c" * len(DS) + r"}\toprule",
         "Model & Constraint & Selection & " + " & ".join(sn for _, sn in DS) + r" \\\midrule",
@@ -425,8 +388,9 @@ def table_size(dfs):
 
 
 # one representative per family for the critical-difference diagram (Nemenyi needs few methods with 8 datasets)
-CD_ROWS = [lab("WILCAR-C", "cegis", "dcv1se"), lab("RIXM-C", "cegis", "holdout"), lab("WILCAR-C", "mean", "holdout"),
-           lab("WILCAR", "none", "holdout"), lab("MLP", "none", "holdout"), lab("LR-C", "sign", "holdout"),
+CD_ROWS = [lab("WILCAR-C", "cegis", "dcv"), lab("RIXM-C", "cegis", "holdout"), lab("WILCAR-C", "sign", "dcv"),
+           lab("WILCAR-C", "mean", "dcv"), lab("WILCAR", "none", "dcv"), lab("RIXM", "none", "holdout"),
+           lab("MLP", "none", "holdout"), lab("LR-C", "sign", "holdout"),
            lab("XGB-C", "monotone", "holdout"), lab("LGBM-C", "monotone", "holdout"), lab("MINMAX", "structural", "holdout"),
            lab("CMNN", "structural", "holdout"), lab("LMN", "structural", "holdout")]
 Q05 = {2: 1.960, 3: 2.343, 4: 2.569, 5: 2.728, 6: 2.850, 7: 2.949, 8: 3.031, 9: 3.102, 10: 3.164, 11: 3.219, 12: 3.268,
@@ -509,18 +473,17 @@ def main():
     dfs = {r: load(t) for r, t in tags.items()}
     print({r: (None if d is None else len(d)) for r, d in dfs.items()})
     table_datasets()
-    M, ranks = table_main(dfs, "mcc", "main_mcc.tex", "MCC")
+    M, ranks = table_main(dfs, "mcc", "main_mcc_full.tex", "MCC", supp=True)
+    table_main(dfs, "mcc", "main_mcc.tex", "MCC", supp=False, groups=COMPACT_GROUPS)
     table_main(dfs, "auc", "main_auc.tex", "AUC", supp=True)
     table_main(dfs, "brier", "main_brier.tex", "Brier score", supp=True)
-    table_cert(dfs)
+    table_modes(dfs)
     table_lit(dfs)
-    table_ablation(dfs)
     table_syn(dfs)
     table_size(dfs)
     table_cert_bench()
     numbers(dfs, M, ranks)
     figure_cd(M)
-
 
 if __name__ == "__main__":
     main()

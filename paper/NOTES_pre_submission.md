@@ -1,5 +1,23 @@
 # Pre-submission notes (2026-09-29) — to address when closing the next complete version
 
+## Update 2026-09-30 (v7, concise version)
+* Co-advisor required ≤ 20 pages excluding references → article rewritten (v7): preprint PDF 14 pages before the
+  references (20 in all), Word 17 before the references, journal layout 10 pages; ~2,950 words of body text, 44
+  references. Proofs, B&B algorithm, capacity figure (old Fig. 2), certificate ablation, DCV algorithm, full MCC/AUC/Brier
+  tables, sizes/times and CD diagram moved to the Supplementary Material (11 pages). DCV-1SE and the ablation table were
+  dropped (no dcv1se rows in the campaign; gd/zeroout/dcvall not run). Old long source: git history (commit 1489a72).
+* Results used (campaign of 2026-09-30, copied from the user's folder): main, cegis, global, multi, lit, syn, syn_cegis,
+  syn_global complete; l2zero partial (not used). Key numbers: cegis 100 % certified (2.7 % fallback, 15/555), MCC =
+  free (+0.002, p = 0.07) ≈ CMNN (−0.004, p = 0.20) > LMN/Min-Max (p < 1e-4); Friedman/ID p = 0.004, only Min-Max and LMN
+  worse after Holm; free nets monotone in 35 %, mean 75 %, anchor 64 %; synthetic: cegis 0.053 vs sign 0.076 (−30 %),
+  free 0.044, LGBM-C/Min-Max 0.041, LMN 0.042, CMNN 0.048; official splits: our SLFNs ≈ our retrained CMNN/LMN/Min-Max.
+* global/syn_global `cert_status` columns are wrong in these files (SLSQP residue ≈ −1e-12, fixed on the user's machine
+  in commit bc64edd, not yet pushed); the paper reports the sign mode as certified by construction (Prop. 1).
+* Done from §3: Sartor et al. 2025 cited and in Table lit; exchange-method sentence with Hettich & Kortanek 1993.
+  Still open: data-scarcity experiment, rigorous interval re-check, constructive-argument numbers, flexibility-analysis
+  analogy, MCC before/after repair, NCA constraint definition (text now says "gain estimated over the training data").
+
+
 Decision (Ghabriel, 2026-09-29): wait for the experiment campaigns; address everything below when closing the next
 "initial final version with nothing missing". Nothing here has been implemented yet.
 

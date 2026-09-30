@@ -1,0 +1,46 @@
+\begin{table*}[!tbp]\centering
+\caption{Test MCC on the real datasets, all methods: mean and, in parentheses, standard deviation over the outer folds. Conventions as in Table~\ref{M-tab:main_mcc} of the article; best value per dataset in bold; rank: average rank over the eight datasets.}
+\label{tab:main_mcc_full}
+\resizebox{\linewidth}{!}{\begin{tabular}{lllccccccccc}\toprule
+Model & Constraint & Selection & ALG & BCO & BCD & HF & PIM & HD & COM & LOAN & Rank \\\midrule
+\multicolumn{12}{l}{\textit{Certified SLFNs, counterexample-guided (this work)}} \\
+WILCAR & cegis & DCV & 0.901\,{\scriptsize(0.06)} & 0.932\,{\scriptsize(0.03)} & 0.952\,{\scriptsize(0.03)} & 0.574\,{\scriptsize(0.11)} & 0.473\,{\scriptsize(0.07)} & 0.589\,{\scriptsize(0.12)} & 0.349\,{\scriptsize(0.03)} & 0.293\,{\scriptsize(0.02)} & 11.1 \\
+WILCAR & cegis & hold-out & 0.906\,{\scriptsize(0.06)} & \textbf{0.937\,{\scriptsize(0.03)}} & 0.866\,{\scriptsize(0.26)} & 0.564\,{\scriptsize(0.10)} & 0.468\,{\scriptsize(0.07)} & 0.597\,{\scriptsize(0.12)} & 0.349\,{\scriptsize(0.03)} & 0.293\,{\scriptsize(0.02)} & 13.2 \\
+RIXM & cegis & hold-out & 0.908\,{\scriptsize(0.06)} & 0.936\,{\scriptsize(0.03)} & 0.937\,{\scriptsize(0.05)} & 0.564\,{\scriptsize(0.11)} & 0.471\,{\scriptsize(0.07)} & 0.599\,{\scriptsize(0.12)} & 0.352\,{\scriptsize(0.03)} & 0.292\,{\scriptsize(0.02)} & 9.1 \\
+\midrule
+\multicolumn{12}{l}{\textit{SLFNs with sign constraints}} \\
+WILCAR & sign & DCV & 0.899\,{\scriptsize(0.07)} & 0.929\,{\scriptsize(0.03)} & 0.953\,{\scriptsize(0.03)} & 0.574\,{\scriptsize(0.11)} & 0.471\,{\scriptsize(0.07)} & 0.589\,{\scriptsize(0.12)} & 0.350\,{\scriptsize(0.03)} & 0.292\,{\scriptsize(0.02)} & 12.2 \\
+WILCAR & sign & hold-out & 0.909\,{\scriptsize(0.07)} & 0.932\,{\scriptsize(0.03)} & 0.916\,{\scriptsize(0.19)} & 0.564\,{\scriptsize(0.10)} & 0.470\,{\scriptsize(0.07)} & 0.597\,{\scriptsize(0.12)} & 0.348\,{\scriptsize(0.03)} & 0.286\,{\scriptsize(0.02)} & 15.4 \\
+RIXM & sign & hold-out & 0.909\,{\scriptsize(0.07)} & 0.932\,{\scriptsize(0.03)} & \textbf{0.955\,{\scriptsize(0.03)}} & 0.562\,{\scriptsize(0.10)} & 0.468\,{\scriptsize(0.07)} & 0.601\,{\scriptsize(0.12)} & 0.350\,{\scriptsize(0.03)} & 0.291\,{\scriptsize(0.02)} & 11.2 \\
+\midrule
+\multicolumn{12}{l}{\textit{SLFNs with anchor constraints}} \\
+WILCAR & anchor & DCV & 0.906\,{\scriptsize(0.06)} & 0.932\,{\scriptsize(0.03)} & 0.954\,{\scriptsize(0.03)} & 0.574\,{\scriptsize(0.11)} & 0.475\,{\scriptsize(0.07)} & 0.589\,{\scriptsize(0.12)} & 0.349\,{\scriptsize(0.03)} & 0.292\,{\scriptsize(0.02)} & 10.9 \\
+WILCAR & anchor & hold-out & 0.906\,{\scriptsize(0.06)} & \textbf{0.937\,{\scriptsize(0.03)}} & 0.865\,{\scriptsize(0.26)} & 0.564\,{\scriptsize(0.10)} & 0.472\,{\scriptsize(0.07)} & 0.597\,{\scriptsize(0.12)} & 0.349\,{\scriptsize(0.03)} & 0.293\,{\scriptsize(0.02)} & 11.6 \\
+RIXM & anchor & hold-out & 0.908\,{\scriptsize(0.06)} & 0.936\,{\scriptsize(0.03)} & 0.937\,{\scriptsize(0.05)} & 0.564\,{\scriptsize(0.11)} & 0.473\,{\scriptsize(0.07)} & 0.599\,{\scriptsize(0.12)} & 0.351\,{\scriptsize(0.03)} & 0.291\,{\scriptsize(0.02)} & 9.4 \\
+\midrule
+\multicolumn{12}{l}{\textit{SLFNs with the average-gain constraint of \citet{Sa2026}}} \\
+WILCAR & mean & DCV & 0.901\,{\scriptsize(0.06)} & 0.936\,{\scriptsize(0.03)} & 0.938\,{\scriptsize(0.04)} & 0.558\,{\scriptsize(0.10)} & \textbf{0.475\,{\scriptsize(0.07)}} & 0.589\,{\scriptsize(0.13)} & 0.350\,{\scriptsize(0.03)} & 0.293\,{\scriptsize(0.02)} & 10.9 \\
+WILCAR & mean & hold-out & 0.907\,{\scriptsize(0.06)} & 0.935\,{\scriptsize(0.03)} & 0.896\,{\scriptsize(0.11)} & 0.556\,{\scriptsize(0.10)} & 0.471\,{\scriptsize(0.07)} & 0.598\,{\scriptsize(0.12)} & 0.351\,{\scriptsize(0.03)} & 0.292\,{\scriptsize(0.02)} & 12.4 \\
+RIXM & mean & hold-out & 0.906\,{\scriptsize(0.06)} & 0.935\,{\scriptsize(0.03)} & 0.936\,{\scriptsize(0.04)} & 0.553\,{\scriptsize(0.10)} & 0.470\,{\scriptsize(0.07)} & 0.600\,{\scriptsize(0.12)} & 0.353\,{\scriptsize(0.03)} & 0.290\,{\scriptsize(0.02)} & 13.2 \\
+\midrule
+\multicolumn{12}{l}{\textit{Unconstrained SLFNs}} \\
+WILCAR & none & DCV & 0.897\,{\scriptsize(0.07)} & 0.929\,{\scriptsize(0.03)} & 0.952\,{\scriptsize(0.03)} & 0.567\,{\scriptsize(0.12)} & 0.472\,{\scriptsize(0.07)} & 0.589\,{\scriptsize(0.12)} & 0.349\,{\scriptsize(0.03)} & 0.292\,{\scriptsize(0.02)} & 12.8 \\
+WILCAR & none & hold-out & 0.907\,{\scriptsize(0.07)} & 0.931\,{\scriptsize(0.03)} & 0.953\,{\scriptsize(0.03)} & 0.562\,{\scriptsize(0.11)} & 0.469\,{\scriptsize(0.07)} & 0.598\,{\scriptsize(0.12)} & 0.348\,{\scriptsize(0.03)} & 0.290\,{\scriptsize(0.01)} & 14.2 \\
+RIXM & none & hold-out & 0.907\,{\scriptsize(0.07)} & 0.931\,{\scriptsize(0.03)} & 0.954\,{\scriptsize(0.03)} & 0.563\,{\scriptsize(0.11)} & 0.473\,{\scriptsize(0.07)} & 0.599\,{\scriptsize(0.12)} & 0.351\,{\scriptsize(0.03)} & 0.294\,{\scriptsize(0.02)} & 8.8 \\
+ELM & none & hold-out & 0.828\,{\scriptsize(0.07)} & 0.920\,{\scriptsize(0.03)} & 0.884\,{\scriptsize(0.06)} & 0.439\,{\scriptsize(0.14)} & 0.428\,{\scriptsize(0.10)} & 0.521\,{\scriptsize(0.17)} & 0.337\,{\scriptsize(0.03)} & 0.280\,{\scriptsize(0.02)} & 25.2 \\
+MLP & none & hold-out & 0.868\,{\scriptsize(0.06)} & 0.934\,{\scriptsize(0.03)} & 0.949\,{\scriptsize(0.03)} & 0.556\,{\scriptsize(0.12)} & 0.427\,{\scriptsize(0.08)} & 0.585\,{\scriptsize(0.11)} & 0.344\,{\scriptsize(0.03)} & 0.291\,{\scriptsize(0.02)} & 18.5 \\
+\midrule
+\multicolumn{12}{l}{\textit{Monotone baselines}} \\
+LR & sign & hold-out & 0.931\,{\scriptsize(0.07)} & 0.924\,{\scriptsize(0.03)} & 0.954\,{\scriptsize(0.03)} & 0.576\,{\scriptsize(0.12)} & 0.455\,{\scriptsize(0.07)} & 0.569\,{\scriptsize(0.15)} & 0.344\,{\scriptsize(0.03)} & 0.286\,{\scriptsize(0.02)} & 15.4 \\
+XGBoost & monotone & hold-out & \textbf{0.967\,{\scriptsize(0.03)}} & 0.926\,{\scriptsize(0.04)} & 0.931\,{\scriptsize(0.03)} & 0.617\,{\scriptsize(0.12)} & 0.462\,{\scriptsize(0.07)} & 0.515\,{\scriptsize(0.11)} & 0.357\,{\scriptsize(0.02)} & \textbf{0.295\,{\scriptsize(0.02)}} & 11.2 \\
+LightGBM & monotone & hold-out & 0.950\,{\scriptsize(0.05)} & 0.922\,{\scriptsize(0.04)} & 0.933\,{\scriptsize(0.03)} & 0.628\,{\scriptsize(0.11)} & 0.459\,{\scriptsize(0.09)} & 0.518\,{\scriptsize(0.12)} & 0.356\,{\scriptsize(0.02)} & 0.295\,{\scriptsize(0.02)} & 11.9 \\
+Min-Max & structural & hold-out & 0.911\,{\scriptsize(0.07)} & 0.925\,{\scriptsize(0.03)} & 0.914\,{\scriptsize(0.04)} & 0.539\,{\scriptsize(0.10)} & 0.455\,{\scriptsize(0.08)} & 0.544\,{\scriptsize(0.14)} & 0.348\,{\scriptsize(0.03)} & 0.288\,{\scriptsize(0.02)} & 20.4 \\
+CMNN & structural & hold-out & 0.937\,{\scriptsize(0.07)} & 0.927\,{\scriptsize(0.03)} & 0.947\,{\scriptsize(0.03)} & 0.562\,{\scriptsize(0.11)} & 0.466\,{\scriptsize(0.08)} & \textbf{0.610\,{\scriptsize(0.12)}} & 0.354\,{\scriptsize(0.03)} & 0.293\,{\scriptsize(0.02)} & 10.4 \\
+LMN & structural & hold-out & 0.894\,{\scriptsize(0.07)} & 0.932\,{\scriptsize(0.03)} & 0.929\,{\scriptsize(0.05)} & 0.545\,{\scriptsize(0.12)} & 0.448\,{\scriptsize(0.07)} & 0.548\,{\scriptsize(0.14)} & 0.346\,{\scriptsize(0.03)} & 0.291\,{\scriptsize(0.02)} & 20.0 \\
+\midrule
+\multicolumn{12}{l}{\textit{Unconstrained baselines}} \\
+LR & none & hold-out & 0.911\,{\scriptsize(0.07)} & 0.924\,{\scriptsize(0.03)} & 0.950\,{\scriptsize(0.03)} & 0.555\,{\scriptsize(0.13)} & 0.455\,{\scriptsize(0.07)} & 0.567\,{\scriptsize(0.15)} & 0.346\,{\scriptsize(0.02)} & 0.285\,{\scriptsize(0.02)} & 18.7 \\
+XGBoost & none & hold-out & \textbf{0.967\,{\scriptsize(0.03)}} & 0.929\,{\scriptsize(0.03)} & 0.926\,{\scriptsize(0.02)} & \textbf{0.630\,{\scriptsize(0.11)}} & 0.449\,{\scriptsize(0.08)} & 0.523\,{\scriptsize(0.12)} & \textbf{0.357\,{\scriptsize(0.03)}} & 0.294\,{\scriptsize(0.02)} & 11.4 \\
+LightGBM & none & hold-out & 0.947\,{\scriptsize(0.05)} & 0.935\,{\scriptsize(0.04)} & 0.927\,{\scriptsize(0.03)} & 0.610\,{\scriptsize(0.10)} & 0.469\,{\scriptsize(0.06)} & 0.518\,{\scriptsize(0.12)} & 0.354\,{\scriptsize(0.03)} & 0.291\,{\scriptsize(0.02)} & 11.4 \\
+\bottomrule\end{tabular}}
+\end{table*}

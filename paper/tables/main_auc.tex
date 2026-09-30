@@ -1,40 +1,46 @@
 \begin{table*}[!tbp]\centering
-\caption{Test AUC on the real datasets (mean and, in parentheses, standard deviation over the outer folds). Rows, groups and conventions as in Table~\ref{M-tab:main_mcc} of the main article; rank over the datasets with complete results.}
+\caption{Test AUC on the real datasets, all methods: mean and, in parentheses, standard deviation over the outer folds. Conventions as in Table~\ref{M-tab:main_mcc} of the article; best value per dataset in bold; rank: average rank over the eight datasets.}
 \label{tab:main_auc}
 \resizebox{\linewidth}{!}{\begin{tabular}{lllccccccccc}\toprule
 Model & Constraint & Selection & ALG & BCO & BCD & HF & PIM & HD & COM & LOAN & Rank \\\midrule
-\multicolumn{12}{l}{\textit{Certified SLFNs (this work)}} \\
-WILCAR & cegis & DCV-1SE & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-WILCAR & cegis & DCV & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-WILCAR & cegis & hold-out & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-RIXM & cegis & hold-out & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\multicolumn{12}{l}{\textit{Certified SLFNs, counterexample-guided (this work)}} \\
+WILCAR & cegis & DCV & 0.991\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.857\,{\scriptsize(0.05)} & 0.827\,{\scriptsize(0.04)} & 0.914\,{\scriptsize(0.04)} & 0.734\,{\scriptsize(0.01)} & 0.703\,{\scriptsize(0.01)} & 11.6 \\
+WILCAR & cegis & hold-out & 0.992\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.971\,{\scriptsize(0.10)} & 0.856\,{\scriptsize(0.05)} & 0.827\,{\scriptsize(0.04)} & 0.915\,{\scriptsize(0.04)} & 0.732\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 14.7 \\
+RIXM & cegis & hold-out & 0.991\,{\scriptsize(0.01)} & \textbf{0.996\,{\scriptsize(0.00)}} & 0.992\,{\scriptsize(0.01)} & 0.856\,{\scriptsize(0.05)} & 0.827\,{\scriptsize(0.04)} & 0.915\,{\scriptsize(0.04)} & 0.733\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 12.8 \\
+\midrule
+\multicolumn{12}{l}{\textit{SLFNs with sign constraints}} \\
+WILCAR & sign & DCV & 0.993\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & 0.857\,{\scriptsize(0.05)} & 0.827\,{\scriptsize(0.04)} & 0.914\,{\scriptsize(0.04)} & 0.734\,{\scriptsize(0.01)} & 0.703\,{\scriptsize(0.01)} & 11.0 \\
+WILCAR & sign & hold-out & 0.993\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.856\,{\scriptsize(0.05)} & 0.827\,{\scriptsize(0.04)} & 0.915\,{\scriptsize(0.04)} & 0.731\,{\scriptsize(0.01)} & 0.699\,{\scriptsize(0.01)} & 14.8 \\
+RIXM & sign & hold-out & 0.993\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & 0.856\,{\scriptsize(0.05)} & 0.827\,{\scriptsize(0.04)} & 0.915\,{\scriptsize(0.04)} & 0.732\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 10.8 \\
+\midrule
+\multicolumn{12}{l}{\textit{SLFNs with anchor constraints}} \\
+WILCAR & anchor & DCV & 0.991\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.857\,{\scriptsize(0.05)} & 0.829\,{\scriptsize(0.04)} & 0.914\,{\scriptsize(0.04)} & 0.734\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 10.8 \\
+WILCAR & anchor & hold-out & 0.992\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.971\,{\scriptsize(0.10)} & 0.856\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.03)} & 0.915\,{\scriptsize(0.04)} & 0.731\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 13.2 \\
+RIXM & anchor & hold-out & 0.991\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.992\,{\scriptsize(0.01)} & 0.856\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.04)} & 0.915\,{\scriptsize(0.04)} & 0.732\,{\scriptsize(0.01)} & 0.701\,{\scriptsize(0.01)} & 13.0 \\
 \midrule
 \multicolumn{12}{l}{\textit{SLFNs with the average-gain constraint of \citet{Sa2026}}} \\
-WILCAR & mean & DCV-1SE & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-WILCAR & mean & DCV & 0.992\,{\scriptsize(0.01)} & \textbf{0.996\,{\scriptsize(0.00)}} & -- & -- & -- & -- & -- & -- & 7.0 \\
-WILCAR & mean & hold-out & 0.992\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.979\,{\scriptsize(0.06)} & -- & -- & -- & -- & -- & 6.2 \\
-RIXM & mean & hold-out & 0.992\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & 6.8 \\
+WILCAR & mean & DCV & 0.992\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.859\,{\scriptsize(0.05)} & 0.829\,{\scriptsize(0.03)} & 0.915\,{\scriptsize(0.04)} & 0.734\,{\scriptsize(0.01)} & 0.703\,{\scriptsize(0.01)} & 8.2 \\
+WILCAR & mean & hold-out & 0.992\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.981\,{\scriptsize(0.06)} & 0.856\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.04)} & 0.915\,{\scriptsize(0.04)} & 0.732\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 12.9 \\
+RIXM & mean & hold-out & 0.992\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.856\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.04)} & \textbf{0.916\,{\scriptsize(0.04)}} & 0.732\,{\scriptsize(0.01)} & 0.701\,{\scriptsize(0.01)} & 12.7 \\
 \midrule
 \multicolumn{12}{l}{\textit{Unconstrained SLFNs}} \\
-WILCAR & none & DCV-1SE & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-WILCAR & none & DCV & 0.992\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & -- & -- & -- & -- & -- & 9.0 \\
-WILCAR & none & hold-out & 0.993\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & -- & -- & -- & -- & -- & 6.5 \\
-RIXM & none & hold-out & 0.993\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & 6.5 \\
-ELM & none & hold-out & 0.972\,{\scriptsize(0.02)} & 0.993\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & 16.0 \\
-MLP & none & hold-out & 0.979\,{\scriptsize(0.02)} & 0.995\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & 12.0 \\
+WILCAR & none & DCV & 0.992\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & 0.855\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.04)} & 0.914\,{\scriptsize(0.04)} & 0.734\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 11.2 \\
+WILCAR & none & hold-out & 0.993\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & 0.854\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.03)} & 0.915\,{\scriptsize(0.04)} & 0.731\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 12.6 \\
+RIXM & none & hold-out & 0.993\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & 0.854\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.03)} & 0.915\,{\scriptsize(0.04)} & 0.732\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 11.1 \\
+ELM & none & hold-out & 0.972\,{\scriptsize(0.02)} & 0.993\,{\scriptsize(0.00)} & 0.985\,{\scriptsize(0.01)} & 0.785\,{\scriptsize(0.06)} & 0.800\,{\scriptsize(0.05)} & 0.861\,{\scriptsize(0.07)} & 0.723\,{\scriptsize(0.02)} & 0.695\,{\scriptsize(0.01)} & 25.4 \\
+MLP & none & hold-out & 0.979\,{\scriptsize(0.02)} & 0.995\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.852\,{\scriptsize(0.05)} & 0.817\,{\scriptsize(0.04)} & 0.904\,{\scriptsize(0.05)} & 0.726\,{\scriptsize(0.01)} & 0.701\,{\scriptsize(0.01)} & 20.1 \\
 \midrule
 \multicolumn{12}{l}{\textit{Monotone baselines}} \\
-LR & sign & hold-out & 0.995\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & 7.2 \\
-XGBoost & monotone & hold-out & \textbf{0.998\,{\scriptsize(0.00)}} & 0.993\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & 8.8 \\
-LightGBM & monotone & hold-out & 0.998\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & 8.5 \\
-Min-Max & structural & hold-out & 0.990\,{\scriptsize(0.01)} & 0.994\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & 13.0 \\
-CMNN & structural & hold-out & 0.994\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & 8.5 \\
-LMN & structural & hold-out & 0.986\,{\scriptsize(0.02)} & 0.995\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & 11.0 \\
+LR & sign & hold-out & 0.995\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & 0.856\,{\scriptsize(0.05)} & 0.823\,{\scriptsize(0.04)} & 0.910\,{\scriptsize(0.04)} & 0.725\,{\scriptsize(0.01)} & 0.700\,{\scriptsize(0.01)} & 15.6 \\
+XGBoost & monotone & hold-out & \textbf{0.998\,{\scriptsize(0.00)}} & 0.993\,{\scriptsize(0.00)} & 0.992\,{\scriptsize(0.01)} & \textbf{0.906\,{\scriptsize(0.03)}} & 0.829\,{\scriptsize(0.03)} & 0.890\,{\scriptsize(0.04)} & 0.737\,{\scriptsize(0.01)} & 0.704\,{\scriptsize(0.01)} & 9.4 \\
+LightGBM & monotone & hold-out & 0.998\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.905\,{\scriptsize(0.03)} & \textbf{0.830\,{\scriptsize(0.04)}} & 0.887\,{\scriptsize(0.04)} & 0.736\,{\scriptsize(0.01)} & \textbf{0.704\,{\scriptsize(0.01)}} & 8.8 \\
+Min-Max & structural & hold-out & 0.990\,{\scriptsize(0.01)} & 0.994\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.844\,{\scriptsize(0.04)} & 0.816\,{\scriptsize(0.04)} & 0.887\,{\scriptsize(0.05)} & 0.730\,{\scriptsize(0.01)} & 0.700\,{\scriptsize(0.01)} & 22.6 \\
+CMNN & structural & hold-out & 0.994\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & \textbf{0.995\,{\scriptsize(0.01)}} & 0.855\,{\scriptsize(0.04)} & 0.828\,{\scriptsize(0.04)} & 0.908\,{\scriptsize(0.04)} & 0.737\,{\scriptsize(0.01)} & 0.703\,{\scriptsize(0.01)} & 10.9 \\
+LMN & structural & hold-out & 0.986\,{\scriptsize(0.02)} & 0.995\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & 0.847\,{\scriptsize(0.05)} & 0.824\,{\scriptsize(0.03)} & 0.902\,{\scriptsize(0.05)} & 0.733\,{\scriptsize(0.01)} & 0.701\,{\scriptsize(0.01)} & 18.0 \\
 \midrule
 \multicolumn{12}{l}{\textit{Unconstrained baselines}} \\
-LR & none & hold-out & 0.993\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & 8.2 \\
-XGBoost & none & hold-out & \textbf{0.998\,{\scriptsize(0.00)}} & 0.993\,{\scriptsize(0.01)} & -- & -- & -- & -- & -- & -- & 9.2 \\
-LightGBM & none & hold-out & 0.998\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.00)} & -- & -- & -- & -- & -- & -- & 8.5 \\
+LR & none & hold-out & 0.993\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & 0.855\,{\scriptsize(0.05)} & 0.823\,{\scriptsize(0.04)} & 0.910\,{\scriptsize(0.04)} & 0.726\,{\scriptsize(0.01)} & 0.699\,{\scriptsize(0.01)} & 17.3 \\
+XGBoost & none & hold-out & \textbf{0.998\,{\scriptsize(0.00)}} & 0.993\,{\scriptsize(0.01)} & 0.993\,{\scriptsize(0.01)} & 0.905\,{\scriptsize(0.04)} & 0.825\,{\scriptsize(0.03)} & 0.887\,{\scriptsize(0.04)} & \textbf{0.737\,{\scriptsize(0.01)}} & 0.704\,{\scriptsize(0.01)} & 11.6 \\
+LightGBM & none & hold-out & 0.998\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.900\,{\scriptsize(0.04)} & 0.829\,{\scriptsize(0.03)} & 0.879\,{\scriptsize(0.04)} & 0.736\,{\scriptsize(0.01)} & 0.703\,{\scriptsize(0.01)} & 10.0 \\
 \bottomrule\end{tabular}}
-\par\smallskip\footnotesize\textit{Datasets complete so far: ALG, BCO. Pending campaigns: cegis.}
 \end{table*}

@@ -40,7 +40,122 @@ classification''}
 \begin{document}
 \maketitle
 
-\noindent Section, equation, table and algorithm numbers without the prefix S refer to the main article.
+\noindent Section, equation, table, figure and algorithm numbers without the prefix S refer to the main article.
+
+% =====================================================================================================
+\section{Proofs}\label{sup:proofs}
+
+\paragraph{\Cref{M-lem:gain}}
+By the chain rule,
+\[
+\frac{\partial p_\theta}{\partial x_i}=\sig'(z_o)\,\frac{\partial z_o}{\partial x_i},\qquad
+\frac{\partial z_o}{\partial x_i}=\sum_j v_j\sig'(z_j)W_{ji}.
+\]
+Multiplying by $s_i$ gives $s_ig_i=\sig'(z_o)\sum_j s_iv_jW_{ji}\sig'(z_j)=\sig'(z_o)h_i$, and $\sig'(z_o)>0$.
+
+\paragraph{\Cref{M-prop:sign}}
+If $c_{ij}\ge0$ for all $j$, then $h_i(x)=\sum_jc_{ij}\sig'(z_j(x))\ge0$ for every $x\in\R^p$ because $\sig'>0$;
+conclude with \cref{M-lem:gain} and \cref{M-def:mono}.
+
+\paragraph{\Cref{M-thm:ua}}
+Let $F=\sig^{-1}\circ f$. Since $f(\B)$ is a compact subset of $(0,1)$, $F$ is continuous and, $\sig^{-1}$ being
+increasing, $s$-monotone. \emph{Extension.} Let $\pi:\R^p\to\B$ clip every coordinate to $[0,1]$ and
+$\tilde F=F\circ\pi$; $\tilde F$ is continuous, bounded and $s$-monotone on $\R^p$, because increasing $x_i$ increases
+$\pi(x)_i$ or leaves it unchanged and does not affect the other coordinates. \emph{Smoothing.} Let $\phi_\delta\ge0$ be a
+smooth mollifier supported in the ball of radius $\delta$ with $\int\phi_\delta=1$, and $F_\delta=\tilde F*\phi_\delta$.
+Then $F_\delta\in C^\infty$, and for $t\ge0$,
+$s_i\bigl(F_\delta(x+te_i)-F_\delta(x)\bigr)=\int\phi_\delta(y)\,s_i\bigl(\tilde F(x-y+te_i)-\tilde F(x-y)\bigr)dy\ge0$, so
+$s_i\,\partial_iF_\delta\ge0$; by uniform continuity of $\tilde F$ on a neighbourhood of $\B$,
+$\sup_\B|F_\delta-F|\to0$ as $\delta\to0$. \emph{Margin.} Let $\eta>0$ and
+$H=F_\delta+\eta\sum_{i\in\I}s_ix_i$; then $s_i\partial_iH\ge\eta$ on $\B$ for $i\in\I$. \emph{Approximation.} The
+logistic function is non-constant and has bounded derivatives of every order, so by \citet[Theorem 3]{Hornik1991} functions of the form
+$z_o(x)=\sum_jv_j\sig(w_j^\top x+b_j)+c$ are dense in $C^1$ on compact sets: there is $z_o$ with
+$\sup_\B|z_o-H|<\eta$ and $\sup_\B|\partial_iz_o-\partial_iH|<\eta/2$ for $i\in\I$. Hence
+$s_i\partial_iz_o>\eta/2$ on $\B$, and $p_\theta=\sig(z_o)$ has $s_ig_i=\sig'(z_o)s_i\partial_iz_o>0$; by
+\cref{M-lem:gain}, $h_i=s_i\partial_iz_o>\eta/2$, so the minimum of $h_i$ on the compact set $\B$ is positive.
+\emph{Error.} Since $\sig$ is $\tfrac14$-Lipschitz,
+$\sup_\B|p_\theta-f|\le\tfrac14\bigl(\sup_\B|z_o-H|+\eta\,|\I|+\sup_\B|F_\delta-F|\bigr)<\varepsilon$ for $\eta$ and
+$\delta$ small enough. Finite termination of \cref{alg:bb} follows from \cref{M-prop:term}.
+
+\paragraph{Bounds}
+(a) For $x\in Q$, $w_j^\top x+b_j=w_j^\top m+b_j+w_j^\top(x-m)$ with $|w_j^\top(x-m)|\le|w_j|^\top r$, attained at a
+vertex, so $z_j(Q)=[\alpha_j,\beta_j]$. Since $\sig'$ is even and unimodal with its maximum at $0$, its minimum over an
+interval is attained at an endpoint and its maximum at the point of the interval closest to $0$; summing
+$c_j\sig'(z_j(x))\ge c_j\underline d_j$ ($c_j\ge0$) and $\ge c_j\overline d_j$ ($c_j<0$) gives the first term of
+\eqref{M-eq:lbx}. (b) The range of $\sig''$ on $[\alpha_j,\beta_j]$ is attained at the endpoints or at $\pm t^\ast$, so
+$[\underline e_j,\overline e_j]$ encloses $\sig''(z_j(x))$ for $x\in Q$, and interval arithmetic on
+$\sum_jc_jW_{jd}\sig''(z_j)$ encloses $\partial_dh$ on $Q$. The mean value theorem gives
+$h(x)\ge h(m)-\sum_d|x_d-m_d|\sup_Q|\partial_dh|\ge h(m)-\sum_dr_d\max\{|G^-_d|,|G^+_d|\}$. (c) If $G^-_d>0$, $h$ is
+increasing in $x_d$ on $Q$, so $\min_Qh$ is attained on the face $x_d=l_d$ (symmetrically for $G^+_d<0$); replacing $Q$
+by that face does not change $\min_Qh$. (d) $\varphi$ is a sum of functions of one coordinate each, so its minimum over a
+product of intervals is the sum of the one-dimensional minima, given by the unimodality of $\sig'$ as in (a).
+
+\paragraph{\Cref{M-thm:sound}}
+Every point of $\B$ belongs to a box of the initial list, and every box is either split into two boxes that cover it,
+reduced to a face on which $h$ attains its minimum over the box (c), or discarded. A box is discarded only if
+$L(Q)\ge0$, which by (a)--(b) implies $h\ge0$ on $Q$; or, in pre-activation space, if $\min_R\varphi\ge0$, which implies
+$h(x)=\varphi(Wx+b)\ge0$ for every $x$ with $Wx+b\in R$ (d); or if $R$ does not meet $Z$, in which case no $x\in\B$ maps
+into $R$. If the search ends with an empty list, $\min_\B h_i\ge0$ and, by \cref{M-lem:gain}, $s_ig_i\ge0$ on $\B$. A
+counterexample is returned only after evaluating $h(\hat x)<0$ at a point $\hat x\in\B$ (the centre of a sub-box of $\B$,
+or the solution of a linear program with bounds $0\le x\le1$).
+
+\paragraph{\Cref{M-prop:term}}
+Inputs with $\sum_j|c_jW_{jd}|=0$ do not affect $h$ and are never split; along every other coordinate the splitting rule
+halves a coordinate of largest weighted width, so under breadth-first processing the radius of every box at depth $k$
+tends to zero with $k$. Let $\Gamma=\frac{\sqrt3}{18}\sum_d\sum_j|c_jW_{jd}|$, an upper bound of
+$\max\{|G^-_d|,|G^+_d|\}$ summed over $d$. If $\min_\B h=\delta>0$, the mean-value term of \eqref{M-eq:lbx} is at least
+$\delta-\Gamma\max_dr_d$, positive once $\max_dr_d<\delta/\Gamma$, so every branch is discarded at finite depth. If
+$\min_\B h<0$, continuity gives a box $Q^\ast\subseteq\B$ on which $h<0$; boxes that contain a point of $Q^\ast$ are never
+discarded, and at finite depth one of them lies inside $Q^\ast$, whose centre is then a counterexample. The monotonicity
+test only replaces boxes by faces that contain their minimisers and does not affect either argument.
+
+% =====================================================================================================
+\section{Branch-and-bound certificate}\label{sup:bb}
+\Cref{alg:bb} decides, for one constrained input $i$ at a time, whether $\min_\B h_i\ge0$ (Section~\ref{M-sec:certificate});
+write $c_j=c_{ij}$ and $h=h_i$. The bounds rely on elementary facts: $\sig'$ is even, increasing on $(-\infty,0]$ and
+decreasing on $[0,\infty)$; $\sig''$ is odd, with maximum $\sqrt3/18$ at $-t^\ast$ and minimum $-\sqrt3/18$ at $t^\ast$,
+$t^\ast=\ln(2+\sqrt3)$, and monotone between these points and on either side of them. On a box $Q=[l,u]$ with centre $m$
+and radius $r$, $[\alpha_j,\beta_j]$, $\underline d_j$ and $\overline d_j$ are as in Section~\ref{M-sec:certificate},
+$[\underline e_j,\overline e_j]$ is the range of $\sig''$ on $[\alpha_j,\beta_j]$, and interval arithmetic on
+$\partial h/\partial x_d=\sum_jc_jW_{jd}\sig''(z_j)$ gives the enclosure $[G^-_d,G^+_d]$. $L(Q)$ denotes the right-hand
+side of Eq.~\eqref{M-eq:lbx}. In pre-activation space the search starts from the bounding box of the zonotope
+$Z=\{Wx+b:x\in\B\}$, splits the box with the most negative bound first and, for boxes that meet $Z$, evaluates $h$ at the
+solution of the linear program (minimising the linearisation of $\varphi$ at the centre of $R$), which yields
+counterexamples. The certificate is run once per constrained input on the final network, with budgets of
+$2\times10^5$ boxes in input space and 3000 linear programs in pre-activation space.
+
+\begin{algorithm*}[!tbp]
+\caption{Branch-and-bound certificate for input $i$ ($h=h_i$).}\label{alg:bb}
+\begin{algorithmic}[1]
+\If{$c_j\ge0$ for all $j$} \Return \textsc{certified} \EndIf
+\State $\mathcal{Q}\gets\{\B\}$ \Comment{input space; pre-activation space when $n<p$ and the input-space search exhausts $N/4$ boxes}
+\While{$\mathcal{Q}\neq\emptyset$}
+  \State remove a box $Q$ from $\mathcal{Q}$; apply the monotonicity test to $Q$
+  \If{$L(Q)\ge0$ (\eqref{M-eq:lbx}; \eqref{M-eq:lbz} in pre-activation space) \textbf{or} $Q$ does not meet $Z$} \textbf{continue} \EndIf
+  \State $\hat x\gets$ centre of $Q$ (pre-activation space: point returned by the linear program)
+  \If{$h(\hat x)<0$} \Return \textsc{counterexample} $\hat x$ \EndIf
+  \If{more than $N$ boxes processed} \Return \textsc{unknown} \EndIf
+  \State split $Q$ in half along $\argmax_d (u_d-l_d)\max\{|G^-_d|,|G^+_d|\}$ (pre-activation space: $\argmax_j(\zeta^u_j-\zeta^l_j)|c_j|$); add both halves to $\mathcal{Q}$
+\EndWhile
+\State \Return \textsc{certified}
+\end{algorithmic}
+\end{algorithm*}
+
+\IfFileExists{tables/cert_bench.tex}{\input{tables/cert_bench.tex}}{}
+
+% =====================================================================================================
+\section{Capacity of the constraint families}\label{sup:capacity}
+\Cref{fig:capacity} repeats the comparison of Fig.~\ref{M-fig:surfaces} over the number of hidden units.
+
+\begin{figure*}[!tbp]\centering
+\IfFileExists{figures/fig_capacity.pdf}{\includegraphics[width=0.9\textwidth]{figures/fig_capacity.pdf}}{\fbox{figure \pend}}
+\caption{Error against the true probability versus the number of hidden units $n$, for the ``and'' target and the
+``wave'' target $\sig(6(x_1+x_2)-6+1.5\sin(3(x_1-x_2)))$, which has no min/max structure. One network per size, trained
+on the same 2000 samples (best of three initialisations, no model selection). Grey: unconstrained; blue: sign
+constraints; red: cegis. Filled markers: certified by \cref{alg:bb}; open: counterexample found. With the sign
+constraint the error stops decreasing after two units; cegis networks keep improving and are certified at every size,
+about 0.005 above the (non-monotone) unconstrained networks on ``and'' and equal to them on ``wave''.}\label{fig:capacity}
+\end{figure*}
 
 % =====================================================================================================
 \section{Gradients of the gains}\label{sup:gradients}
@@ -161,9 +276,16 @@ workstation, one task per core.
 
 % =====================================================================================================
 \section{Additional results}\label{sup:more}
+\IfFileExists{tables/main_mcc_full.tex}{\input{tables/main_mcc_full.tex}}{}
 \IfFileExists{tables/main_auc.tex}{\input{tables/main_auc.tex}}{}
 \IfFileExists{tables/main_brier.tex}{\input{tables/main_brier.tex}}{}
 \IfFileExists{tables/size.tex}{\input{tables/size.tex}}{}
+
+\begin{figure}[H]\centering
+\IfFileExists{figures/fig_cd.pdf}{\includegraphics[width=0.9\textwidth]{figures/fig_cd.pdf}}{\fbox{critical-difference diagram \pend}}
+\caption{Average MCC ranks of the methods of Table~\ref{M-tab:main_mcc} over the eight datasets and Nemenyi critical
+difference ($\alpha=0.05$); methods joined by a thick bar are not significantly different.}\label{fig:cd}
+\end{figure}
 
 \bibliographystyle{elsarticle-harv}
 \bibliography{refs}

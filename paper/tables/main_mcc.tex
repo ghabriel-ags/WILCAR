@@ -1,40 +1,25 @@
 \begin{table*}[!tbp]\centering
-\caption{Test MCC on the real datasets: mean and, in parentheses, standard deviation over the outer folds ($5\times5$-fold nested cross-validation; $5\times2$ for COM and LOAN). Constraint: cegis --- counterexample-guided, certified (\cref{sec:cegis}); mean --- average-gain constraint (\cref{eq:mean}); sign --- sign-bounded coefficients; monotone --- monotone splits of the tree ensembles; structural --- monotone by architecture. Selection of the number of hidden units: hold-out split, DCV or DCV-1SE (\cref{sec:dcv}); the baselines select their hyper-parameters on the hold-out split. WILCAR, RIXM and ELM with a constraint are called WILCAR-C, RIXM-C and ELM-C in the text. Best value per dataset in bold (datasets with complete results only). Rank: average rank over the datasets with complete results (ALG, BCO).}
+\caption{Test MCC on the real datasets, mean over the outer folds ($5\times5$-fold nested cross-validation; $5\times2$ for LOAN). Constraints as in \cref{sec:gains}; monotone: monotone splits of the tree ensembles; structural: monotone by architecture. Selection of the number of hidden units by DCV or on a hold-out split. Best value per dataset in bold; rank: average rank over the eight datasets. All methods and standard deviations: Supplementary \cref{S-tab:main_mcc_full}.}
 \label{tab:main_mcc}
 \resizebox{\linewidth}{!}{\begin{tabular}{lllccccccccc}\toprule
 Model & Constraint & Selection & ALG & BCO & BCD & HF & PIM & HD & COM & LOAN & Rank \\\midrule
 \multicolumn{12}{l}{\textit{Certified SLFNs (this work)}} \\
-WILCAR & cegis & DCV-1SE & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-WILCAR & cegis & DCV & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-WILCAR & cegis & hold-out & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-RIXM & cegis & hold-out & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+WILCAR & cegis & DCV & 0.901 & 0.932 & 0.952 & 0.574 & 0.473 & 0.589 & 0.349 & 0.293 & 5.8 \\
+RIXM & cegis & hold-out & 0.908 & \textbf{0.936} & 0.937 & 0.564 & 0.471 & 0.599 & 0.352 & 0.292 & 5.2 \\
 \midrule
-\multicolumn{12}{l}{\textit{SLFNs with the average-gain constraint of \citet{Sa2026}}} \\
-WILCAR & mean & DCV-1SE & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-WILCAR & mean & DCV & 0.901\,{\scriptsize(0.06)} & \textbf{0.936\,{\scriptsize(0.03)}} & -- & -- & -- & -- & -- & -- & 7.0 \\
-WILCAR & mean & hold-out & 0.907\,{\scriptsize(0.06)} & 0.935\,{\scriptsize(0.03)} & 0.891\,{\scriptsize(0.12)} & -- & -- & -- & -- & -- & 5.5 \\
-RIXM & mean & hold-out & 0.906\,{\scriptsize(0.06)} & 0.935\,{\scriptsize(0.03)} & -- & -- & -- & -- & -- & -- & 8.0 \\
-\midrule
-\multicolumn{12}{l}{\textit{Unconstrained SLFNs}} \\
-WILCAR & none & DCV-1SE & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-WILCAR & none & DCV & 0.897\,{\scriptsize(0.07)} & 0.929\,{\scriptsize(0.03)} & 0.952\,{\scriptsize(0.03)} & -- & -- & -- & -- & -- & 11.5 \\
-WILCAR & none & hold-out & 0.907\,{\scriptsize(0.07)} & 0.931\,{\scriptsize(0.03)} & 0.953\,{\scriptsize(0.03)} & -- & -- & -- & -- & -- & 9.0 \\
-RIXM & none & hold-out & 0.907\,{\scriptsize(0.07)} & 0.931\,{\scriptsize(0.03)} & -- & -- & -- & -- & -- & -- & 9.0 \\
-ELM & none & hold-out & 0.828\,{\scriptsize(0.07)} & 0.920\,{\scriptsize(0.03)} & -- & -- & -- & -- & -- & -- & 17.0 \\
-MLP & none & hold-out & 0.868\,{\scriptsize(0.06)} & 0.934\,{\scriptsize(0.03)} & -- & -- & -- & -- & -- & -- & 10.5 \\
+\multicolumn{12}{l}{\textit{Other SLFNs}} \\
+WILCAR & sign & DCV & 0.899 & 0.929 & 0.953 & 0.574 & 0.471 & 0.589 & 0.350 & 0.292 & 6.4 \\
+WILCAR & mean & DCV & 0.901 & 0.936 & 0.938 & 0.558 & \textbf{0.475} & 0.589 & 0.350 & 0.293 & 5.5 \\
+WILCAR & none & DCV & 0.897 & 0.929 & 0.952 & 0.567 & 0.472 & 0.589 & 0.349 & 0.292 & 6.8 \\
+RIXM & none & hold-out & 0.907 & 0.931 & 0.954 & 0.563 & 0.473 & 0.599 & 0.351 & 0.294 & 4.5 \\
+MLP & none & hold-out & 0.868 & 0.934 & 0.949 & 0.556 & 0.427 & 0.585 & 0.344 & 0.291 & 9.5 \\
 \midrule
 \multicolumn{12}{l}{\textit{Monotone baselines}} \\
-LR & sign & hold-out & 0.931\,{\scriptsize(0.07)} & 0.924\,{\scriptsize(0.03)} & -- & -- & -- & -- & -- & -- & 10.2 \\
-XGBoost & monotone & hold-out & \textbf{0.967\,{\scriptsize(0.03)}} & 0.926\,{\scriptsize(0.04)} & -- & -- & -- & -- & -- & -- & 6.8 \\
-LightGBM & monotone & hold-out & 0.950\,{\scriptsize(0.05)} & 0.922\,{\scriptsize(0.04)} & -- & -- & -- & -- & -- & -- & 9.5 \\
-Min-Max & structural & hold-out & 0.911\,{\scriptsize(0.07)} & 0.925\,{\scriptsize(0.03)} & -- & -- & -- & -- & -- & -- & 10.5 \\
-CMNN & structural & hold-out & 0.937\,{\scriptsize(0.07)} & 0.927\,{\scriptsize(0.03)} & -- & -- & -- & -- & -- & -- & 8.0 \\
-LMN & structural & hold-out & 0.894\,{\scriptsize(0.07)} & 0.932\,{\scriptsize(0.03)} & -- & -- & -- & -- & -- & -- & 10.5 \\
-\midrule
-\multicolumn{12}{l}{\textit{Unconstrained baselines}} \\
-LR & none & hold-out & 0.911\,{\scriptsize(0.07)} & 0.924\,{\scriptsize(0.03)} & -- & -- & -- & -- & -- & -- & 10.8 \\
-XGBoost & none & hold-out & \textbf{0.967\,{\scriptsize(0.03)}} & 0.929\,{\scriptsize(0.03)} & -- & -- & -- & -- & -- & -- & 5.8 \\
-LightGBM & none & hold-out & 0.947\,{\scriptsize(0.05)} & 0.935\,{\scriptsize(0.04)} & -- & -- & -- & -- & -- & -- & 3.5 \\
+LR & sign & hold-out & 0.931 & 0.924 & \textbf{0.954} & 0.576 & 0.455 & 0.569 & 0.344 & 0.286 & 8.1 \\
+XGBoost & monotone & hold-out & \textbf{0.967} & 0.926 & 0.931 & 0.617 & 0.462 & 0.515 & \textbf{0.357} & \textbf{0.295} & 5.9 \\
+LightGBM & monotone & hold-out & 0.950 & 0.922 & 0.933 & \textbf{0.628} & 0.459 & 0.518 & 0.356 & 0.295 & 6.4 \\
+Min-Max & structural & hold-out & 0.911 & 0.925 & 0.914 & 0.539 & 0.455 & 0.544 & 0.348 & 0.288 & 10.8 \\
+CMNN & structural & hold-out & 0.937 & 0.927 & 0.947 & 0.562 & 0.466 & \textbf{0.610} & 0.354 & 0.293 & 5.6 \\
+LMN & structural & hold-out & 0.894 & 0.932 & 0.929 & 0.545 & 0.448 & 0.548 & 0.346 & 0.291 & 10.5 \\
 \bottomrule\end{tabular}}
-\par\smallskip\footnotesize\textit{Datasets complete so far: ALG, BCO. Pending campaigns: cegis.}
 \end{table*}

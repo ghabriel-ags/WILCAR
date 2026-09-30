@@ -1,0 +1,11 @@
+\begin{table*}[!tbp]\centering\small
+\caption{Constraint families and what they deliver on the real data (WILCAR with DCV, 185 outer folds over eight datasets). Guarantee: what holds on the whole domain $\B$. MCC: mean over datasets; viol.: share of (point, constrained input) pairs with a wrong-sign gain on $10^4$ uniform points of $\B$; cert.: networks proved monotone by the certificate or by construction; time: median per outer fold (selection, refit and certificate).}
+\label{tab:modes}
+\resizebox{\linewidth}{!}{\begin{tabular}{lllrrrr}\toprule
+Mode & Condition imposed & Guarantee on $\B$ & MCC & viol.\ (\%) & cert.\ (\%) & time (s) \\\midrule
+none & ---  & none & 0.631 & 11.0 & 35 & 18 \\
+mean & average gain $\ge\varepsilon_m$ on the training inputs, \eqref{eq:mean} & sign of the average effect & 0.630 & 3.0 & 75 & 88 \\
+anchor & gain $\ge\varepsilon_p$ at $k$-means anchors, \eqref{eq:point} & none between anchors & 0.634 & 3.1 & 64 & 16 \\
+sign & $s_iv_jW_{ji}\ge0$, \eqref{eq:sign} & monotone (\cref{prop:sign}) & 0.632 & 0.0 & 100 & 30 \\
+cegis & gain $\ge\varepsilon_p$ at anchors grown by counterexamples + certificate & monotone (\cref{prop:always}) & 0.633 & 0.0 & 100 & 22 \\
+\bottomrule\end{tabular}}\end{table*}
