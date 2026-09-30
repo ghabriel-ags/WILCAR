@@ -37,15 +37,15 @@ def lab(method, constraint, sel):
 
 # full comparison (Supplementary Material): (title, [(role, method, selection, constraint)])
 MAIN_GROUPS = [
-    ("Certified SLFNs, counterexample-guided (this work)", [("cegis", "WILCAR-C", "dcv", "cegis"), ("cegis", "WILCAR-C", "holdout", "cegis"),
+    ("Certified SFNNs, counterexample-guided (this work)", [("cegis", "WILCAR-C", "dcv", "cegis"), ("cegis", "WILCAR-C", "holdout", "cegis"),
                                                             ("cegis", "RIXM-C", "holdout", "cegis")]),
-    ("SLFNs with sign constraints", [("global", "WILCAR-C", "dcv", "sign"), ("global", "WILCAR-C", "holdout", "sign"),
+    ("SFNNs with sign constraints", [("global", "WILCAR-C", "dcv", "sign"), ("global", "WILCAR-C", "holdout", "sign"),
                                      ("global", "RIXM-C", "holdout", "sign")]),
-    ("SLFNs with anchor constraints", [("multi", "WILCAR-C", "dcv", "anchor"), ("multi", "WILCAR-C", "holdout", "anchor"),
+    ("SFNNs with anchor constraints", [("multi", "WILCAR-C", "dcv", "anchor"), ("multi", "WILCAR-C", "holdout", "anchor"),
                                        ("multi", "RIXM-C", "holdout", "anchor")]),
-    ("SLFNs with the average-gain constraint of \\citet{Sa2026}",
+    ("SFNNs with the mean constraint",
      [("main", "WILCAR-C", "dcv", "mean"), ("main", "WILCAR-C", "holdout", "mean"), ("main", "RIXM-C", "holdout", "mean")]),
-    ("Unconstrained SLFNs", [("main", "WILCAR", "dcv", "none"), ("main", "WILCAR", "holdout", "none"),
+    ("Unconstrained SFNNs", [("main", "WILCAR", "dcv", "none"), ("main", "WILCAR", "holdout", "none"),
                              ("main", "RIXM", "holdout", "none"), ("main", "ELM", "holdout", "none"), ("main", "MLP", "holdout", "none")]),
     ("Monotone baselines", [("main", "LR-C", "holdout", "sign"), ("main", "XGB-C", "holdout", "monotone"),
                             ("main", "LGBM-C", "holdout", "monotone"), ("main", "MINMAX", "holdout", "structural"),
@@ -57,8 +57,8 @@ MAIN_ROWS = [(r, m, se, lab(m, c, se)) for _, rows in MAIN_GROUPS for (r, m, se,
 
 # compact comparison of the article: one or two representatives per family
 COMPACT_GROUPS = [
-    ("Certified SLFNs (this work)", [("cegis", "WILCAR-C", "dcv", "cegis"), ("cegis", "RIXM-C", "holdout", "cegis")]),
-    ("Other SLFNs", [("global", "WILCAR-C", "dcv", "sign"), ("main", "WILCAR-C", "dcv", "mean"), ("main", "WILCAR", "dcv", "none"),
+    ("Certified SFNNs (this work)", [("cegis", "WILCAR-C", "dcv", "cegis"), ("cegis", "RIXM-C", "holdout", "cegis")]),
+    ("Other SFNNs", [("global", "WILCAR-C", "dcv", "sign"), ("main", "WILCAR-C", "dcv", "mean"), ("main", "WILCAR", "dcv", "none"),
                      ("main", "RIXM", "holdout", "none"), ("main", "MLP", "holdout", "none")]),
     ("Monotone baselines", [("main", "LR-C", "holdout", "sign"), ("main", "XGB-C", "holdout", "monotone"),
                             ("main", "LGBM-C", "holdout", "monotone"), ("main", "MINMAX", "holdout", "structural"),
@@ -191,7 +191,7 @@ def table_main(dfs, metric="mcc", name="main_mcc.tex", caption_metric="MCC", sup
                r"rank: average rank over the eight datasets.}")
     else:
         cap = (rf"\caption{{Test {caption_metric} on the real datasets, mean over the outer folds ($5\times5$-fold nested cross-validation; "
-               r"$5\times2$ for LOAN). Constraints as in \cref{sec:gains}; monotone: monotone splits of the tree ensembles; structural: "
+               r"$5\times2$ for LOAN). Constraints as in \cref{sec:problem}; monotone: monotone splits of the tree ensembles; structural: "
                r"monotone by architecture. Selection of the number of hidden units by DCV or on a hold-out split. Best value per dataset "
                r"in bold; rank: average rank over the eight datasets. All methods and standard deviations: Supplementary "
                r"\cref{S-tab:main_mcc_full}.}")
@@ -317,8 +317,8 @@ def table_syn(dfs):
         r"\begin{table*}[!tbp]\centering\small",
         r"\caption{Synthetic targets (Supplementary \cref{S-tab:synthdef}): mean absolute error between the fitted and the true "
         r"$P(Y=1\mid x)$ on $2\times10^4$ uniform points, averaged over the 25 outer folds; mean: over the seven targets; cert.: share of final models "
-        r"that are monotone on $[0,1]^p$ (certified by the certificate of \cref{sec:certificate} or by construction). Constraints as in \cref{sec:gains}; "
-        r"every SLFN uses the best of three initialisations per constructive step. Best value per target in bold.}",
+        r"that are monotone on $[0,1]^p$ (certified by the certificate of \cref{sec:certificate} or by construction). Constraints as in \cref{sec:problem}; "
+        r"every SFNN uses the best of three initialisations per constructive step. Best value per target in bold.}",
         r"\label{tab:synth}",
         r"\resizebox{\linewidth}{!}{\begin{tabular}{lll" + "c" * (len(SYN_DS) + 2) + r"}\toprule",
         "Model & Constraint & Selection & " + " & ".join(n for _, n in SYN_DS) + r" & mean & cert.\ (\%) \\\midrule",
@@ -349,7 +349,7 @@ def table_cert_bench():
     viol = {k: 100 * df[(df.kind == k) & (df.variant == "full")].sampled_violation.mean() for k, _ in kinds}
     write("cert_bench.tex", "\n".join([
         r"\begin{table*}[!tbp]\centering\small",
-        rf"\caption{{Ablation of the certificate (\cref{{alg:bb}}) on {nn} SLFNs ({per} of each kind: seven real datasets, "
+        rf"\caption{{Ablation of the certificate (\cref{{alg:bb}}) on {nn} SFNNs ({per} of each kind: seven real datasets, "
         r"$n\in\{2,4,8,16\}$, two seeds), with the same budget of $2\times10^5$ boxes. Outcome shares (\%) and time per network "
         r"(median and 90th percentile, ms). Dense sampling ($5\times10^4$ points) finds violations in "
         rf"{viol['free']:.0f}\%, {viol['mean']:.0f}\% and {viol['cegis']:.0f}\% of the unconstrained, mean-constrained and cegis networks; "

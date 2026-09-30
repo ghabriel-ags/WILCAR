@@ -78,7 +78,7 @@ $\sup_\B|p_\theta-f|\le\tfrac14\bigl(\sup_\B|z_o-H|+\eta\,|\I|+\sup_\B|F_\delta-
 $\delta$ small enough. Finite termination of \cref{alg:bb} follows from \cref{M-prop:term}.
 
 \paragraph{Bounds}
-(a) For $x\in Q$, $w_j^\top x+b_j=w_j^\top m+b_j+w_j^\top(x-m)$ with $|w_j^\top(x-m)|\le|w_j|^\top r$, attained at a
+Let $L(Q)$ denote the right-hand side of Eq.~\eqref{M-eq:lbx}. (a) For $x\in Q$, $w_j^\top x+b_j=w_j^\top m+b_j+w_j^\top(x-m)$ with $|w_j^\top(x-m)|\le|w_j|^\top r$, attained at a
 vertex, so $z_j(Q)=[\alpha_j,\beta_j]$. Since $\sig'$ is even and unimodal with its maximum at $0$, its minimum over an
 interval is attained at an endpoint and its maximum at the point of the interval closest to $0$; summing
 $c_j\sig'(z_j(x))\ge c_j\underline d_j$ ($c_j\ge0$) and $\ge c_j\overline d_j$ ($c_j<0$) gives the first term of
@@ -118,7 +118,7 @@ $t^\ast=\ln(2+\sqrt3)$, and monotone between these points and on either side of 
 and radius $r$, $[\alpha_j,\beta_j]$, $\underline d_j$ and $\overline d_j$ are as in Section~\ref{M-sec:certificate},
 $[\underline e_j,\overline e_j]$ is the range of $\sig''$ on $[\alpha_j,\beta_j]$, and interval arithmetic on
 $\partial h/\partial x_d=\sum_jc_jW_{jd}\sig''(z_j)$ gives the enclosure $[G^-_d,G^+_d]$. $L(Q)$ denotes the right-hand
-side of Eq.~\eqref{M-eq:lbx}. In pre-activation space the search starts from the bounding box of the zonotope
+side of Eq.~\eqref{M-eq:lbx}, as in \cref{sup:proofs}. In pre-activation space the search starts from the bounding box of the zonotope
 $Z=\{Wx+b:x\in\B\}$, splits the box with the most negative bound first and, for boxes that meet $Z$, evaluates $h$ at the
 solution of the linear program (minimising the linearisation of $\varphi$ at the centre of $R$), which yields
 counterexamples. The certificate is run once per constrained input on the final network, with budgets of

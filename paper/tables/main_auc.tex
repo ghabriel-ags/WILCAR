@@ -3,27 +3,27 @@
 \label{tab:main_auc}
 \resizebox{\linewidth}{!}{\begin{tabular}{lllccccccccc}\toprule
 Model & Constraint & Selection & ALG & BCO & BCD & HF & PIM & HD & COM & LOAN & Rank \\\midrule
-\multicolumn{12}{l}{\textit{Certified SLFNs, counterexample-guided (this work)}} \\
+\multicolumn{12}{l}{\textit{Certified SFNNs, counterexample-guided (this work)}} \\
 WILCAR & cegis & DCV & 0.991\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.857\,{\scriptsize(0.05)} & 0.827\,{\scriptsize(0.04)} & 0.914\,{\scriptsize(0.04)} & 0.734\,{\scriptsize(0.01)} & 0.703\,{\scriptsize(0.01)} & 11.6 \\
 WILCAR & cegis & hold-out & 0.992\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.971\,{\scriptsize(0.10)} & 0.856\,{\scriptsize(0.05)} & 0.827\,{\scriptsize(0.04)} & 0.915\,{\scriptsize(0.04)} & 0.732\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 14.7 \\
 RIXM & cegis & hold-out & 0.991\,{\scriptsize(0.01)} & \textbf{0.996\,{\scriptsize(0.00)}} & 0.992\,{\scriptsize(0.01)} & 0.856\,{\scriptsize(0.05)} & 0.827\,{\scriptsize(0.04)} & 0.915\,{\scriptsize(0.04)} & 0.733\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 12.8 \\
 \midrule
-\multicolumn{12}{l}{\textit{SLFNs with sign constraints}} \\
+\multicolumn{12}{l}{\textit{SFNNs with sign constraints}} \\
 WILCAR & sign & DCV & 0.993\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & 0.857\,{\scriptsize(0.05)} & 0.827\,{\scriptsize(0.04)} & 0.914\,{\scriptsize(0.04)} & 0.734\,{\scriptsize(0.01)} & 0.703\,{\scriptsize(0.01)} & 11.0 \\
 WILCAR & sign & hold-out & 0.993\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.856\,{\scriptsize(0.05)} & 0.827\,{\scriptsize(0.04)} & 0.915\,{\scriptsize(0.04)} & 0.731\,{\scriptsize(0.01)} & 0.699\,{\scriptsize(0.01)} & 14.8 \\
 RIXM & sign & hold-out & 0.993\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & 0.856\,{\scriptsize(0.05)} & 0.827\,{\scriptsize(0.04)} & 0.915\,{\scriptsize(0.04)} & 0.732\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 10.8 \\
 \midrule
-\multicolumn{12}{l}{\textit{SLFNs with anchor constraints}} \\
+\multicolumn{12}{l}{\textit{SFNNs with anchor constraints}} \\
 WILCAR & anchor & DCV & 0.991\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.857\,{\scriptsize(0.05)} & 0.829\,{\scriptsize(0.04)} & 0.914\,{\scriptsize(0.04)} & 0.734\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 10.8 \\
 WILCAR & anchor & hold-out & 0.992\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.971\,{\scriptsize(0.10)} & 0.856\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.03)} & 0.915\,{\scriptsize(0.04)} & 0.731\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 13.2 \\
 RIXM & anchor & hold-out & 0.991\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.992\,{\scriptsize(0.01)} & 0.856\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.04)} & 0.915\,{\scriptsize(0.04)} & 0.732\,{\scriptsize(0.01)} & 0.701\,{\scriptsize(0.01)} & 13.0 \\
 \midrule
-\multicolumn{12}{l}{\textit{SLFNs with the average-gain constraint of \citet{Sa2026}}} \\
+\multicolumn{12}{l}{\textit{SFNNs with the mean constraint}} \\
 WILCAR & mean & DCV & 0.992\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.859\,{\scriptsize(0.05)} & 0.829\,{\scriptsize(0.03)} & 0.915\,{\scriptsize(0.04)} & 0.734\,{\scriptsize(0.01)} & 0.703\,{\scriptsize(0.01)} & 8.2 \\
 WILCAR & mean & hold-out & 0.992\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.981\,{\scriptsize(0.06)} & 0.856\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.04)} & 0.915\,{\scriptsize(0.04)} & 0.732\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 12.9 \\
 RIXM & mean & hold-out & 0.992\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.993\,{\scriptsize(0.01)} & 0.856\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.04)} & \textbf{0.916\,{\scriptsize(0.04)}} & 0.732\,{\scriptsize(0.01)} & 0.701\,{\scriptsize(0.01)} & 12.7 \\
 \midrule
-\multicolumn{12}{l}{\textit{Unconstrained SLFNs}} \\
+\multicolumn{12}{l}{\textit{Unconstrained SFNNs}} \\
 WILCAR & none & DCV & 0.992\,{\scriptsize(0.01)} & 0.995\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & 0.855\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.04)} & 0.914\,{\scriptsize(0.04)} & 0.734\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 11.2 \\
 WILCAR & none & hold-out & 0.993\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & 0.854\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.03)} & 0.915\,{\scriptsize(0.04)} & 0.731\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 12.6 \\
 RIXM & none & hold-out & 0.993\,{\scriptsize(0.01)} & 0.996\,{\scriptsize(0.00)} & 0.994\,{\scriptsize(0.01)} & 0.854\,{\scriptsize(0.05)} & 0.828\,{\scriptsize(0.03)} & 0.915\,{\scriptsize(0.04)} & 0.732\,{\scriptsize(0.01)} & 0.702\,{\scriptsize(0.01)} & 11.1 \\
