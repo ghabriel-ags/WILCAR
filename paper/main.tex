@@ -52,14 +52,14 @@
 
 \title{Constructive neural networks with certified partial monotonicity for binary classification}
 
-\author[ufba]{Ghabriel A. Gomes de Sá}
-\ead{ghabriel.anton@ufba.br}
-\author[ufba]{Cristiano Hora Fontes\corref{cor}}
+\author[ufba]{Ghabriel A. G. de Sá\corref{cor}}
+\ead{ghabriel\_ags@hotmail.com}
+\author[ufba]{Cristiano H. O. Fontes}
 \ead{cfontes@ufba.br}
 \author[ufba]{Marcelo Embiruçu}
 \ead{embirucu@ufba.br}
 \cortext[cor]{Corresponding author.}
-\affiliation[ufba]{organization={Industrial Engineering Program, Polytechnic Institute, Federal University of Bahia},
+\affiliation[ufba]{organization={Programa de Pós-Graduação em Engenharia Industrial, Escola Politécnica, Universidade Federal da Bahia},
   city={Salvador}, state={BA}, country={Brazil}}
 
 \begin{abstract}
@@ -91,7 +91,7 @@ Single feedforward neural network \sep Binary classification
 In many classification problems the direction of the effect of some inputs is known in advance: the probability of
 death after heart failure should not decrease as the ejection fraction falls, and the probability of default should not
 decrease as the debt-to-income ratio grows. Properly validated networks may still contradict such gain signs
-\citep{Fontes2024,Sa2026}, and their predictions then cannot be defended to a clinician or a regulator. Networks that
+\citep{Sa2026}, and their predictions then cannot be defended to a clinician or a regulator. Networks that
 enforce the known directions are \emph{partially monotonic} \citep{DanielsVelikova2010}. \emph{Soft} approaches
 penalise violations at sampled points \citep{SillAbuMostafa1996} and give no guarantee elsewhere. \emph{Structural}
 approaches are monotone by construction: non-negative weights \citep{ArcherWang1993}, min-max networks \citep{Sill1997},
@@ -396,16 +396,10 @@ accurate as unconstrained networks and CMNN, and more accurate than Min-Max and 
 constructive networks is a natural next step.
 
 % =====================================================================================================
-\section*{Acknowledgements}
-The authors acknowledge the financial support of the National Council for Scientific and Technological Development
-(Conselho Nacional de Desenvolvimento Científico e Tecnológico, CNPq, Brazil; Productivity of Research Funds
-304341/2024-0).
-
 \section*{CRediT authorship contribution statement}
-\textbf{Ghabriel A. Gomes de Sá:} Conceptualization, Methodology, Software, Formal analysis, Investigation, Data
-curation, Writing -- original draft, Writing -- review \& editing. \textbf{Cristiano Hora Fontes:} Conceptualization,
-Methodology, Formal analysis, Supervision, Writing -- review \& editing. \textbf{Marcelo Embiruçu:} Conceptualization,
-Methodology, Formal analysis, Investigation, Supervision, Writing -- review \& editing.
+\todo{confirm.} \textbf{Ghabriel A. G. de Sá:} Conceptualization, Methodology, Software, Formal analysis, Investigation,
+Writing -- original draft. \textbf{Cristiano H. O. Fontes:} Conceptualization, Supervision, Writing -- review \& editing.
+\textbf{Marcelo Embiruçu:} Supervision, Writing -- review \& editing.
 
 \section*{Declaration of competing interest}
 The authors declare that they have no known competing financial interests or personal relationships that could have
@@ -415,8 +409,11 @@ appeared to influence the work reported in this paper.
 The UCI datasets are public; COMPAS, Heart Disease and Loan Defaulter come from the release of \citet{Runje2023}. Code
 and raw results: \todo{repository DOI}.
 
+\section*{Funding}
+\todo{funding statement.}
+
 \section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
-During the preparation of this work the authors used Claude (Anthropic) to assist with code development and with
+\todo{confirm wording.} During the preparation of this work the authors used Claude (Anthropic) to assist with code development and with
 drafting and editing the text. The authors reviewed and edited the content and take full responsibility for it.
 
 \bibliographystyle{elsarticle-harv}
