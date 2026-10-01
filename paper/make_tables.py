@@ -57,7 +57,7 @@ MAIN_ROWS = [(r, m, se, lab(m, c, se)) for _, rows in MAIN_GROUPS for (r, m, se,
 
 # compact comparison of the article: one or two representatives per family
 COMPACT_GROUPS = [
-    ("Certified SFNNs (this work)", [("cegis", "WILCAR-C", "dcv", "cegis"), ("cegis", "RIXM-C", "holdout", "cegis")]),
+    ("Counterexample-guided SFNNs (this work)", [("cegis", "WILCAR-C", "dcv", "cegis"), ("cegis", "RIXM-C", "holdout", "cegis")]),
     ("Other SFNNs", [("global", "WILCAR-C", "dcv", "sign"), ("main", "WILCAR-C", "dcv", "mean"), ("main", "WILCAR", "dcv", "none"),
                      ("main", "RIXM", "holdout", "none"), ("main", "MLP", "holdout", "none")]),
     ("Monotone baselines", [("main", "LR-C", "holdout", "sign"), ("main", "XGB-C", "holdout", "monotone"),
@@ -190,8 +190,8 @@ def table_main(dfs, metric="mcc", name="main_mcc.tex", caption_metric="MCC", sup
                r"the outer folds. Conventions as in Table~\ref{M-tab:main_mcc} of the article; best value per dataset in bold; "
                r"rank: average rank over the eight datasets.}")
     else:
-        cap = (rf"\caption{{Test {caption_metric} on the real datasets, mean over the outer folds ($5\times5$-fold nested cross-validation; "
-               r"$5\times2$ for LOAN). Constraints as in \cref{sec:problem}; monotone: monotone splits of the tree ensembles; structural: "
+        cap = (rf"\caption{{Test {caption_metric} on the real datasets, mean over the outer folds (5-fold nested cross-validation repeated five times; "
+               r"twice for LOAN). Constraints as in \cref{sec:problem}; monotone: monotone splits of the tree ensembles; structural: "
                r"monotone by architecture. Selection of the number of hidden units by DCV or on a hold-out split. Best value per dataset "
                r"in bold; rank: average rank over the eight datasets. All methods and standard deviations: Supplementary "
                r"\cref{S-tab:main_mcc_full}.}")

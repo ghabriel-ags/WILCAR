@@ -1,9 +1,9 @@
 \begin{table*}[!tbp]\centering
-\caption{Test MCC on the real datasets, mean over the outer folds ($5\times5$-fold nested cross-validation; $5\times2$ for LOAN). Constraints as in \cref{sec:problem}; monotone: monotone splits of the tree ensembles; structural: monotone by architecture. Selection of the number of hidden units by DCV or on a hold-out split. Best value per dataset in bold; rank: average rank over the eight datasets. All methods and standard deviations: Supplementary \cref{S-tab:main_mcc_full}.}
+\caption{Test MCC on the real datasets, mean over the outer folds (5-fold nested cross-validation repeated five times; twice for LOAN). Constraints as in \cref{sec:problem}; monotone: monotone splits of the tree ensembles; structural: monotone by architecture. Selection of the number of hidden units by DCV or on a hold-out split. Best value per dataset in bold; rank: average rank over the eight datasets. All methods and standard deviations: Supplementary \cref{S-tab:main_mcc_full}.}
 \label{tab:main_mcc}
 \resizebox{\linewidth}{!}{\begin{tabular}{lllccccccccc}\toprule
 Model & Constraint & Selection & ALG & BCO & BCD & HF & PIM & HD & COM & LOAN & Rank \\\midrule
-\multicolumn{12}{l}{\textit{Certified SFNNs (this work)}} \\
+\multicolumn{12}{l}{\textit{Counterexample-guided SFNNs (this work)}} \\
 WILCAR & cegis & DCV & 0.901 & 0.932 & 0.952 & 0.574 & 0.473 & 0.589 & 0.349 & 0.293 & 5.8 \\
 RIXM & cegis & hold-out & 0.908 & \textbf{0.936} & 0.937 & 0.564 & 0.471 & 0.599 & 0.352 & 0.292 & 5.2 \\
 \midrule

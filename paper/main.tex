@@ -117,10 +117,11 @@ universal approximators of continuous partially monotone functions (\cref{thm:ua
 parametrisation, not in the depth;
 \item a counterexample-guided training imposes the gain signs at anchor points that grow with the violations found by
 an adversarial search, and a repair-and-fallback step makes every returned network certified (\cref{sec:cegis});
-\item a sound branch-and-bound certificate, specialised to one hidden layer and exact in pre-activation space, proves
-the gain signs on the whole domain (\cref{sec:certificate});
+\item a sound branch-and-bound certificate, specialised to one hidden layer, proves the gain signs on the whole domain
+(\cref{sec:certificate}); unlike the mixed-integer certificate of \citet{Liu2020} it handles sigmoid units, and unlike
+the Lipschitz covering of \citet{PoloMolina2026cert} its cost does not grow exponentially with the number of inputs;
 \item synthetic targets with a known probability and eight real datasets, under nested cross-validation, compare the
-approach with thirteen alternatives, including Min-Max, constrained monotonic and Lipschitz monotonic networks.
+approach with eleven alternatives, including Min-Max, constrained monotonic and Lipschitz monotonic networks.
 \end{itemize}
 Proofs, derivations, settings and complete results are in the Supplementary Material.
 
@@ -183,7 +184,8 @@ $\sup_\B|p_\theta-f|<\varepsilon$ and $\min_{\B}h_i>0$ for every $i\in\I$.
 \end{theorem}
 
 The proof smooths $f$ by a monotone mollification, adds a small linear term that creates a gain margin, and uses the
-density of SFNNs in $C^1$ \citep{Hornik1991}. The margin also makes the certificate of \cref{sec:certificate} complete
+density of SFNNs in $C^1$ \citep{Hornik1991}; it is elementary, and the statement is, to our knowledge, not found in the
+literature on monotone networks, which concerns sign-constrained weights \citep{DanielsVelikova2010,Mikulincer2025,Sartor2025}. The margin also makes the certificate of \cref{sec:certificate} complete
 for such networks (\cref{prop:term}).
 
 \begin{figure*}[!tbp]\centering
@@ -217,15 +219,17 @@ gradients of the gains (Supplementary \cref{S-sup:gradients}).
 
 \subsection{Counterexample-guided constraints}\label{sec:cegis}
 The \emph{cegis} mode (\cref{alg:cegis}), named after counterexample-guided inductive synthesis \citep{SolarLezama2006},
-searches the class of \cref{thm:ua} directly. At size $n$ the network is
-projected by SLSQP onto the anchor constraints \eqref{eq:point}. An adversarial search then minimises each $h_i$ over
-$\B$ (L-BFGS-B from random points and from the training points with the smallest $h_i$, with
-$\nabla_xh_i=\sum_jc_{ij}\sig''(z_j)w_j$); every point with $h_i<0$ becomes an anchor and the network is re-solved.
+aims at the class of \cref{thm:ua}. At size $n$ the network is re-solved by SLSQP under the anchor constraints
+\eqref{eq:point}. An adversarial search then minimises each $h_i$ over $\B$ (L-BFGS-B from 16 random points and 8
+training points with the smallest $h_i$, with $\nabla_xh_i=\sum_jc_{ij}\sig''(z_j)w_j$); for each $i$, the minimiser
+with $h_i<0$ becomes an anchor and the network is re-solved.
 Anchors are kept from size to size. This is the exchange scheme of semi-infinite programming \citep{Hettich1993}: the
 infinite set of constraints $h_i(x)\ge0$, $x\in\B$, is replaced by a finite set that grows with the most violated points.
 After the final refit the certificate of \cref{sec:certificate} is run; its counterexamples also become anchors
-(\emph{repair}). If the network is still not certified after $R_{\mathrm{rep}}$ repairs, the weights with $c_{ij}<0$ are
-set to zero and the network is re-solved under \eqref{eq:sign} (\emph{fallback}).
+(\emph{repair}). If the certificate is undecided or still fails after $R_{\mathrm{rep}}$ repairs, the weights with $c_{ij}<0$ are
+set to zero and the network is re-solved under \eqref{eq:sign} (\emph{fallback}). COMET \citep{Sivaraman2020} also
+trains with counterexamples, but as labelled data of a soft penalty and with monotone envelopes at prediction time; here
+they are hard constraints and the returned network itself is monotone.
 
 \begin{proposition}[Certified output]\label{prop:always}
 The network returned by the cegis mode is $s$-monotone on $\B$: it is either certified (\cref{thm:sound}) or satisfies
@@ -261,9 +265,9 @@ on $Q$,
 h(m)-\sum_{d=1}^{p}r_d\max\{|G^-_d|,|G^+_d|\}\Bigr\},
 \end{equation}
 the natural interval extension and the mean-value form \citep{Moore2009}; the monotonicity test of interval global
-optimisation \citep{HansenWalster2004} collapses a box onto a face when $G^-_d>0$ or $G^+_d<0$. When $n<p$ the search runs
-in pre-activation space, where $h=\varphi(Wx+b)$ with $\varphi(z)=\sum_jc_j\sig'(z_j)$ separable, so that its minimum on
-a box $R=[\zeta^l,\zeta^u]$ is exact:
+optimisation \citep{HansenWalster2004} collapses a box onto a face when $G^-_d>0$ or $G^+_d<0$. When $n<p$ and the input-space search
+exhausts a quarter of its box budget, the search continues in pre-activation space, where $h=\varphi(Wx+b)$ with $\varphi(z)=\sum_jc_j\sig'(z_j)$ separable, so that its minimum on a box
+$R=[\zeta^l,\zeta^u]$ is computed exactly:
 \begin{equation}\label{eq:lbz}
 \min_{z\in R}\varphi(z)=\sum_{c_j\ge0}c_j\min\{\sig'(\zeta^l_j),\sig'(\zeta^u_j)\}+\sum_{c_j<0}c_j\,\sig'\bigl(\clip(0;\zeta^l_j,\zeta^u_j)\bigr);
 \end{equation}
@@ -275,7 +279,7 @@ counterexample $\hat x$ lies in $\B$ and satisfies $s_ig_i(\hat x)<0$.
 \end{theorem}
 
 \begin{proposition}[Termination]\label{prop:term}
-If $\min_\B h_i\neq0$ and boxes are processed breadth-first, the input-space search terminates after finitely many boxes.
+If $\min_\B h_i\neq0$, the input-space search with an unlimited box budget terminates after finitely many boxes.
 \end{proposition}
 
 Bounding a box costs $O(np)$ operations. The number of boxes is exponential in $\min\{n,p\}$ in the worst case, but in
@@ -344,18 +348,18 @@ minimum, whose sharp corners a sum of sigmoid ridges approximates slowly.
 The Friedman test rejects equal performance over the thirteen methods of \cref{tab:main_mcc} (Iman--Davenport
 $p=0.004$), but after Holm's correction only Min-Max and LMN are worse than the top-ranked method, the unconstrained
 RIXM (adjusted $p=0.016$ and $0.023$); the other SFNNs, CMNN and the tree ensembles are statistically tied. Over the 185 outer folds,
-certified WILCAR differs from the unconstrained one by $+0.002$ MCC (Wilcoxon $p=0.07$) and from CMNN by $-0.004$
-($p=0.20$), and exceeds LMN by $0.017$ and Min-Max by $0.019$ ($p<10^{-4}$). AUC and Brier score lead to the same
-ranking (Supplementary \cref{S-tab:main_auc,S-tab:main_brier}): mean AUC 0.877 for certified WILCAR, unconstrained WILCAR
+certified WILCAR differs from the unconstrained one by $+0.002$ MCC (Wilcoxon $p=0.07$, with ties split) and from CMNN by $-0.004$
+($p=0.20$), and exceeds LMN by $0.017$ and Min-Max by $0.019$ ($p<10^{-4}$). AUC and Brier score give the same
+picture (Supplementary \cref{S-tab:main_auc,S-tab:main_brier}): mean AUC 0.877 for certified WILCAR, unconstrained WILCAR
 and CMNN, 0.873 for LMN, 0.869 for Min-Max and 0.881 for the monotone tree ensembles. Trees are ahead on ALG and HF,
 the networks on HD.
 
 Only 35\% of the unconstrained networks are monotone on the domain, with 11\% of wrong-sign pairs (\cref{tab:modes}).
 The mean constraint raises this to 75\% and the anchor constraint, which leaves the space between anchors free, to
-64\%; neither gives a guarantee. The sign and cegis constraints are monotone in every fold, at no cost in MCC. In cegis
-mode, 97.3\% of the networks were certified by the branch and bound and 2.7\% (15 of 555) were returned by the fallback.
+64\%; neither gives a guarantee. The sign and cegis constraints are monotone in every fold, at no cost in MCC. Over the 555 cegis runs of WILCAR and RIXM, 97.3\% of the networks were certified by the branch and bound and 2.7\%
+(15, 14 of them on Loan Defaulter) were returned by the fallback.
 The median cost per outer fold is 22 s for certified WILCAR and 18 s for unconstrained WILCAR; the mean is dominated by BCD
-(27 constrained inputs) and Loan Defaulter, where 22 of 740 selection loops reached the one-hour budget. On a separate
+(27 constrained inputs) and Loan Defaulter, where 22 of the 555 selection loops reached the one-hour budget. On a separate
 set of 168 networks, the certificate decided 96\% of those produced by a cegis step, whose margins are thin by design,
 with a median time below one millisecond (Supplementary \cref{S-tab:certbench}).
 
@@ -369,8 +373,9 @@ single unit the two constraints coincide. The flexibility of cegis matters when 
 Under one common protocol (\cref{tab:lit}, lower block), the certified SFNNs match the published monotone architectures
 retrained by us: 67.9--68.2\% on COMPAS against 67.6--67.8\%, 80.3--82.0\% on Heart Disease against 80.3--83.6\%, and
 65.0\% on Loan Defaulter against 64.7--65.0\%. The published figures are up to 1.6 points higher on COMPAS, within 0.5 on
-Loan Defaulter and up to 12 points higher on Heart Disease, whose official test set has 61 patients. They were obtained
-under each paper's own selection protocol, and our retrained CMNN and LMN fall short of them by similar margins.
+Loan Defaulter and up to 12 points higher on Heart Disease, whose official test set has 61 patients. They were obtained under each paper's own protocol: CMNN reports the best five of ten runs, LMN's procedure selects on
+the test error \citep{Igel2024}, and \citet{PoloMolina2026kan}, re-running CMNN and LMN, obtained 88\% and 87\% on Heart
+Disease. Our retrained CMNN and LMN fall 8 and 6 points short of their published figures there.
 
 \subsection{Discussion}\label{sec:discussion}
 The constraints form a hierarchy: the mean constraint fixes the sign of the global effect of each input, the anchor
@@ -382,8 +387,8 @@ scheme: anchors found at size $n$ remain valid at size $n+1$, and small networks
 pre-activation search works in dimension $n$.
 
 The certificate relies on the separability of one hidden layer in pre-activation space; deeper networks would need
-bound propagation \citep{Gowal2019,Liu2021verif}. The guarantee holds on the training box $\B$, and the certificate is
-exact up to floating-point rounding. The quadratic programs limit constrained networks to tens of hidden units and
+bound propagation \citep{Gowal2019,Liu2021verif}. The guarantee holds on the training box $\B$; the certificate is sound up to
+floating-point rounding and the feasibility tolerance of the linear programs, which directed rounding would remove. The quadratic programs limit constrained networks to tens of hidden units and
 training sets to tens of thousands of rows.
 
 % =====================================================================================================
