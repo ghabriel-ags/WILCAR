@@ -57,12 +57,10 @@ MAIN_ROWS = [(r, m, se, lab(m, c, se)) for _, rows in MAIN_GROUPS for (r, m, se,
 
 # compact comparison of the article: one or two representatives per family
 COMPACT_GROUPS = [
-    ("Counterexample-guided SFNNs (this work)", [("cegis", "WILCAR-C", "dcv", "cegis"), ("cegis", "RIXM-C", "holdout", "cegis")]),
-    ("Other SFNNs", [("global", "WILCAR-C", "dcv", "sign"), ("main", "WILCAR-C", "dcv", "mean"), ("main", "WILCAR", "dcv", "none"),
-                     ("main", "RIXM", "holdout", "none"), ("main", "MLP", "holdout", "none")]),
-    ("Monotone baselines", [("main", "LR-C", "holdout", "sign"), ("main", "XGB-C", "holdout", "monotone"),
-                            ("main", "LGBM-C", "holdout", "monotone"), ("main", "MINMAX", "holdout", "structural"),
-                            ("main", "CMNN", "holdout", "structural"), ("main", "LMN", "holdout", "structural")]),
+    ("Counterexample-guided SFNN (this work)", [("cegis", "WILCAR-C", "dcv", "cegis")]),
+    ("Unconstrained SFNN (control)", [("main", "WILCAR", "dcv", "none")]),
+    ("Baselines", [("main", "LR-C", "holdout", "sign"), ("main", "XGB-C", "holdout", "monotone"), ("main", "MLP", "holdout", "none"),
+                   ("main", "MINMAX", "holdout", "structural"), ("main", "CMNN", "holdout", "structural"), ("main", "LMN", "holdout", "structural")]),
 ]
 
 # published test accuracies (%) on the official splits

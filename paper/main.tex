@@ -121,7 +121,7 @@ an adversarial search, and a repair-and-fallback step makes every returned netwo
 (\cref{sec:certificate}); unlike the mixed-integer certificate of \citet{Liu2020} it handles sigmoid units, and unlike
 the Lipschitz covering of \citet{PoloMolina2026cert} its cost does not grow exponentially with the number of inputs;
 \item synthetic targets with a known probability and eight real datasets, under nested cross-validation, compare the
-approach with eleven alternatives, including Min-Max, constrained monotonic and Lipschitz monotonic networks.
+approach with six baselines, including Min-Max, constrained monotonic and Lipschitz monotonic networks.
 \end{itemize}
 Proofs, derivations, settings and complete results are in the Supplementary Material.
 
@@ -345,9 +345,10 @@ minimum, whose sharp corners a sum of sigmoid ridges approximates slowly.
 \subsection{Real data}\label{sec:perf}
 \IfFileExists{tables/main_mcc.tex}{\input{tables/main_mcc.tex}}{}
 \IfFileExists{tables/modes.tex}{\input{tables/modes.tex}}{}
-The Friedman test rejects equal performance over the thirteen methods of \cref{tab:main_mcc} (Iman--Davenport
-$p=0.004$), but after Holm's correction only Min-Max and LMN are worse than the top-ranked method, the unconstrained
-RIXM (adjusted $p=0.016$ and $0.023$); the other SFNNs, CMNN and the tree ensembles are statistically tied. Over the 185 outer folds,
+The Friedman test rejects equal performance over the eight methods of \cref{tab:main_mcc} (Iman--Davenport
+$p=0.006$). The counterexample-guided WILCAR has the best average rank (2.9), followed by CMNN (3.3), monotone XGBoost
+and the unconstrained WILCAR (3.5); after Holm's correction only Min-Max is significantly worse (adjusted $p=0.02$).
+All constrained SFNNs, including RIXM, are in Supplementary \cref{S-tab:main_mcc_full}. Over the 185 outer folds,
 certified WILCAR differs from the unconstrained one by $+0.002$ MCC (Wilcoxon $p=0.07$, with ties split) and from CMNN by $-0.004$
 ($p=0.20$), and exceeds LMN by $0.017$ and Min-Max by $0.019$ ($p<10^{-4}$). AUC and Brier score give the same
 picture (Supplementary \cref{S-tab:main_auc,S-tab:main_brier}): mean AUC 0.877 for certified WILCAR, unconstrained WILCAR
