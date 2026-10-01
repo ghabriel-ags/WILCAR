@@ -72,9 +72,10 @@ them, gain-sign constraints are imposed at anchor points that grow with the coun
 and the final network is checked by a sound branch-and-bound certificate; if the check fails, a sign-constrained
 solution is returned, so every network is certified. On seven synthetic targets with a known probability, the certified
 networks have 30\% lower error than sign-constrained ones. On eight datasets, including the COMPAS, Heart Disease and
-Loan Defaulter benchmarks, under nested cross-validation, they match unconstrained networks and constrained monotonic
-neural networks in MCC, outperform Min-Max and Lipschitz monotonic networks, and are certified in every fold, whereas
-only 35--41\% of the unconstrained networks are monotone.
+Loan Defaulter benchmarks, under nested cross-validation, they have the best average rank among eight methods, including constrained
+monotonic networks and monotone gradient-boosted trees, and are certified in every fold, whereas only 35--41\% of the
+unconstrained networks are monotone. The result is a smooth model with one to five hidden units, with gains that exist
+everywhere and have the expected signs, where monotone trees need hundreds of piecewise-constant splits.
 \end{abstract}
 
 \begin{keyword}
@@ -101,8 +102,11 @@ architecture in advance. \emph{Certified} approaches train an ordinary network a
 programming \citep{Liu2020}, SMT counterexamples added to the training data \citep{Sivaraman2020} or Lipschitz coverings
 of the domain \citep{PoloMolina2026cert}.
 
-Single feedforward neural networks (SFNN), with one hidden layer, remain a natural choice for small and medium tabular
-data, and constructive algorithms define their number of hidden units by growing the hidden layer
+Monotone constraints are also available in gradient-boosted trees \citep{ChenGuestrin2016}, which are strong on
+tabular data; but a tree ensemble is piecewise constant, has no gains, is flat outside the training range and needs
+hundreds of trees. When the model is to be read as an input--output relation with static gains, or embedded in
+optimisation and control, a smooth network is needed. Single feedforward neural networks (SFNN), with one hidden layer,
+are a natural choice for small and medium tabular data, and constructive algorithms define their number of hidden units by growing the hidden layer
 \citep{Fahlman1990,KwokYeung1997,HuangChenSiew2006}. WILCAR, which initialises the weights by linearisation and reuses
 them along the growth, was proposed for regression and multiclass classification \citep{Sa2022,Fontes2021}. In earlier
 work we imposed gain signs on constructive SFNNs as hard constraints \citep{Sa2026}: the static gain of each input,
@@ -352,8 +356,8 @@ All constrained SFNNs, including RIXM, are in Supplementary \cref{S-tab:main_mcc
 certified WILCAR differs from the unconstrained one by $+0.002$ MCC (Wilcoxon $p=0.07$, with ties split) and from CMNN by $-0.004$
 ($p=0.20$), and exceeds LMN by $0.017$ and Min-Max by $0.019$ ($p<10^{-4}$). AUC and Brier score give the same
 picture (Supplementary \cref{S-tab:main_auc,S-tab:main_brier}): mean AUC 0.877 for certified WILCAR, unconstrained WILCAR
-and CMNN, 0.873 for LMN, 0.869 for Min-Max and 0.881 for the monotone tree ensembles. Trees are ahead on ALG and HF,
-the networks on HD.
+and CMNN, 0.873 for LMN, 0.869 for Min-Max and 0.881 for the monotone tree ensembles. Monotone XGBoost is ahead on ALG and HF, the networks on HD (0.589 against 0.515), and the
+certified SFNN is ahead of the trees on five of the eight datasets.
 
 Only 35\% of the unconstrained networks are monotone on the domain, with 11\% of wrong-sign pairs (\cref{tab:modes}).
 The mean constraint raises this to 75\% and the anchor constraint, which leaves the space between anchors free, to
@@ -387,6 +391,15 @@ which. Sign constraints give the guarantee through the parameters, at the price 
 scheme: anchors found at size $n$ remain valid at size $n+1$, and small networks are cheap to certify, because the
 pre-activation search works in dimension $n$.
 
+\emph{Against monotone trees.} Gradient-boosted trees with monotone splits are the strongest baseline and are monotone
+by construction; they tie with the certified SFNNs in MCC and AUC. The difference is the model. A tree ensemble is a
+piecewise-constant function: its gains are zero or undefined, it is flat outside the training range, and it takes
+100--300 trees of depth 2--4 where the certified SFNN uses one to five sigmoid units. The SFNN is a single smooth
+equation with gains defined at every point, certified to have the expected signs on the whole box; it can be
+differentiated, embedded in an optimiser or a model predictive controller, and read as the static-gain model of
+\citet{Sa2026}. The guarantee of the trees is a property of the splits; the guarantee here is a property of the
+function.
+
 The certificate relies on the separability of one hidden layer in pre-activation space; deeper networks would need
 bound propagation \citep{Gowal2019,Liu2021verif}. The guarantee holds on the training box $\B$; the certificate is sound up to
 floating-point rounding and the feasibility tolerance of the linear programs, which directed rounding would remove. The quadratic programs limit constrained networks to tens of hidden units and
@@ -397,8 +410,9 @@ training sets to tens of thousands of rows.
 Single-hidden-layer networks that are monotone on their domain are universal approximators of continuous partially
 monotone functions, while sign-constrained ones are not. Counterexample-guided constraints, a sound certificate and a
 sign-constrained fallback reach that class with constructive networks. Every network returned is certified; on
-synthetic targets the certified networks have 30\% lower error than sign-constrained ones, and on real data they are as
-accurate as unconstrained networks and CMNN, and more accurate than Min-Max and LMN. Extending the certificate to deeper
+synthetic targets the certified networks have 30\% lower error than sign-constrained ones, and on real data they have the best
+average rank among eight methods, tied with constrained monotonic networks and monotone gradient-boosted trees, with a
+smooth model of one to five hidden units in place of hundreds of piecewise-constant trees. Extending the certificate to deeper
 constructive networks is a natural next step.
 
 % =====================================================================================================
