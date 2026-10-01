@@ -126,10 +126,10 @@ def table_datasets():
             extra = r"\textsuperscript{a}" if key == "loan" else ""
             lines.append(f"{short} & {name} {cite} & {dom} & {n}{extra} & {p} & {c} ({100 * c / p:.0f}\\%) & {pos:.1f} \\\\")
         except Exception:
-            known = {"loan": ("20000\\textsuperscript{a}", 28, 5)}          # declared in data.py; positive rate needs the Zenodo file
+            known = {"loan": ("20000\\textsuperscript{a}", 28, 5, "49.3")}   # declared in data.py; positive rate measured on the user's machine (2026-10-01)
             if key in known:
-                n, p, c = known[key]
-                lines.append(f"{short} & {name} {cite} & {dom} & {n} & {p} & {c} ({100 * c / p:.0f}\\%) & \\pend \\\\")
+                n, p, c, pos = known[key]
+                lines.append(f"{short} & {name} {cite} & {dom} & {n} & {p} & {c} ({100 * c / p:.0f}\\%) & {pos} \\\\")
             else:
                 lines.append(f"{short} & {name} {cite} & {dom} & -- & -- & -- & -- \\\\")
     write("datasets.tex", "\n".join([
