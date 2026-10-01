@@ -1,0 +1,26 @@
+\begin{table}[H]\centering\small
+\caption{Ablations of the training recipe on the five UCI datasets (25 outer folds each; constrained methods in the mean mode). MCC: mean over datasets; time: median per outer fold, in seconds. Reference: the same method and selection in the main campaign (L-BFGS, $\lambda_0=0.3$, new unit with random output weight); for the last block, the hold-out selection of the same method.}
+\label{tab:ablation}
+\begin{tabular}{lllrrrr}\toprule
+ & & & \multicolumn{2}{c}{Reference} & \multicolumn{2}{c}{Ablation} \\\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Model & Constraint & Selection & MCC & time & MCC & time \\\midrule
+\multicolumn{7}{l}{\emph{No weight prior ($\lambda_0=0$)}}\\
+WILCAR & mean & DCV & 0.762 & 99 & 0.661 & 436 \\
+WILCAR & mean & hold-out & 0.753 & 7 & 0.633 & 113 \\
+RIXM & mean & hold-out & 0.760 & 6 & 0.608 & 337 \\
+WILCAR & none & DCV & 0.764 & 17 & 0.755 & 4 \\
+WILCAR & none & hold-out & 0.764 & 1 & 0.737 & 1 \\
+RIXM & none & hold-out & 0.766 & 4 & 0.726 & 4 \\
+\multicolumn{7}{l}{\emph{Gradient descent, $\lambda_0=0$ \citep{Sa2022}}}\\
+WILCAR & none & DCV & 0.764 & 17 & 0.775 & 181 \\
+WILCAR & none & hold-out & 0.764 & 1 & 0.765 & 40 \\
+RIXM & none & hold-out & 0.766 & 4 & 0.672 & 64 \\
+\multicolumn{7}{l}{\emph{New unit with zero output weight}}\\
+WILCAR & mean & DCV & 0.762 & 99 & 0.762 & 104 \\
+WILCAR & mean & hold-out & 0.753 & 7 & 0.753 & 8 \\
+WILCAR & none & DCV & 0.764 & 17 & 0.764 & 10 \\
+WILCAR & none & hold-out & 0.764 & 1 & 0.765 & 1 \\
+\multicolumn{7}{l}{\emph{DCV with re-initialisation (reference: hold-out)}}\\
+RIXM & mean & DCV & 0.760 & 6 & 0.761 & 77 \\
+RIXM & none & DCV & 0.766 & 4 & 0.764 & 144 \\
+\bottomrule\end{tabular}\end{table}

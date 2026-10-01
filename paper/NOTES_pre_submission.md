@@ -1,5 +1,13 @@
 # Pre-submission notes (2026-09-29) — to address when closing the next complete version
 
+## Update 2026-10-01 (v8.3)
+* Ablations of items 7–10 integrated (gd, l2zero, zeroout, dcvall; five UCI datasets, mean mode): Supplementary S9 /
+  Table S10 and one paragraph in §5.2. Findings: prior needed for constrained training (−0.10 to −0.15 MCC, 4–60× slower
+  without it); WILCAR > RIXM only under GD (0.765 vs 0.672) — an optimiser effect; zero-out irrelevant (p = 0.96); DCV on
+  RIXM selects as well as hold-out at 14–34× its cost and 8× the cost of DCV with reuse. The old §3 argument "DCV needs
+  weight reuse for smooth curves" is now stated as a cost argument. Pages: preprint 15 before refs (21), Word 18, journal 10.
+* global/syn_global certification recalculation still running on the user's machine; sign-mode cert columns unchanged.
+
 ## Update 2026-09-30 (v7, concise version)
 * Co-advisor required ≤ 20 pages excluding references → article rewritten (v7): preprint PDF 14 pages before the
   references (20 in all), Word 17 before the references, journal layout 10 pages; ~2,950 words of body text, 44

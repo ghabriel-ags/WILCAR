@@ -1,0 +1,21 @@
+dataset,label,certified,counterexample
+algerian,WILCAR,2,23
+algerian,WILCAR (DCV),2,23
+algerian,WILCAR-C,25,0
+algerian,WILCAR-C (DCV),25,0
+breast_diagnostic,WILCAR,0,25
+breast_diagnostic,WILCAR (DCV),0,25
+breast_diagnostic,WILCAR-C,25,0
+breast_diagnostic,WILCAR-C (DCV),25,0
+breast_original,WILCAR,23,2
+breast_original,WILCAR (DCV),25,0
+breast_original,WILCAR-C,25,0
+breast_original,WILCAR-C (DCV),25,0
+heart_failure,WILCAR,7,18
+heart_failure,WILCAR (DCV),6,19
+heart_failure,WILCAR-C,25,0
+heart_failure,WILCAR-C (DCV),25,0
+pima,WILCAR,9,16
+pima,WILCAR (DCV),5,20
+pima,WILCAR-C,14,11
+pima,WILCAR-C (DCV),7,18

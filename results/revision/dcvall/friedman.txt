@@ -1,0 +1,7 @@
+datasets N=5, methods k=4
+Friedman chi2=4.200; Iman-Davenport F=1.556, p=0.2512
+Nemenyi CD (alpha=0.05) = 2.098
+Holm-corrected tests vs. best (RIXM):
+  RIXM-C (DCV)         rank=2.40  p=0.3272  p_holm=0.3272
+  RIXM (DCV)           rank=2.80  p=0.1416  p_holm=0.2833
+  RIXM-C               rank=3.20  p=0.0500  p_holm=0.1501

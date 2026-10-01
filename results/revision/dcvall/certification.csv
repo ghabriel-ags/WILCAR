@@ -1,0 +1,21 @@
+dataset,label,certified,counterexample
+algerian,RIXM,2,23
+algerian,RIXM (DCV),2,23
+algerian,RIXM-C,25,0
+algerian,RIXM-C (DCV),25,0
+breast_diagnostic,RIXM,0,25
+breast_diagnostic,RIXM (DCV),0,25
+breast_diagnostic,RIXM-C,25,0
+breast_diagnostic,RIXM-C (DCV),25,0
+breast_original,RIXM,23,2
+breast_original,RIXM (DCV),25,0
+breast_original,RIXM-C,25,0
+breast_original,RIXM-C (DCV),25,0
+heart_failure,RIXM,7,18
+heart_failure,RIXM (DCV),6,19
+heart_failure,RIXM-C,25,0
+heart_failure,RIXM-C (DCV),25,0
+pima,RIXM,7,18
+pima,RIXM (DCV),6,19
+pima,RIXM-C,13,12
+pima,RIXM-C (DCV),8,17

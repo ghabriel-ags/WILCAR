@@ -1,0 +1,145 @@
+dataset,label,by_construction,certified,counterexample,none
+algerian,CMNN,25,0,0,0
+algerian,ELM,0,0,0,25
+algerian,ELM-C,0,0,0,25
+algerian,LGBM,0,0,0,25
+algerian,LGBM-C,25,0,0,0
+algerian,LMN,25,0,0,0
+algerian,LR,0,0,0,25
+algerian,LR-C,25,0,0,0
+algerian,MINMAX,25,0,0,0
+algerian,MLP,0,0,0,25
+algerian,RIXM,0,2,23,0
+algerian,RIXM-C,0,25,0,0
+algerian,WILCAR,0,2,23,0
+algerian,WILCAR (DCV),0,2,23,0
+algerian,WILCAR-C,0,25,0,0
+algerian,WILCAR-C (DCV),0,25,0,0
+algerian,XGB,0,0,0,25
+algerian,XGB-C,25,0,0,0
+breast_diagnostic,CMNN,25,0,0,0
+breast_diagnostic,ELM,0,0,0,25
+breast_diagnostic,ELM-C,0,0,0,25
+breast_diagnostic,LGBM,0,0,0,25
+breast_diagnostic,LGBM-C,25,0,0,0
+breast_diagnostic,LMN,25,0,0,0
+breast_diagnostic,LR,0,0,0,25
+breast_diagnostic,LR-C,25,0,0,0
+breast_diagnostic,MINMAX,25,0,0,0
+breast_diagnostic,MLP,0,0,0,25
+breast_diagnostic,RIXM,0,0,25,0
+breast_diagnostic,RIXM-C,0,25,0,0
+breast_diagnostic,WILCAR,0,0,25,0
+breast_diagnostic,WILCAR (DCV),0,0,25,0
+breast_diagnostic,WILCAR-C,0,24,1,0
+breast_diagnostic,WILCAR-C (DCV),0,25,0,0
+breast_diagnostic,XGB,0,0,0,25
+breast_diagnostic,XGB-C,25,0,0,0
+breast_original,CMNN,25,0,0,0
+breast_original,ELM,0,0,0,25
+breast_original,ELM-C,0,0,0,25
+breast_original,LGBM,0,0,0,25
+breast_original,LGBM-C,25,0,0,0
+breast_original,LMN,25,0,0,0
+breast_original,LR,0,0,0,25
+breast_original,LR-C,25,0,0,0
+breast_original,MINMAX,25,0,0,0
+breast_original,MLP,0,0,0,25
+breast_original,RIXM,0,23,2,0
+breast_original,RIXM-C,0,25,0,0
+breast_original,WILCAR,0,23,2,0
+breast_original,WILCAR (DCV),0,25,0,0
+breast_original,WILCAR-C,0,25,0,0
+breast_original,WILCAR-C (DCV),0,25,0,0
+breast_original,XGB,0,0,0,25
+breast_original,XGB-C,25,0,0,0
+compas,CMNN,25,0,0,0
+compas,ELM,0,0,0,25
+compas,ELM-C,0,0,0,25
+compas,LGBM,0,0,0,25
+compas,LGBM-C,25,0,0,0
+compas,LMN,25,0,0,0
+compas,LR,0,0,0,25
+compas,LR-C,25,0,0,0
+compas,MINMAX,25,0,0,0
+compas,MLP,0,0,0,25
+compas,RIXM,0,8,17,0
+compas,RIXM-C,0,8,17,0
+compas,WILCAR,0,12,13,0
+compas,WILCAR (DCV),0,0,25,0
+compas,WILCAR-C,0,7,18,0
+compas,WILCAR-C (DCV),0,0,25,0
+compas,XGB,0,0,0,25
+compas,XGB-C,25,0,0,0
+heart_disease,CMNN,25,0,0,0
+heart_disease,ELM,0,0,0,25
+heart_disease,ELM-C,0,0,0,25
+heart_disease,LGBM,0,0,0,25
+heart_disease,LGBM-C,25,0,0,0
+heart_disease,LMN,25,0,0,0
+heart_disease,LR,0,0,0,25
+heart_disease,LR-C,25,0,0,0
+heart_disease,MINMAX,25,0,0,0
+heart_disease,MLP,0,0,0,25
+heart_disease,RIXM,0,21,4,0
+heart_disease,RIXM-C,0,25,0,0
+heart_disease,WILCAR,0,21,4,0
+heart_disease,WILCAR (DCV),0,22,3,0
+heart_disease,WILCAR-C,0,25,0,0
+heart_disease,WILCAR-C (DCV),0,25,0,0
+heart_disease,XGB,0,0,0,25
+heart_disease,XGB-C,25,0,0,0
+heart_failure,CMNN,25,0,0,0
+heart_failure,ELM,0,0,0,25
+heart_failure,ELM-C,0,0,0,25
+heart_failure,LGBM,0,0,0,25
+heart_failure,LGBM-C,25,0,0,0
+heart_failure,LMN,25,0,0,0
+heart_failure,LR,0,0,0,25
+heart_failure,LR-C,25,0,0,0
+heart_failure,MINMAX,25,0,0,0
+heart_failure,MLP,0,0,0,25
+heart_failure,RIXM,0,7,18,0
+heart_failure,RIXM-C,0,25,0,0
+heart_failure,WILCAR,0,7,18,0
+heart_failure,WILCAR (DCV),0,6,19,0
+heart_failure,WILCAR-C,0,25,0,0
+heart_failure,WILCAR-C (DCV),0,25,0,0
+heart_failure,XGB,0,0,0,25
+heart_failure,XGB-C,25,0,0,0
+loan,CMNN,10,0,0,0
+loan,ELM,0,0,0,10
+loan,ELM-C,0,0,0,10
+loan,LGBM,0,0,0,10
+loan,LGBM-C,10,0,0,0
+loan,LMN,10,0,0,0
+loan,LR,0,0,0,10
+loan,LR-C,10,0,0,0
+loan,MINMAX,10,0,0,0
+loan,MLP,0,0,0,10
+loan,RIXM,0,0,10,0
+loan,RIXM-C,0,2,8,0
+loan,WILCAR,0,2,8,0
+loan,WILCAR (DCV),0,4,6,0
+loan,WILCAR-C,0,2,8,0
+loan,WILCAR-C (DCV),0,7,3,0
+loan,XGB,0,0,0,10
+loan,XGB-C,10,0,0,0
+pima,CMNN,25,0,0,0
+pima,ELM,0,0,0,25
+pima,ELM-C,0,0,0,25
+pima,LGBM,0,0,0,25
+pima,LGBM-C,25,0,0,0
+pima,LMN,25,0,0,0
+pima,LR,0,0,0,25
+pima,LR-C,25,0,0,0
+pima,MINMAX,25,0,0,0
+pima,MLP,0,0,0,25
+pima,RIXM,0,7,18,0
+pima,RIXM-C,0,13,12,0
+pima,WILCAR,0,9,16,0
+pima,WILCAR (DCV),0,5,20,0
+pima,WILCAR-C,0,14,11,0
+pima,WILCAR-C (DCV),0,6,19,0
+pima,XGB,0,0,0,25
+pima,XGB-C,25,0,0,0

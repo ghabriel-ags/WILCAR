@@ -368,6 +368,12 @@ The median cost per outer fold is 22 s for certified WILCAR and 18 s for unconst
 set of 168 networks, the certificate decided 96\% of those produced by a cegis step, whose margins are thin by design,
 with a median time below one millisecond (Supplementary \cref{S-tab:certbench}).
 
+\emph{Ablations} (Supplementary \cref{S-tab:ablation}, five UCI datasets). The prior is what makes constrained training
+work: with $\lambda_0=0$ the constrained networks lose 0.10--0.15 MCC and SLSQP takes 4--60 times longer, while the
+unconstrained ones lose at most 0.04. Under the full-batch gradient descent of \citet{Sa2022}, WILCAR keeps its accuracy and
+RIXM drops to 0.672 (Holm $p=0.003$); with L-BFGS the two are equal, so weight reuse no longer buys accuracy. It buys
+cost: DCV with re-initialisation at every size selects as well as with reuse, at eight times the time per fold.
+
 On real data the sign and cegis constraints give the same accuracy. Selection favours small networks (median of 5
 hidden units for certified WILCAR with DCV and 1 with the hold-out split; Supplementary \cref{S-tab:size}), and with a
 single unit the two constraints coincide. The flexibility of cegis matters when the target needs more units, as in

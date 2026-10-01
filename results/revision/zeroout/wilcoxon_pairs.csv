@@ -1,0 +1,6 @@
+dataset,pair,mean_diff,median_diff,wins,losses,p,p_nb,p_holm,p_nb_holm
+algerian,WILCAR-C vs WILCAR,0.0001,0.0,5,4,0.8134,0.9927,1.0,1.0
+breast_diagnostic,WILCAR-C vs WILCAR,-0.0569,-0.0186,3,17,0.0005,0.3619,0.0026,1.0
+breast_original,WILCAR-C vs WILCAR,0.0045,0.0,12,5,0.0605,0.5303,0.2419,1.0
+heart_failure,WILCAR-C vs WILCAR,-0.0089,-0.0022,8,14,0.1828,0.6726,0.5484,1.0
+pima,WILCAR-C vs WILCAR,0.0009,0.0,8,7,0.7863,0.9416,1.0,1.0

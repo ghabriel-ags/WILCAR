@@ -323,6 +323,50 @@ def table_syn(dfs):
         *lines, r"\bottomrule\end{tabular}}", note, r"\end{table*}"]))
 
 
+UCI5 = ["algerian", "breast_original", "breast_diagnostic", "heart_failure", "pima"]
+# ablations of the training recipe (Supplementary): (title, tag, [(method, selection)]); reference = same method in `main`
+ABLATIONS = [
+    (r"No weight prior ($\lambda_0=0$)", "l2zero",
+     [("WILCAR-C", "dcv"), ("WILCAR-C", "holdout"), ("RIXM-C", "holdout"), ("WILCAR", "dcv"), ("WILCAR", "holdout"), ("RIXM", "holdout")]),
+    (r"Gradient descent, $\lambda_0=0$ \citep{Sa2022}", "gd", [("WILCAR", "dcv"), ("WILCAR", "holdout"), ("RIXM", "holdout")]),
+    (r"New unit with zero output weight", "zeroout",
+     [("WILCAR-C", "dcv"), ("WILCAR-C", "holdout"), ("WILCAR", "dcv"), ("WILCAR", "holdout")]),
+    (r"DCV with re-initialisation (reference: hold-out)", "dcvall", [("RIXM-C", "dcv"), ("RIXM", "dcv")]),
+]
+
+
+def table_ablation(dfs):
+    mn = dfs.get("main")
+    lines = []
+    for title, tag, rows in ABLATIONS:
+        df = dfs.get(tag)
+        if df is None or mn is None:
+            continue
+        lines.append(rf"\multicolumn{{7}}{{l}}{{\emph{{{title}}}}}\\")
+        for meth, sel in rows:
+            d = df[(df.method == meth) & (df.selection == sel) & df.dataset.isin(UCI5)]
+            rsel = "holdout" if tag == "dcvall" else sel
+            r = mn[(mn.method == meth) & (mn.selection == rsel) & mn.dataset.isin(UCI5)]
+            if not len(d) or not len(r):
+                continue
+            c = "mean" if meth.endswith("-C") else "none"
+            lines.append(f"{lab(meth, c, sel)} & {r.groupby('dataset').mcc.mean().mean():.3f} & {r.time_s.median():.0f} & "
+                         f"{d.groupby('dataset').mcc.mean().mean():.3f} & {d.time_s.median():.0f} \\\\")
+    if not lines:
+        return
+    write("ablation.tex", "\n".join([
+        r"\begin{table}[H]\centering\small",
+        r"\caption{Ablations of the training recipe on the five UCI datasets (25 outer folds each; constrained methods in the "
+        r"mean mode). MCC: mean over datasets; time: median per outer fold, in seconds. Reference: the same method and "
+        r"selection in the main campaign (L-BFGS, $\lambda_0=0.3$, new unit with random output weight); for the last block, "
+        r"the hold-out selection of the same method.}",
+        r"\label{tab:ablation}",
+        r"\begin{tabular}{lllrrrr}\toprule",
+        r" & & & \multicolumn{2}{c}{Reference} & \multicolumn{2}{c}{Ablation} \\\cmidrule(lr){4-5}\cmidrule(lr){6-7}",
+        r"Model & Constraint & Selection & MCC & time & MCC & time \\\midrule",
+        *lines, r"\bottomrule\end{tabular}\end{table}"]))
+
+
 def table_cert_bench():
     f = RES / "cert_bench.jsonl"
     if not f.exists():
@@ -480,6 +524,7 @@ def main():
     table_syn(dfs)
     table_size(dfs)
     table_cert_bench()
+    table_ablation(dfs)
     numbers(dfs, M, ranks)
     figure_cd(M)
 

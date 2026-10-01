@@ -287,6 +287,20 @@ workstation, one task per core.
 difference ($\alpha=0.05$); methods joined by a thick bar are not significantly different.}\label{fig:cd}
 \end{figure}
 
+% =====================================================================================================
+\section{Ablations of the training recipe}\label{sup:ablation}
+\Cref{tab:ablation} removes one ingredient of Section~\ref{M-sec:constructive} at a time on the five UCI datasets.
+Without the prior ($\lambda_0=0$) the unconstrained networks lose 0.01--0.04 MCC, the constrained ones 0.10--0.15, and
+SLSQP, started from unbounded weights with saturated units, takes 4--60 times longer (Friedman over the six settings,
+Iman--Davenport $p=0.002$). With full-batch gradient descent and no prior, the optimiser of \citet{Sa2022}, WILCAR keeps
+its accuracy (0.765--0.775) and RIXM falls to 0.672 (Holm-adjusted $p=0.003$): the advantage of weight reuse reported
+there is an optimiser effect, which L-BFGS removes, at 10--40 times the cost. Starting the new unit with zero output
+weight, so that the network with $n+1$ units begins exactly at the function with $n$ units, changes nothing
+(Friedman $p=0.96$). DCV applied to RIXM, which re-initialises all weights at every size, selects as well as the hold-out
+split (0.764 against 0.766; 0.761 against 0.760 with the mean constraint), at 14--34 times its cost and 8 times the
+cost of DCV with weight reuse (144 s against 17 s per fold): weight reuse is what makes DCV affordable.
+
+\IfFileExists{tables/ablation.tex}{\input{tables/ablation.tex}}{}
 \bibliographystyle{elsarticle-harv}
 \bibliography{refs}
 

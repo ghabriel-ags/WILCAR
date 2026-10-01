@@ -1,0 +1,6 @@
+dataset,pair,mean_diff,median_diff,wins,losses,p,p_nb,p_holm,p_nb_holm
+algerian,RIXM-C vs RIXM,-0.0014,0.0,5,5,0.945,0.9214,0.945,1.0
+breast_diagnostic,RIXM-C vs RIXM,-0.0179,-0.0179,4,14,0.0048,0.2449,0.0241,1.0
+breast_original,RIXM-C vs RIXM,0.0039,0.0,12,5,0.0815,0.5742,0.3259,1.0
+heart_failure,RIXM-C vs RIXM,-0.0105,-0.0118,7,15,0.0926,0.6367,0.3259,1.0
+pima,RIXM-C vs RIXM,-0.003,0.0,7,11,0.45,0.8053,0.9001,1.0

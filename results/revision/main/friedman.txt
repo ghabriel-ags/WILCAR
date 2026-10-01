@@ -1,0 +1,21 @@
+datasets N=8, methods k=18
+Friedman chi2=59.180; Iman-Davenport F=5.393, p=9.739e-09
+Nemenyi CD (alpha=0.05) = 9.313
+Holm-corrected tests vs. best (RIXM):
+  CMNN                 rank=6.38  p=0.7079  p_holm=1.0000
+  WILCAR-C (DCV)       rank=6.75  p=0.6065  p_holm=1.0000
+  XGB-C                rank=7.06  p=0.5273  p_holm=1.0000
+  XGB                  rank=7.31  p=0.4679  p_holm=1.0000
+  LGBM                 rank=7.38  p=0.4537  p_holm=1.0000
+  WILCAR (DCV)         rank=7.38  p=0.4537  p_holm=1.0000
+  WILCAR-C             rank=7.62  p=0.3993  p_holm=1.0000
+  LGBM-C               rank=7.75  p=0.3736  p_holm=1.0000
+  WILCAR               rank=8.00  p=0.3254  p_holm=1.0000
+  RIXM-C               rank=8.12  p=0.3029  p_holm=1.0000
+  LR-C                 rank=9.69  p=0.1062  p_holm=1.0000
+  MLP                  rank=11.12  p=0.0312  p_holm=0.3747
+  LR                   rank=11.44  p=0.0231  p_holm=0.3007
+  LMN                  rank=12.25  p=0.0100  p_holm=0.1401
+  MINMAX               rank=12.88  p=0.0050  p_holm=0.0744
+  ELM                  rank=16.75  p=0.0000  p_holm=0.0003
+  ELM-C                rank=17.75  p=0.0000  p_holm=0.0001

@@ -1,0 +1,6 @@
+datasets N=5, methods k=3
+Friedman chi2=10.000; Iman-Davenport F=inf, p=0
+Nemenyi CD (alpha=0.05) = 1.482
+Holm-corrected tests vs. best (WILCAR (DCV)):
+  WILCAR               rank=2.00  p=0.1138  p_holm=0.1138
+  RIXM                 rank=3.00  p=0.0016  p_holm=0.0031

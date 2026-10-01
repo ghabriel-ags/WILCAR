@@ -1,0 +1,11 @@
+dataset,pair,mean_diff,median_diff,wins,losses,p,p_nb,p_holm,p_nb_holm
+algerian,WILCAR-C vs WILCAR,-0.2647,-0.2391,2,21,0.0,0.0323,0.0004,0.3235
+algerian,RIXM-C vs RIXM,-0.1797,-0.0822,2,19,0.0002,0.1461,0.0017,1.0
+breast_diagnostic,WILCAR-C vs WILCAR,-0.1978,-0.1243,1,24,0.0,0.1019,0.0,0.9172
+breast_diagnostic,RIXM-C vs RIXM,-0.3015,-0.1505,10,15,0.0061,0.1524,0.0429,1.0
+breast_original,WILCAR-C vs WILCAR,-0.0168,0.0,11,10,0.9249,0.676,1.0,1.0
+breast_original,RIXM-C vs RIXM,-0.0592,0.0,10,12,0.2011,0.4811,1.0,1.0
+heart_failure,WILCAR-C vs WILCAR,-0.0424,0.0,12,11,0.9143,0.7102,1.0,1.0
+heart_failure,RIXM-C vs RIXM,-0.0555,-0.0351,11,14,0.2872,0.6855,1.0,1.0
+pima,WILCAR-C vs WILCAR,0.0037,0.0094,14,7,0.443,0.9156,1.0,1.0
+pima,RIXM-C vs RIXM,0.0068,0.0,8,9,0.9247,0.8618,1.0,1.0
