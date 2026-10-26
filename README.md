@@ -98,6 +98,7 @@ thesis/
 ├── src/
 │   ├── __init__.py
 │   ├── base.py                 # Base classes, TrainingConfig, TrainingResults
+│   ├── run_dynamic_cv.py       # Dynamic Cross-Validation (WILCAR only)
 │   ├── wilcar/
 │   │   ├── __init__.py
 │   │   ├── unconstrained.py    # WILCAR (backprop, weight reuse, linearization)
@@ -121,7 +122,6 @@ thesis/
 ├── run_experiment.py           # Single method execution
 ├── run_all_methods.py          # Batch execution (6 methods)
 ├── run_cross_validation.py     # K-fold cross-validation
-├── run_dynamic_cv.py           # Dynamic Cross-Validation (WILCAR only)
 ├── generate_figures.py         # Publication-quality figures
 ├── regenerate_dashboard.py     # Comparative dashboards
 │
@@ -185,7 +185,7 @@ python run_all_methods.py --dataset computer_hardware
 python run_cross_validation.py --dataset computer_hardware --methods 1 2 3 4 5 6
 
 # Dynamic Cross-Validation (WILCAR only)
-python run_dynamic_cv.py --dataset computer_hardware --methods 1 2
+python src/run_dynamic_cv.py --dataset computer_hardware --methods 1 2
 ```
 
 ### Binary Classification
@@ -199,6 +199,9 @@ python run_all_methods.py --task classification --dataset breast__binary_
 
 # 5-fold cross-validation
 python run_cross_validation.py --task classification --dataset breast__binary_ --methods 1 2 3 4 5 6
+
+# Dynamic Cross-Validation (WILCAR only), with the final model retrained on the full dataset
+python src/run_dynamic_cv.py --task classification --dataset pima__binary_ --methods 1 2 --retrain -y
 
 # Loop over all classification datasets
 for ds in Algerian_forest_fires__binary_ breast__binary_ Diagnostic_Breast_Cancer__binary_ heart_failure_clinical_records_dataset__binary_ pima__binary_; do
@@ -216,27 +219,29 @@ done
 |---------|---|---|-----|---------------|
 | `airfoil_self_noise` | 5 | 1503 | 80% | `[-1, 0, -1, +1, -1]` |
 | `computer_hardware` | 6 | 209 | 100% | `[-1, +1, +1, +1, +1, +1]` |
-| `ENB2012_Y1` (Heating Load) | 8 | 768 | 75% | `[-1, +1, +1, +1, -1, 0, +1, 0]` |
-| `ENB2012_Y2` (Cooling Load) | 8 | 768 | 75% | `[-1, +1, +1, +1, -1, 0, +1, 0]` |
-| `lavender_friction_DFC` | 3 | 625 | 67% | `[+1, -1, 0]` |
+| `ENB2012_Y1` (Heating Load) | 8 | 768 | 75% | `[+1, -1, +1, -1, +1, 0, +1, 0]` |
+| `ENB2012_Y2` (Cooling Load) | 8 | 768 | 75% | `[+1, -1, +1, -1, +1, 0, +1, 0]` |
+| `lavender_friction_DFC` | 3 | 625 | 67% | `[0, +1, +1]` |
 | `optical_interconnection_network` | 3 | 630 | 67% | `[-1, 0, +1]` |
 | `qsar_aquatic_toxicity` | 8 | 546 | 100% | `[+1, -1, +1, +1, +1, -1, +1, +1]` |
 | `qsar_fish_toxicity` | 6 | 908 | 100% | `[-1, +1, -1, +1, +1, +1]` |
 | `Real_estate_valuation` | 3 | 414 | 100% | `[-1, -1, +1]` |
-| `synchronous_machine` | 4 | 557 | 100% | `[+1, +1, -1, +1]` |
-| `yacht_hydrodynamics` | 6 | 308 | 17% | `[0, 0, 0, 0, +1, 0]` |
+| `synchronous_machine` | 4 | 557 | 100% | `[+1, -1, +1, +1]` |
+| `yacht_hydrodynamics` | 6 | 308 | 17% | `[0, 0, 0, 0, 0, +1]` |
 
 ### Binary Classification (5 datasets, Chapter 6)
 
 | Dataset | p | n | CR | Signal Vector |
 |---------|---|---|-----|---------------|
-| `Algerian_forest_fires__binary_` | 10 | 244 | 90% | `[+1, -1, 0, -1, +1, +1, +1, +1, +1, +1]` |
+| `Algerian_forest_fires__binary_` | 10 | 243¹ | 90% | `[+1, -1, 0, -1, +1, +1, +1, +1, +1, +1]` |
 | `breast__binary_` | 9 | 683 | 100% | `[+1, +1, +1, +1, +1, +1, +1, +1, +1]` |
 | `Diagnostic_Breast_Cancer__binary_` | 30 | 569 | 90% | `[+1]×9, [0], [+1]×9, [0], [+1]×9, [0]` |
 | `heart_failure_clinical_records_dataset__binary_` | 12 | 299 | 58% | `[+1, +1, 0, 0, -1, +1, 0, +1, -1, 0, 0, -1]` |
 | `pima__binary_` | 8 | 768 | 75% | `[+1, +1, 0, +1, 0, +1, +1, +1]` |
 
 CR = Constraint Ratio (proportion of variables with definite gain sign).
+
+¹ The UCI file has 244 data rows; one malformed row (two values merged into one field, inherited from the UCI source) is dropped by the loader, so n = 243.
 
 ---
 
