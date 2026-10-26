@@ -237,18 +237,21 @@ class WILCARConstrainedNumpy(BaseNeuralNetwork):
         """
         Expand network by adding a hidden neuron.
         Reuses weights from previous model (n-1).
+        If sizes were skipped (no configuration reached 100% SCR), the previous
+        model has fewer than n-1 neurons: add one neuron per missing size.
         """
         new_param = copy.deepcopy(previous_param)
-        
-        # Add neuron to hidden layer
-        new_w1 = np.random.randn(1, self.n_inputs) * np.sqrt(1. / self.n_inputs)
-        new_param['W1'] = np.vstack([new_param['W1'], new_w1])
-        new_param['b1'] = np.vstack([new_param['b1'], np.zeros((1, 1))])
-        
-        # Expand output layer connections
-        new_w2 = np.random.randn(1, 1) * np.sqrt(1. / n_neurons)
-        new_param['W2'] = np.hstack([new_param['W2'], new_w2])
-        
+
+        while new_param['W1'].shape[0] < n_neurons:
+            # Add neuron to hidden layer
+            new_w1 = np.random.randn(1, self.n_inputs) * np.sqrt(1. / self.n_inputs)
+            new_param['W1'] = np.vstack([new_param['W1'], new_w1])
+            new_param['b1'] = np.vstack([new_param['b1'], np.zeros((1, 1))])
+
+            # Expand output layer connections
+            new_w2 = np.random.randn(1, 1) * np.sqrt(1. / n_neurons)
+            new_param['W2'] = np.hstack([new_param['W2'], new_w2])
+
         return new_param
     
     def _reinitialize_new_neuron(self, n_neurons: int):
