@@ -52,7 +52,12 @@ class WILCARConstrainedNumpy(BaseNeuralNetwork):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
+        # Last accepted DCV state (weight reuse between constructive_step calls); defined
+        # here so that the parallel DCV worker, which recreates the model at every step,
+        # can restore it
+        self._vcd_previous_param = None
+
         # Get initial weights via constrained optimization
         print("\n🔧 Computing initial weights with gain constraints...")
         self.initial_weights = self._initialize_first_hidden_neuron()

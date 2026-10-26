@@ -617,8 +617,9 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
                 )
                 for k in range(vcd_config.n_folds)
             )
+            step_states = list(fold_states)
             for k, (result, new_params) in enumerate(parallel_results):
-                fold_states[k] = new_params
+                step_states[k] = new_params
                 if 'success' in result and not result['success']:
                     all_folds_ok = False
                     break
@@ -635,9 +636,17 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
                     step_metrics['fold_accuracy_test'].append(result['accuracy_test'])
                     step_metrics['fold_f1_test'].append(result['f1_test'])
                     step_metrics['fold_mcc_test'].append(result['mcc_test'])
+            # Fold states advance only when step n is accepted (all K folds succeeded);
+            # after a discarded step every fold keeps the state of the last accepted n
+            if all_folds_ok:
+                fold_states = step_states
 
         else:
             # --- Sequential path (fallback / debug) ---
+            # Same rule: keep the state of every fold to restore it if step n is discarded
+            saved_states = [(copy.deepcopy(m.param), m.n_neurons,
+                             copy.deepcopy(getattr(m, '_vcd_previous_param', None)))
+                            for m in fold_models]
             for k in range(vcd_config.n_folds):
                 result = fold_models[k].constructive_step(
                     n=n,
@@ -649,6 +658,10 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
                 # For M2 (constrained): check if optimization succeeded
                 if 'success' in result and not result['success']:
                     all_folds_ok = False
+                    for m, (param, n_neurons, previous) in zip(fold_models, saved_states):
+                        m.param, m.n_neurons = param, n_neurons
+                        if hasattr(m, '_vcd_previous_param'):
+                            m._vcd_previous_param = previous
                     break
                 J_T += result['bce_test'] if is_cls else result['mse_test']
                 step_metrics['fold_mse_test'].append(result['mse_test'])
