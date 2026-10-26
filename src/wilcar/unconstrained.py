@@ -398,6 +398,7 @@ class WILCARUnconstrainedNumpy(BaseNeuralNetwork):
         if self.config.task == 'classification':
             cls_test = calculate_classification_metrics(y_test.flatten(), y_pred_test.flatten())
             result.update({
+                'bce_test': cls_test['bce'],
                 'accuracy_test': cls_test['accuracy'],
                 'f1_test': cls_test['f1'],
                 'mcc_test': cls_test['mcc'],

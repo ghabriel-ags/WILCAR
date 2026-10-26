@@ -414,6 +414,7 @@ class VCDResults:
     dataset_name: str
     optimal_neurons: int
     best_J_T: float
+    task: str = 'regression'
 
     # History per number of neurons
     history: List[Dict] = field(default_factory=list)
@@ -428,10 +429,16 @@ class VCDResults:
     final_train_mse: float = 0.0
     final_scr: float = 0.0
 
-    # CV aggregate metrics at n*
+    # CV aggregate metrics at n* (regression)
     cv_mean_r2_test: float = 0.0
     cv_std_r2_test: float = 0.0
     cv_mean_scr: float = 0.0
+
+    # CV aggregate metrics at n* (classification)
+    cv_mean_accuracy: float = 0.0
+    cv_std_accuracy: float = 0.0
+    cv_mean_f1: float = 0.0
+    cv_mean_mcc: float = 0.0
 
     # Timing
     vcd_time: float = 0.0
@@ -553,6 +560,7 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
     # =========================================================
     # STEP 2: Main VCD loop
     # =========================================================
+    is_cls = vcd_config.task == 'classification'
     best_J_T = float('inf')
     best_n = 0
     patience_counter = 0
@@ -560,9 +568,14 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
 
     vcd_start = time.time()
 
-    print(f"\n  {'n':>5s} | {'J_T':>12s} | {'R² (mean±std)':>18s} | "
-          f"{'SCR':>6s} | {'Time':>7s}")
-    print(f"  {'─'*5}─┼─{'─'*12}─┼─{'─'*18}─┼─{'─'*6}─┼─{'─'*7}")
+    if is_cls:
+        print(f"\n  {'n':>5s} | {'J_T (BCE)':>12s} | {'Acc (mean±std)':>18s} | "
+              f"{'MCC':>6s} | {'SCR':>6s} | {'Time':>7s}")
+        print(f"  {'─'*5}─┼─{'─'*12}─┼─{'─'*18}─┼─{'─'*6}─┼─{'─'*6}─┼─{'─'*7}")
+    else:
+        print(f"\n  {'n':>5s} | {'J_T':>12s} | {'R² (mean±std)':>18s} | "
+              f"{'SCR':>6s} | {'Time':>7s}")
+        print(f"  {'─'*5}─┼─{'─'*12}─┼─{'─'*18}─┼─{'─'*6}─┼─{'─'*7}")
 
     for n in range(1, method_config.max_neurons + 1):
         step_start = time.time()
@@ -578,6 +591,13 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
             'fold_times': [],
             'fold_conformity_details': [],
         }
+        if is_cls:
+            step_metrics.update({
+                'fold_bce_test': [],
+                'fold_accuracy_test': [],
+                'fold_f1_test': [],
+                'fold_mcc_test': [],
+            })
 
         all_folds_ok = True
 
@@ -602,7 +622,7 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
                 if 'success' in result and not result['success']:
                     all_folds_ok = False
                     break
-                J_T += result['mse_test']
+                J_T += result['bce_test'] if is_cls else result['mse_test']
                 step_metrics['fold_mse_test'].append(result['mse_test'])
                 step_metrics['fold_rmse_test'].append(result['rmse_test'])
                 step_metrics['fold_r2_test'].append(result['r2_test'])
@@ -610,6 +630,11 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
                 step_metrics['fold_scr'].append(result['scr'])
                 step_metrics['fold_conformity_details'].append(result.get('conformity_details', []))
                 step_metrics['fold_times'].append(result['training_time'])
+                if is_cls:
+                    step_metrics['fold_bce_test'].append(result['bce_test'])
+                    step_metrics['fold_accuracy_test'].append(result['accuracy_test'])
+                    step_metrics['fold_f1_test'].append(result['f1_test'])
+                    step_metrics['fold_mcc_test'].append(result['mcc_test'])
 
         else:
             # --- Sequential path (fallback / debug) ---
@@ -625,7 +650,7 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
                 if 'success' in result and not result['success']:
                     all_folds_ok = False
                     break
-                J_T += result['mse_test']
+                J_T += result['bce_test'] if is_cls else result['mse_test']
                 step_metrics['fold_mse_test'].append(result['mse_test'])
                 step_metrics['fold_rmse_test'].append(result['rmse_test'])
                 step_metrics['fold_r2_test'].append(result['r2_test'])
@@ -633,6 +658,11 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
                 step_metrics['fold_scr'].append(result['scr'])
                 step_metrics['fold_conformity_details'].append(result.get('conformity_details', []))
                 step_metrics['fold_times'].append(result['training_time'])
+                if is_cls:
+                    step_metrics['fold_bce_test'].append(result['bce_test'])
+                    step_metrics['fold_accuracy_test'].append(result['accuracy_test'])
+                    step_metrics['fold_f1_test'].append(result['f1_test'])
+                    step_metrics['fold_mcc_test'].append(result['mcc_test'])
 
         step_time = time.time() - step_start
 
@@ -651,13 +681,26 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
         step_metrics['mean_mse_test'] = float(np.mean(step_metrics['fold_mse_test']))
         step_metrics['time'] = step_time
 
+        if is_cls:
+            step_metrics['mean_bce_test'] = float(np.mean(step_metrics['fold_bce_test']))
+            step_metrics['mean_accuracy_test'] = float(np.mean(step_metrics['fold_accuracy_test']))
+            step_metrics['std_accuracy_test'] = float(np.std(step_metrics['fold_accuracy_test']))
+            step_metrics['mean_f1_test'] = float(np.mean(step_metrics['fold_f1_test']))
+            step_metrics['mean_mcc_test'] = float(np.mean(step_metrics['fold_mcc_test']))
+
         history.append(step_metrics)
 
         # Log
-        print(f"  {n:5d} | {J_T:12.6f} | "
-              f"{step_metrics['mean_r2_test']:.4f}±{step_metrics['std_r2_test']:.4f}"
-              f"{'':>4s} | {step_metrics['mean_scr']:5.1%} | {step_time:6.1f}s"
-              f"{'  ★' if J_T < best_J_T else ''}")
+        star = '  ★' if J_T < best_J_T else ''
+        if is_cls:
+            print(f"  {n:5d} | {J_T:12.6f} | "
+                  f"{step_metrics['mean_accuracy_test']:.4f}±{step_metrics['std_accuracy_test']:.4f}"
+                  f"{'':>4s} | {step_metrics['mean_mcc_test']:5.3f} | "
+                  f"{step_metrics['mean_scr']:5.1%} | {step_time:6.1f}s{star}")
+        else:
+            print(f"  {n:5d} | {J_T:12.6f} | "
+                  f"{step_metrics['mean_r2_test']:.4f}±{step_metrics['std_r2_test']:.4f}"
+                  f"{'':>4s} | {step_metrics['mean_scr']:5.1%} | {step_time:6.1f}s{star}")
 
         # Stopping criterion
         if J_T < best_J_T:
@@ -682,7 +725,10 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
             vcd_time=vcd_time, total_time=vcd_time, n_folds=vcd_config.n_folds
         )
 
-    print(f"\n  🏆 Optimal: n* = {best_n} | J_T* = {best_J_T:.6f}")
+    if is_cls:
+        print(f"\n  🏆 Optimal: n* = {best_n} | J_T(BCE)* = {best_J_T:.6f}")
+    else:
+        print(f"\n  🏆 Optimal: n* = {best_n} | J_T* = {best_J_T:.6f}")
 
     # Get CV metrics at optimal n*
     optimal_step = next(h for h in history if h['n'] == best_n)
@@ -739,10 +785,16 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
         final_train_mse = final_results.best_train_mse
         final_scr = final_results.best_conformity
 
-        print(f"  ✅ Final model: n={final_n_neurons} | "
-              f"R²(train)={final_train_r2:.4f} | "
-              f"SCR={final_scr:.1%} | "
-              f"Time={retrain_time:.1f}s")
+        if is_cls:
+            print(f"  ✅ Final model: n={final_n_neurons} | "
+                  f"Acc={final_results.best_test_accuracy:.4f} | "
+                  f"MCC={final_results.best_test_mcc:.4f} | "
+                  f"SCR={final_scr:.1%} | Time={retrain_time:.1f}s")
+        else:
+            print(f"  ✅ Final model: n={final_n_neurons} | "
+                  f"R²(train)={final_train_r2:.4f} | "
+                  f"SCR={final_scr:.1%} | "
+                  f"Time={retrain_time:.1f}s")
     else:
         print(f"\n  ⏭️  Skipping retrain (use --retrain to enable)")
 
@@ -751,20 +803,34 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
     # =========================================================
     total_time = vcd_time + retrain_time
 
+    # Build fold_metrics_at_optimal
+    fold_metrics = []
+    for k in range(vcd_config.n_folds):
+        fold_row = {
+            'fold': k,
+            'mse_test': optimal_step['fold_mse_test'][k],
+            'r2_test': optimal_step['fold_r2_test'][k],
+            'r2_train': optimal_step['fold_r2_train'][k],
+            'scr': optimal_step['fold_scr'][k],
+        }
+        if is_cls:
+            fold_row.update({
+                'bce_test': optimal_step['fold_bce_test'][k],
+                'accuracy_test': optimal_step['fold_accuracy_test'][k],
+                'f1_test': optimal_step['fold_f1_test'][k],
+                'mcc_test': optimal_step['fold_mcc_test'][k],
+            })
+        fold_metrics.append(fold_row)
+
     vcd_results = VCDResults(
         method_id=method_id,
         method_name=method_name,
         dataset_name=dataset_name,
         optimal_neurons=best_n,
         best_J_T=best_J_T,
+        task=vcd_config.task,
         history=history,
-        fold_metrics_at_optimal=[{
-            'fold': k,
-            'mse_test': optimal_step['fold_mse_test'][k],
-            'r2_test': optimal_step['fold_r2_test'][k],
-            'r2_train': optimal_step['fold_r2_train'][k],
-            'scr': optimal_step['fold_scr'][k],
-        } for k in range(vcd_config.n_folds)],
+        fold_metrics_at_optimal=fold_metrics,
         fold_conformity_details=[
             optimal_step['fold_conformity_details'][k]
             for k in range(vcd_config.n_folds)
@@ -776,6 +842,10 @@ def run_vcd_for_method(method_id: int, inputs: np.ndarray, targets: np.ndarray,
         cv_mean_r2_test=optimal_step['mean_r2_test'],
         cv_std_r2_test=optimal_step['std_r2_test'],
         cv_mean_scr=optimal_step['mean_scr'],
+        cv_mean_accuracy=optimal_step.get('mean_accuracy_test', 0.0),
+        cv_std_accuracy=optimal_step.get('std_accuracy_test', 0.0),
+        cv_mean_f1=optimal_step.get('mean_f1_test', 0.0),
+        cv_mean_mcc=optimal_step.get('mean_mcc_test', 0.0),
         vcd_time=vcd_time,
         retrain_time=retrain_time,
         total_time=total_time,
@@ -800,18 +870,31 @@ def _save_vcd_results(results: VCDResults, output_dir: Path,
     method_dir.mkdir(parents=True, exist_ok=True)
 
     # VCD History (J_T curve)
+    is_cls = results.task == 'classification'
     history_rows = []
     for h in results.history:
-        history_rows.append({
+        row = {
             'n_neurons': h['n'],
             'J_T': h['J_T'],
             'mean_mse_test': h['mean_mse_test'],
-            'mean_r2_test': h['mean_r2_test'],
-            'std_r2_test': h['std_r2_test'],
-            'mean_r2_train': h['mean_r2_train'],
             'mean_scr': h['mean_scr'],
             'time': h['time'],
-        })
+        }
+        if is_cls:
+            row.update({
+                'mean_bce_test': h['mean_bce_test'],
+                'mean_accuracy_test': h['mean_accuracy_test'],
+                'std_accuracy_test': h['std_accuracy_test'],
+                'mean_f1_test': h['mean_f1_test'],
+                'mean_mcc_test': h['mean_mcc_test'],
+            })
+        else:
+            row.update({
+                'mean_r2_test': h['mean_r2_test'],
+                'std_r2_test': h['std_r2_test'],
+                'mean_r2_train': h['mean_r2_train'],
+            })
+        history_rows.append(row)
 
     pd.DataFrame(history_rows).to_csv(
         method_dir / "vcd_history.csv", index=False
@@ -845,14 +928,12 @@ def _save_vcd_results(results: VCDResults, output_dir: Path,
         'method_id': results.method_id,
         'method_name': results.method_name,
         'dataset_name': results.dataset_name,
+        'task': results.task,
         'optimal_neurons': results.optimal_neurons,
         'best_J_T': results.best_J_T,
-        'cv_mean_r2_test': results.cv_mean_r2_test,
-        'cv_std_r2_test': results.cv_std_r2_test,
+        'J_T_metric': 'bce' if is_cls else 'mse',
         'cv_mean_scr': results.cv_mean_scr,
         'final_n_neurons': results.final_n_neurons,
-        'final_train_r2': results.final_train_r2,
-        'final_train_mse': results.final_train_mse,
         'final_scr': results.final_scr,
         'vcd_time': results.vcd_time,
         'retrain_time': results.retrain_time,
@@ -860,6 +941,20 @@ def _save_vcd_results(results: VCDResults, output_dir: Path,
         'n_folds': results.n_folds,
         'max_neurons_evaluated': results.max_neurons_evaluated,
     }
+    if is_cls:
+        summary.update({
+            'cv_mean_accuracy': results.cv_mean_accuracy,
+            'cv_std_accuracy': results.cv_std_accuracy,
+            'cv_mean_f1': results.cv_mean_f1,
+            'cv_mean_mcc': results.cv_mean_mcc,
+        })
+    else:
+        summary.update({
+            'cv_mean_r2_test': results.cv_mean_r2_test,
+            'cv_std_r2_test': results.cv_std_r2_test,
+            'final_train_r2': results.final_train_r2,
+            'final_train_mse': results.final_train_mse,
+        })
 
     with open(method_dir / "vcd_summary.json", 'w') as f:
         json.dump(summary, f, indent=2)
@@ -877,21 +972,34 @@ def generate_consolidated_results(all_results: Dict[str, Dict[int, VCDResults]],
     rows = []
     for dataset_name, method_results in all_results.items():
         for method_id, results in method_results.items():
-            rows.append({
+            row = {
                 'dataset': dataset_name,
                 'method_id': results.method_id,
                 'method_name': results.method_name,
+                'task': results.task,
                 'n*': results.optimal_neurons,
                 'J_T*': results.best_J_T,
-                'cv_R2_mean': results.cv_mean_r2_test,
-                'cv_R2_std': results.cv_std_r2_test,
+                'J_T_metric': 'bce' if results.task == 'classification' else 'mse',
                 'cv_SCR': results.cv_mean_scr,
                 'final_n': results.final_n_neurons,
-                'final_R2_train': results.final_train_r2,
                 'final_SCR': results.final_scr,
                 'vcd_time_min': results.vcd_time / 60,
                 'total_time_min': results.total_time / 60,
-            })
+            }
+            if results.task == 'classification':
+                row.update({
+                    'cv_Acc_mean': results.cv_mean_accuracy,
+                    'cv_Acc_std': results.cv_std_accuracy,
+                    'cv_F1_mean': results.cv_mean_f1,
+                    'cv_MCC_mean': results.cv_mean_mcc,
+                })
+            else:
+                row.update({
+                    'cv_R2_mean': results.cv_mean_r2_test,
+                    'cv_R2_std': results.cv_std_r2_test,
+                    'final_R2_train': results.final_train_r2,
+                })
+            rows.append(row)
 
     df = pd.DataFrame(rows)
     df.to_csv(output_dir / "consolidated_vcd_results.csv", index=False)
@@ -990,6 +1098,10 @@ def main():
                         help="Run folds sequentially instead of in parallel (for debugging)")
     parser.add_argument('--retrain', action='store_true', default=False,
                         help="Retrain final model with all data using n* (slower)")
+    parser.add_argument('--max-neurons', type=int, default=None,
+                        help="Override max_neurons for all methods (default: use per-method config)")
+    parser.add_argument('--patience', type=int, default=None,
+                        help="Override constructive patience for all methods (default: use per-method config)")
     parser.add_argument('-y', '--yes', action='store_true', default=False,
                         help="Skip confirmation prompt for long runs")
 
@@ -1027,6 +1139,7 @@ def main():
     print("\n" + "=" * 70)
     print("DYNAMIC CROSS-VALIDATION (VCD)")
     print("=" * 70)
+    print(f"  Task:     {vcd_config.task}")
     print(f"  Datasets: {vcd_config.datasets}")
     print(f"  Methods:  {[METHOD_NAMES[m] for m in vcd_config.methods]}")
     print(f"  Folds:    {vcd_config.n_folds}")
@@ -1078,6 +1191,10 @@ def main():
         for method_id in vcd_config.methods:
             try:
                 method_config = get_vcd_method_config(dataset_name, method_id)
+                if args.max_neurons is not None:
+                    method_config.max_neurons = args.max_neurons
+                if args.patience is not None:
+                    method_config.patience = args.patience
 
                 vcd_results = run_vcd_for_method(
                     method_id=method_id,
@@ -1120,19 +1237,32 @@ def main():
     print(f"  Results: {output_dir}")
 
     # Summary table
-    print(f"\n  {'─'*60}")
-    print(f"  {'Dataset':<20s} | {'Method':<15s} | {'n*':>4s} | "
-          f"{'R² (CV)':>12s} | {'SCR':>5s}")
-    print(f"  {'─'*20}─┼─{'─'*15}─┼─{'─'*4}─┼─{'─'*12}─┼─{'─'*5}")
+    is_cls = vcd_config.task == 'classification'
+    print(f"\n  {'─'*70}")
+    if is_cls:
+        print(f"  {'Dataset':<20s} | {'Method':<15s} | {'n*':>4s} | "
+              f"{'Acc (CV)':>12s} | {'MCC':>6s} | {'SCR':>5s}")
+        print(f"  {'─'*20}─┼─{'─'*15}─┼─{'─'*4}─┼─{'─'*12}─┼─{'─'*6}─┼─{'─'*5}")
+    else:
+        print(f"  {'Dataset':<20s} | {'Method':<15s} | {'n*':>4s} | "
+              f"{'R² (CV)':>12s} | {'SCR':>5s}")
+        print(f"  {'─'*20}─┼─{'─'*15}─┼─{'─'*4}─┼─{'─'*12}─┼─{'─'*5}")
 
     for dataset_name, method_results in all_results.items():
         for method_id, res in method_results.items():
-            print(f"  {dataset_name:<20s} | {res.method_name:<15s} | "
-                  f"{res.optimal_neurons:4d} | "
-                  f"{res.cv_mean_r2_test:.4f}±{res.cv_std_r2_test:.4f} | "
-                  f"{res.cv_mean_scr:4.0%}")
+            if is_cls:
+                print(f"  {dataset_name:<20s} | {res.method_name:<15s} | "
+                      f"{res.optimal_neurons:4d} | "
+                      f"{res.cv_mean_accuracy:.4f}±{res.cv_std_accuracy:.4f} | "
+                      f"{res.cv_mean_mcc:5.3f} | "
+                      f"{res.cv_mean_scr:4.0%}")
+            else:
+                print(f"  {dataset_name:<20s} | {res.method_name:<15s} | "
+                      f"{res.optimal_neurons:4d} | "
+                      f"{res.cv_mean_r2_test:.4f}±{res.cv_std_r2_test:.4f} | "
+                      f"{res.cv_mean_scr:4.0%}")
 
-    print(f"  {'─'*60}")
+    print(f"  {'─'*70}")
 
 
 if __name__ == "__main__":

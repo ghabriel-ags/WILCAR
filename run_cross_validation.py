@@ -423,8 +423,10 @@ def run_method(method_id: int,
 # CROSS-VALIDATION EXECUTION
 # =============================================================================
 
-def run_cv_for_dataset(dataset_name: str, cv_config: CVConfig, 
-                       output_dir: Path, base_dir: str = ".") -> pd.DataFrame:
+def run_cv_for_dataset(dataset_name: str, cv_config: CVConfig,
+                       output_dir: Path, base_dir: str = ".",
+                       max_neurons_override: int = None,
+                       patience_override: int = None) -> pd.DataFrame:
     """
     Run complete cross-validation for a single dataset.
     """
@@ -477,7 +479,11 @@ def run_cv_for_dataset(dataset_name: str, cv_config: CVConfig,
         for method_id in cv_config.methods:
             # Get method-specific configuration
             method_config = get_method_config(dataset_name, method_id)
-            
+            if max_neurons_override is not None:
+                method_config.max_neurons = max_neurons_override
+            if patience_override is not None:
+                method_config.patience = patience_override
+
             print(f"\n   🔄 Running {METHOD_NAMES[method_id]} "
                   f"(n≤{method_config.max_neurons}, p={method_config.patience})...", 
                   end=" ", flush=True)
@@ -839,7 +845,11 @@ def main():
                         help="Skip methods/folds that already have results")
     parser.add_argument('-y', '--yes', action='store_true',
                         help="Skip confirmation prompt")
-    
+    parser.add_argument('--max-neurons', type=int, default=None,
+                        help="Override max_neurons for all methods")
+    parser.add_argument('--patience', type=int, default=None,
+                        help="Override constructive patience for all methods")
+
     args = parser.parse_args()
     
     # Setup configuration
@@ -905,7 +915,9 @@ def main():
                 dataset_name=dataset_name,
                 cv_config=cv_config,
                 output_dir=output_dir,
-                base_dir=args.base_dir
+                base_dir=args.base_dir,
+                max_neurons_override=args.max_neurons,
+                patience_override=args.patience
             )
             all_results[dataset_name] = df_results
             

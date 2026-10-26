@@ -711,7 +711,7 @@ class WILCARConstrainedNumpy(BaseNeuralNetwork):
         # Signal conformity
         scr, conf_details = self.calculate_conformity(self.predict)
 
-        return {
+        result = {
             'n_neurons': n,
             'success': True,
             'mse_train': mse_train, 'rmse_train': rmse_train, 'r2_train': r2_train,
@@ -720,6 +720,18 @@ class WILCARConstrainedNumpy(BaseNeuralNetwork):
             'n_attempts': n_attempts, 'n_iterations': n_iter,
             'training_time': training_time
         }
+
+        # Add classification metrics if applicable
+        if self.config.task == 'classification':
+            cls_test = calculate_classification_metrics(y_test.flatten(), y_pred_test.flatten())
+            result.update({
+                'bce_test': cls_test['bce'],
+                'accuracy_test': cls_test['accuracy'],
+                'f1_test': cls_test['f1'],
+                'mcc_test': cls_test['mcc'],
+            })
+
+        return result
 
     def get_params(self) -> Optional[Dict]:
         """Return a deep copy of current network parameters."""
