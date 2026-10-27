@@ -91,6 +91,7 @@ todas as colunas de `fold_results.csv`, menos o tempo de treino):
 |---|---|---|
 | Pima, RIXM (M3), `cv_20261027_094521` (`cv_pima_m3_t20_r2`) | 27/10 15h10, exit 0, 324,7 min | idêntico nos 5 folds |
 | HF, WILCAR (M1) e WILCAR-C (M2), `cv_20261027_151025` (`cv_hf_m12_t20_r2`) | 27/10 17h10, exit 0, 120,3 min | M1 idêntico nos 5 folds. M2: folds 1–4 idênticos; **fold 5: n\* 1 → 11, Acc 0,797 → 0,847, F1 0,647 → 0,769, MCC 0,568 → 0,670** (R² de treino 0,409 → 0,990; SCR 100 % nas duas). Média do M2: Acc 0,813 → 0,823, MCC 0,588 → 0,609, F1 0,678 → 0,703, n\* 1,4 → 3,4 |
+| HF, RIXM (M3), `cv_20261027_171128` (`cv_hf_m3_t20_r2`) | 27/10 18h13, exit 0, 61,4 min | idêntico nos 5 folds |
 
 O fold 5 do WILCAR-C no HF foi conferido como o fold 3 do ELM-C: com o CSV de março e o código de `42b31cb`, dá
 idêntico a março (`cv_20260322_092703`: n\* = 1, MCC 0,6767) com 20 threads e com 16
@@ -165,10 +166,10 @@ diretório de origem, commit e threads por job.
 
 ## Pendências
 
-Para commits posteriores (estado em 27/10, 17h25):
+Para commits posteriores (estado em 27/10, 18h15):
 
 - **K-fold com 20 threads:** Algerian M2 (`cv_20261027_092850`) e Pima M4 (`cv_20261027_092317`) em execução. Na
-  fila `queue_t20.sh`: HF M3 (em execução desde 17h11) e Pima M1/M2; Pima M3 e HF M1/M2 já terminaram. Até
+  fila `queue_t20.sh`: Pima M1/M2 (em execução desde 18h13); Pima M3, HF M1/M2 e HF M3 já terminaram. Até
   terminarem, o relatório usa as versões com 16 threads desses grupos.
 - **K-fold Algerian WILCAR-C com 16 threads** (`cv_20261026_113259`): encerrado por decisão em 27/10 às 09h40,
   depois de 22 h no fold 1. Pela política, não entra nas tabelas.

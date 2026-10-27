@@ -1,7 +1,7 @@
 {
   "branch": "dissertation/rerun-hf-pima",
-  "commit": "139a1e46b938d385263ca1e935b3ad97f11359a4",
-  "commit_date": "2026-10-27 15:11:56 -0300",
+  "commit": "7911f40386d8e437f83be299175b133377a02cd1",
+  "commit_date": "2026-10-27 17:22:07 -0300",
   "worktree_clean_for_code": true,
   "environment": {
     "micromamba_env": "mestrado_ghabriel_pei",
@@ -125,7 +125,8 @@
       "start": "2026-10-26T11:32:55-03:00",
       "end": "2026-10-26T14:41:42-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
+      "superseded_by": "cv_hf_m3_t20_r2"
     },
     {
       "label": "cv_alg_m2",
@@ -380,7 +381,7 @@
       "exit_code": 143,
       "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
       "supersedes": "cv_pima_m12",
-      "role": "stopped by decision (exit 143) to reduce CPU contention; waiting in queue_t20.sh"
+      "role": "stopped by decision (exit 143) to reduce CPU contention; relaunched as cv_pima_m12_t20_r2"
     },
     {
       "label": "cv_hf_m12_t20",
@@ -463,10 +464,24 @@
       "log": "logs/rerun_2026-10/cv_heart_failure_clinical_records_dataset__binary__m3_t20_r2.log",
       "results_dir": "results/cross_validation/cv_20261027_171128",
       "start": "2026-10-27T17:11:27-03:00",
+      "end": "2026-10-27T18:12:54-03:00",
+      "exit_code": 0,
+      "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
+      "supersedes": "cv_hf_m3"
+    },
+    {
+      "label": "cv_pima_m12_t20_r2",
+      "commit": "7911f40386d8e437f83be299175b133377a02cd1",
+      "command": "nice -n 15 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python logs/rerun_2026-10/with_blas_threads.py 20 run_cross_validation.py --task classification -y --dataset pima__binary_ --methods 1 2",
+      "cwd": "/home/ghabr/projects/WILCAR-dissertacao",
+      "pid": 2181794,
+      "log": "logs/rerun_2026-10/cv_pima__binary__m12_t20_r2.log",
+      "results_dir": "results/cross_validation/cv_20261027_181331",
+      "start": "2026-10-27T18:13:31-03:00",
       "end": null,
       "exit_code": null,
       "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
-      "supersedes": "cv_hf_m3"
+      "supersedes": "cv_pima_m12"
     },
     {
       "label": "dcvm2_alg_t4",
