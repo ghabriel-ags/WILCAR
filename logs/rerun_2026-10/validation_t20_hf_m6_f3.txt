@@ -1,0 +1,17 @@
+Validation of the 20-thread emulation (27/10/2026): HF ELM-C (M6) fold 3, pre-fix CSV (md5 6d17d3190a5fdc2d0312d59b2070683a, as in March), code 42b31cb, logs/rerun_2026-10/scripts/run_one_fold.py; reference cv_20260323_194416 (March).
+March: best_neurons=36 test_r2=-3.3702559170912796 test_mse=0.9456748220594741 test_mcc=0.7897278686052697
+
+== a_env20
+THREADPOOL [{"user_api": "blas", "internal_api": "openblas", "num_threads": 16, "prefix": "libopenblas", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libopenblasp-r0.3.30.so", "version": "0.3.30", "threading_layer": "pthreads", "architecture": "Haswell"}, {"user_api": "openmp", "internal_api": "openmp", "num_threads": 16, "prefix": "libgomp", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libgomp.so.1.0.0", "version": null}]
+RESULT {"fold": 3, "best_neurons": 36, "test_r2": -3.3702559170912796, "test_mse": 0.9456748220594741, "train_r2": -0.23459073387670615, "scr": 1.0, "time": 156.94453024864197, "test_accuracy": 0.9, "test_f1": 0.8571428571428571, "test_mcc": 0.7897278686052697}
+
+== b_wrap20
+[with_blas_threads] [('openblas', 20)]
+THREADPOOL [{"user_api": "blas", "internal_api": "openblas", "num_threads": 20, "prefix": "libopenblas", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libopenblasp-r0.3.30.so", "version": "0.3.30", "threading_layer": "pthreads", "architecture": "Haswell"}, {"user_api": "openmp", "internal_api": "openmp", "num_threads": 16, "prefix": "libgomp", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libgomp.so.1.0.0", "version": null}]
+RESULT {"fold": 3, "best_neurons": 36, "test_r2": -3.3702559170912796, "test_mse": 0.9456748220594741, "train_r2": -0.23459073387670615, "scr": 1.0, "time": 155.88960075378418, "test_accuracy": 0.9, "test_f1": 0.8571428571428571, "test_mcc": 0.7897278686052697}
+
+== c_default16
+THREADPOOL [{"user_api": "blas", "internal_api": "openblas", "num_threads": 16, "prefix": "libopenblas", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libopenblasp-r0.3.30.so", "version": "0.3.30", "threading_layer": "pthreads", "architecture": "Haswell"}, {"user_api": "openmp", "internal_api": "openmp", "num_threads": 16, "prefix": "libgomp", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libgomp.so.1.0.0", "version": null}]
+RESULT {"fold": 3, "best_neurons": 36, "test_r2": -3.3702559170912796, "test_mse": 0.9456748220594741, "train_r2": -0.23459073387670615, "scr": 1.0, "time": 159.04894518852234, "test_accuracy": 0.9, "test_f1": 0.8571428571428571, "test_mcc": 0.7897278686052697}
+
+All three RESULT lines equal March bit for bit.

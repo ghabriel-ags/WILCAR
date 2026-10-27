@@ -355,10 +355,15 @@ def main():
 
     if args.new_dirs is None:
         manifest = json.loads(Path("logs/rerun_2026-10/manifest.json").read_text())
-        new_dirs = [j["results_dir"] for j in manifest["jobs"] if j["results_dir"] and not j.get("superseded_by")]
+        # finished runs that are not superseded (in-progress and stopped jobs are left out)
+        current = [j for j in manifest["jobs"]
+                   if j["results_dir"] and j["exit_code"] == 0 and not j.get("superseded_by")]
+        new_dirs = [j["results_dir"] for j in current]
         header_commit = manifest["commit"]
+        threads_note = "\n\nThreads do BLAS por run (política: K-fold com 20, DCV do WILCAR-C com 4 por worker):  \n" + \
+            "  \n".join(f"- `{Path(j['results_dir']).name}` ({j['label']}): {j['blas_threads']}" for j in current)
     else:
-        new_dirs, header_commit = args.new_dirs, "(teste)"
+        new_dirs, header_commit, threads_note = args.new_dirs, "(teste)", ""
     cv_new = load_cv([d for d in new_dirs if "cross_validation" in d], datasets=(*DATASETS, ALG))
     alg_old = load_cv([old_root / "cross_validation" / OLD_ALG_RUN], datasets=(ALG,)).get((ALG, 2))
     dcv_new = load_dcv([d for d in new_dirs if "dynamic_cv" in d])
@@ -377,7 +382,7 @@ def main():
     header = (f"Código: branch `dissertation/rerun-hf-pima`, commit `{header_commit}`. "
               f"Única mudança de entrada vs. março: os dois CSVs corrigidos (HF idade, 2 células; Pima DPF, 47 células).\n\n"
               f"Runs de março: {', '.join(OLD_RUNS['cv'] + OLD_RUNS['dcv'])}.  \n"
-              f"Runs novas: {', '.join(Path(d).name for d in new_dirs)}.")
+              f"Runs novas: {', '.join(Path(d).name for d in new_dirs)}." + threads_note)
     md = comparison_md(cv_old, cv_new, dcv_old, dcv_new, corr, checks, failures, header)
     if (ALG, 2) in cv_new:
         table = algerian_table(alg_old, cv_new[(ALG, 2)])

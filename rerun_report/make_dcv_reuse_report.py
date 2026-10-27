@@ -121,7 +121,8 @@ def main():
     if args.new_dirs is None:
         manifest = json.loads(Path("logs/rerun_2026-10/manifest.json").read_text())
         new_dirs = [j["results_dir"] for j in manifest["jobs"]
-                    if j["label"].startswith("dcvm2_") and j["results_dir"] and not j.get("superseded_by")]
+                    if j["label"].startswith("dcvm2_") and j["results_dir"] and j["exit_code"] == 0
+                    and not j.get("superseded_by")]
         threads = {Path(j["results_dir"]).name: j.get("blas_threads", "") for j in manifest["jobs"] if j["results_dir"]}
     else:
         new_dirs = args.new_dirs

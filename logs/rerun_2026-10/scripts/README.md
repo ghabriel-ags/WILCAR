@@ -10,3 +10,9 @@ dentro deles apontam para esse scratchpad, que é temporário; ficam aqui como r
 - `diag_sync.py` + `analyze_sync.py`: réplicas instrumentadas do DCV do WILCAR-C no synchronous_machine
   (`DIAG_THREADS=4`) e figuras/tabela por fold.
 - `diag_kfold_vs_dcv.py`, `diag_n1_factorial.py`: fold 0 do synchronous_machine, K-fold vs. DCV, e teste fatorial em n = 1.
+- `kfold_dcv_t20_verification_queue.sh` + `compare_kfold_runs.py`: verificação com 20 threads no processo
+  principal (`../with_blas_threads.py`) do K-fold de HF e Pima e dos DCVs de classificação, comparada bit a bit com
+  as runs oficiais. HF M5/M6, Pima M5/M6 e HF M4 terminaram e foram promovidos. Os demais foram encerrados e
+  re-rodados oficialmente (`../queue_t20.sh`).
+- `../validation_t20_hf_m6_f3.txt`: validação da emulação de 20 threads (`threadpool_info()` e resultado do fold 3
+  do ELM-C no HF com o CSV antigo, nas variantes `OPENBLAS_NUM_THREADS=20`, wrapper e default).

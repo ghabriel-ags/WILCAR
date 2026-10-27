@@ -45,6 +45,16 @@ def os_info():
 
 
 commits = [line.split("\t") for line in git("log", "--format=%H\t%cI").splitlines()]  # newest first
+
+
+def blas_threads(cmd):
+    """BLAS threads of a job, from its command line."""
+    if "with_blas_threads.py 20" in cmd:
+        main = "20 in the main process (with_blas_threads.py, threadpoolctl; March default)"
+        return main + ("; 4 per DCV worker" if "OPENBLAS_NUM_THREADS=4" in cmd else "")
+    if "OPENBLAS_NUM_THREADS=4" in cmd:
+        return "OMP/OPENBLAS/MKL_NUM_THREADS=4 (4 per DCV worker, as in March; parent process also 4)"
+    return "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
 jobs = []
 for line in (L / "processes.tsv").read_text().splitlines():
     label, pid, start, log, cmd = line.split("\t")
@@ -63,12 +73,32 @@ for line in (L / "processes.tsv").read_text().splitlines():
         "start": start,
         "end": status.get("end"),
         "exit_code": int(status["exit"]) if "exit" in status else None,
-        "blas_threads": "default (no thread variable set)",
+        "blas_threads": blas_threads(cmd),
     })
+# K-fold re-runs with 20 threads (<label>_t20) supersede the default-thread run once they finished without error;
+# the 16-thread Algerian run, still in progress when its 20-thread run was launched, is kept for comparison only
+# (stopped by decision on 27/10 09:40 and kept out of the tables). Jobs stopped to reduce CPU contention are
+# relaunched as <label>_r<k> with the same command.
+COMPARISON_ONLY = {"cv_alg_m2"}
+for j in jobs:
+    m = re.fullmatch(r"(.+)_t20(?:_r\d+)?", j["label"])
+    if m:
+        j["supersedes"] = m.group(1)
+        old = next(o for o in jobs if o["label"] == j["supersedes"])
+        if j["exit_code"] == 0 or old["label"] in COMPARISON_ONLY:
+            old["superseded_by"] = j["label"]
+        if old["label"] in COMPARISON_ONLY:
+            old["role"] = "comparison only (16 threads), stopped by decision; the official run is " + j["label"]
+for j in jobs:
+    relaunch = [o["label"] for o in jobs if re.fullmatch(re.escape(j["label"]) + r"_r\d+", o["label"])]
+    if j["exit_code"] not in (0, None) and j["label"].endswith("_t20"):
+        j["role"] = (f"stopped by decision (exit {j['exit_code']}) to reduce CPU contention; " +
+                     (f"relaunched as {relaunch[-1]}" if relaunch else "waiting in queue_t20.sh"))
 
-# DCV runs with 4 BLAS threads per worker (as in March: 20 CPUs // 5 workers), run from `git archive` copies of the
-# worktree HEAD in the session scratchpad and copied here (folder name + "_<dataset label>"); they supersede the
-# default-thread runs of the same DCV, which stay in results/
+# Runs made in the session scratchpad from `git archive` copies of the commit of the official run and copied here
+# (folder name + "_<label>"): DCV of WILCAR-C with 4 BLAS threads per worker (as in March: 20 CPUs // 5 workers) and
+# K-fold runs with 20 threads from the 20-thread verification; they supersede the default-thread runs, which stay
+# in results/
 rows = [line.split("\t") for line in (L / "promoted.tsv").read_text().splitlines()]
 for p in (dict(zip(rows[0], r)) for r in rows[1:]):
     jobs.append({
@@ -83,7 +113,7 @@ for p in (dict(zip(rows[0], r)) for r in rows[1:]):
         "start": p["start"],
         "end": p["end"],
         "exit_code": int(p["exit"]),
-        "blas_threads": "OMP/OPENBLAS/MKL_NUM_THREADS=4 (4 per DCV worker, as in March; parent process also 4)",
+        "blas_threads": blas_threads(p["command"]),
         "supersedes": p["supersedes"],
     })
     next(j for j in jobs if j["label"] == p["supersedes"])["superseded_by"] = p["label"]
@@ -104,8 +134,10 @@ manifest = {
         "cpu": cpu_info(),
         "os": os_info(),
         "host": platform.node(),
-        "thread_env_vars_at_launch": ("per job, see jobs[].blas_threads: K-fold and DCV M1 with no thread variable "
-                                      "set (as in March); DCV M2 with OMP/OPENBLAS/MKL_NUM_THREADS=4"),
+        "thread_env_vars_at_launch": ("per job, see jobs[].blas_threads. Policy: K-fold with 20 threads in the main "
+                                      "process (March default, via with_blas_threads.py); DCV of WILCAR-C with "
+                                      "OMP/OPENBLAS/MKL_NUM_THREADS=4 (4 per worker, as in March); DCV of WILCAR "
+                                      "with the default (identical to 4 per worker)"),
         "thread_env_vars_in_this_process": thread_vars,
         "blas_threadpool_info_default": threadpoolctl.threadpool_info(),
         "dcv_worker_threads": ("without thread variables, joblib/loky limits BLAS threads in each of the 5 DCV "

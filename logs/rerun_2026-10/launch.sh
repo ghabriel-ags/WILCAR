@@ -12,6 +12,12 @@
 # OMP/OPENBLAS_NUM_THREADS=1 (or 2) OpenBLAS takes other code paths and the results change; with the
 # defaults, folds re-run on the pre-fix CSVs are bit-for-bit identical to March.
 #
+# Update (27/10): in March WSL exposed 20 CPUs, so the OpenBLAS default was 20 threads (now 16), and 16 vs 20
+# changes some K-fold folds (HF ELM-C fold 3). The *_t20 jobs re-run the K-fold with 20 threads in the main
+# process through with_blas_threads.py (threadpoolctl; no code change), at nice 15 so that the Algerian K-fold
+# and the HF DCV keep priority. The DCV of WILCAR-C runs with OMP/OPENBLAS/MKL_NUM_THREADS=4 (4 per worker, as
+# March: 20 // 5); see promoted.tsv.
+#
 # Each job writes <label>.exit with its exit code and end time; processes.tsv records the launches.
 set -u
 cd "$(dirname "$0")/../.."
@@ -21,6 +27,7 @@ unset OMP_NUM_THREADS MKL_NUM_THREADS OPENBLAS_NUM_THREADS
 
 launch() {  # label log command...
   local label=$1 log=$2; shift 2
+  log=${log%.log}$(grep -o -E '_r[0-9]+$' <<< "$label").log  # relaunch <label>_r<k>: own log, same command
   if grep -q "^$label	" "$L/processes.tsv" 2>/dev/null; then echo "skip $label (already launched)"; return; fi
   nohup bash -c '"$@" > "$0" 2>&1; echo "exit=$? end=$(date --iso-8601=seconds)" > "'"$L/$label"'.exit"' \
     "$L/$log" "$@" > /dev/null 2>&1 &
@@ -36,9 +43,10 @@ BO=breast__binary_
 BD=Diagnostic_Breast_Cancer__binary_
 CV="$PY run_cross_validation.py --task classification -y"
 DCV="$PY src/run_dynamic_cv.py --task classification -y"
+CV20="nice -n 15 $PY $L/with_blas_threads.py 20 run_cross_validation.py --task classification -y"
 
 for label in "$@"; do
-  case $label in
+  case $(sed -E 's/_r[0-9]+$//' <<< "$label") in
     cv_pima_m3)  launch $label "cv_${PI}_m3.log"  $CV --dataset $PI --methods 3 ;;
     cv_pima_m4)  launch $label "cv_${PI}_m4.log"  $CV --dataset $PI --methods 4 ;;
     cv_pima_m12) launch $label "cv_${PI}_m12.log" $CV --dataset $PI --methods 1 2 ;;
@@ -59,6 +67,13 @@ for label in "$@"; do
     dcvm2_hf)    launch $label "dcvm2_${HF}.log"    $DCV --dataset $HF --methods 2 --retrain ;;
     dcvm2_pima)  launch $label "dcvm2_${PI}.log"    $DCV --dataset $PI --methods 2 --retrain ;;
     dcvm2_reg)   launch $label "dcvm2_regression.log" $PY src/run_dynamic_cv.py --task regression --methods 2 -y ;;
+    # K-fold with 20 BLAS threads (March default); M5/M6 and HF M4 come from the verification runs (promoted.tsv)
+    cv_pima_m3_t20)  launch $label "cv_${PI}_m3_t20.log"  $CV20 --dataset $PI --methods 3 ;;
+    cv_pima_m4_t20)  launch $label "cv_${PI}_m4_t20.log"  $CV20 --dataset $PI --methods 4 ;;
+    cv_pima_m12_t20) launch $label "cv_${PI}_m12_t20.log" $CV20 --dataset $PI --methods 1 2 ;;
+    cv_hf_m12_t20)   launch $label "cv_${HF}_m12_t20.log" $CV20 --dataset $HF --methods 1 2 ;;
+    cv_hf_m3_t20)    launch $label "cv_${HF}_m3_t20.log"  $CV20 --dataset $HF --methods 3 ;;
+    cv_alg_m2_t20)   launch $label "cv_${AL}_m2_t20.log"  $CV20 --dataset $AL --methods 2 ;;
     *) echo "unknown job $label"; exit 1 ;;
   esac
 done

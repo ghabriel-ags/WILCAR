@@ -17,41 +17,78 @@ projeto, não altera os resultados.
 
 ## Threads do BLAS
 
-Resumo: **K-fold e DCV do WILCAR (M1) com o default** (nenhuma variável exportada, como em março). **DCV do
-WILCAR-C (M2) com `OMP_NUM_THREADS=OPENBLAS_NUM_THREADS=MKL_NUM_THREADS=4`**, que reproduz o número de threads
-dos workers de março.
+Resumo da política, para emular março:
+- **K-fold:** 20 threads no processo principal, emuladas com `logs/rerun_2026-10/with_blas_threads.py`.
+- **DCV do WILCAR-C:** 4 threads por worker (`OMP_NUM_THREADS=OPENBLAS_NUM_THREADS=MKL_NUM_THREADS=4`).
+- **DCV do WILCAR (M1):** default (3 por worker), idêntico a 4.
 
-### K-fold: default
+As runs de março não definiam variáveis de thread, então valiam os defaults. Na época, o WSL expunha as 20 CPUs
+lógicas do host (sem `processors=` no `.wslconfig`): 20 threads no processo principal e 20 // 5 = 4 em cada worker
+do DCV (o joblib/loky limita os workers a `cpu_count // n_jobs`). Hoje o `.wslconfig` fixa `processors=16` (era 8
+em maio/2026), e os defaults dão 16 e 16 // 5 = 3. A variável `OPENBLAS_NUM_THREADS` fica limitada às CPUs
+visíveis, mas `openblas_set_num_threads`, chamada pelo `threadpoolctl` no wrapper, não. Assim, 20 threads podem
+ser emuladas sem mudar código.
 
-As runs de março não definiram `OMP_NUM_THREADS`, `MKL_NUM_THREADS` nem `OPENBLAS_NUM_THREADS`. Com 1 thread, o
-OpenBLAS segue outro caminho de cálculo e os resultados mudam. Por isso o K-fold usa o default (16 threads hoje,
-20 em março). Evidências:
+### Evidências gerais
 
-- **WILCAR-C, Algerian, folds 3 e 5:** idênticos a março (bit a bit) com threads default, 2, 4 e 16. Com 1 thread,
-  diferentes (fold 2: n\* 1 → 3; fold 4: n\* 1 → 2).
-- **HF e Pima com os CSVs antigos (pré-correção):** 9 de 9 folds, cobrindo os métodos 1, 2, 3, 5 e 6, são idênticos a
-  março com threads default (HF M1 f3, M2 f5, M3 f3, M5 f4, M6 f2; Pima M1 f4, M2 f1, M5 f1, M6 f1). O ambiente
-  reproduz março exatamente, então as diferenças da re-rodada vêm só da correção dos dados.
-- **2 threads não equivale ao default em geral:** breast, WILCAR-C, fold 3 com 2 threads dá n\* = 12 (março: 4).
-  Com threads default, o fold é idêntico a março.
+- **1 thread muda os resultados:** WILCAR-C, Algerian, fold 2: n\* 1 → 3; fold 4: n\* 1 → 2. Os folds 3 e 5 são
+  idênticos a março com threads default, 2, 4 e 16.
+- **2 threads não equivale ao default:** breast, WILCAR-C, fold 3 com 2 threads dá n\* = 12 (março: 4).
+- **16 threads reproduzem março na maioria dos folds, mas não em todos:**
+  - Idênticos com 16 threads: HF e Pima com os CSVs antigos, 9 de 9 folds (HF M1 f3, M2 f5, M3 f3, M5 f4, M6 f2;
+    Pima M1 f4, M2 f1, M5 f1, M6 f1), e os 5 folds do breast WILCAR-C.
+  - Diferentes: no computer_hardware (WILCAR-C, `cv_20260310_140954`), os folds 1, 2 e 5 diferem na 8ª–10ª casa
+    com 16 threads e são idênticos a março com 20.
+  - Com os CSVs corrigidos, o ELM-C do HF muda no fold 3 (tabela abaixo).
 - **DCV:** o J_T(n) do WILCAR com n = 1..3 em modo paralelo é idêntico a março para Algerian, breast, BCD, HF e Pima
   (os dois últimos com os CSVs antigos). Na regressão, o DCV completo do WILCAR em `optical_network` e
   `computer_hardware` reproduz `vcd_20260310_140932` (histórico e resumo).
-
-Com threads default, as execuções são determinísticas: repetições do mesmo fold, inclusive com a máquina carregada,
-dão resultados idênticos. Os tempos por fold, porém, dependem da carga e não são comparáveis com março.
+- **Determinismo:** com um número fixo de threads, repetições do mesmo fold, inclusive com a máquina carregada,
+  dão resultados idênticos. Os tempos por fold dependem da carga e não são comparáveis com março.
 
 Nota técnica: para comparar valores com março lendo os CSVs, use `pd.read_csv(..., float_precision="round_trip")`.
 O parser padrão do pandas pode errar o último bit.
 
+### K-fold: 20 threads
+
+O K-fold foi rodado primeiro com 16 threads (o default). Uma verificação com 20 threads, mesmo comando e mesmo commit
+(`42b31cb`), comparada bit a bit com essas runs, deu:
+
+| Run (CSVs corrigidos) | 20 vs. 16 threads |
+|---|---|
+| Pima, ELM-C (M6), 5 folds | idêntico |
+| Pima, ELM (M5), 5 folds | folds 1, 2 e 5 idênticos. Folds 3 e 4: R²/MSE diferem na 13ª–14ª casa (até 2,5 × 10⁻¹³; ex.: R² de teste −0,32543178352805757 vs. −0,32543178352781066). n\*, Acc, F1 e MCC idênticos |
+| HF, ELM (M5), 5 folds | folds 2 e 4 idênticos. Folds 1, 3 e 5: R²/MSE diferem na 15ª–16ª casa (até 3,6 × 10⁻¹⁵). n\*, Acc, F1 e MCC idênticos |
+| **HF, ELM-C (M6), 5 folds** | folds 1, 2, 4 e 5 idênticos. **Fold 3: n\* 45 → 49, F1 0,800 → 0,818, MCC 0,702 → 0,733** (Acc 0,867 igual). Média: MCC 0,622 → 0,628, F1 0,722 → 0,725 |
+| HF, RIXM-C (M4), 5 folds | idêntico |
+
+**Validação da emulação.**
+- `OPENBLAS_NUM_THREADS=20` não basta: o OpenBLAS limita a variável às 16 CPUs visíveis, e o `threadpool_info()`
+  do processo mostra `num_threads` = 16. Com o wrapper, mostra 20 (OpenBLAS 0.3.30, pthreads).
+- O fold 3 do ELM-C no HF com o CSV antigo (o de março, md5 idêntico) deu idêntico a `cv_20260323_194416` nas
+  três variantes: variável = 20 (efetivo 16), wrapper com 20 e default 16. Esse fold não distingue 16 de 20 com os
+  dados antigos.
+- O teste que distingue é o do computer_hardware (ver *Evidências gerais*): os folds 1, 2 e 5 diferem de março com
+  16 threads e são idênticos com 20.
+
+Como 16 vs. 20 threads muda resultados na precisão reportada, todo o K-fold de HF, Pima e Algerian vale na versão
+com 20 threads:
+- **M5/M6 de HF e Pima e o M4 do HF:** são as próprias runs de verificação. Rodaram em cópias `git archive` de
+  `42b31cb` no scratchpad e foram promovidas para `results/cross_validation/`, com o rótulo no nome.
+- **HF M1/M2 e M3, Pima M1/M2, M3 e M4 e Algerian M2:** foram lançados no worktree pelo `launch.sh` (jobs `*_t20`).
+  Para reduzir a disputa de CPU entre threads do OpenBLAS, rodam ao mesmo tempo só o DCV do HF M2 (nice 10), o
+  Algerian (nice 15) e o Pima M4 (nice 17). HF M1/M2 e M3, Pima M1/M2 e M3 foram encerrados após cerca de 17 min
+  e seguem um por vez em `queue_t20.sh` (nice 19, rótulos `*_t20_r2`). A concorrência não altera resultados, só
+  o tempo de parede.
+
+As runs com 16 threads continuam em `results/` e ficam marcadas como substituídas (`superseded_by`) quando a de 20
+termina sem erro. Até lá, o relatório usa a de 16, e a lista de pendências está no fim deste arquivo.
+
 ### DCV: 4 threads por worker no WILCAR-C
 
-Sem variáveis de thread, o joblib (loky) limita cada um dos 5 workers do DCV a `cpu_count // 5` threads. Em março, o
-WSL expunha as 20 CPUs lógicas do host (sem `processors=` no `.wslconfig`), então os workers tinham 20 // 5 = 4
-threads. Hoje o `.wslconfig` fixa `processors=16` (era 8 em maio/2026), então o default dá 16 // 5 = 3.
-
-A diferença apareceu no BCD: o J_T(1) do WILCAR-C não batia com março. Em n = 1 não há reaproveitamento de pesos,
-e o código desse passo é o mesmo de março. Passo n = 1 do DCV do WILCAR-C no BCD, por threads por worker:
+A diferença de threads apareceu primeiro no BCD: o J_T(1) do WILCAR-C não batia com março. Em n = 1 não há
+reaproveitamento de pesos, e o código desse passo é o mesmo de março. Passo n = 1 do DCV do WILCAR-C no BCD, por
+threads por worker:
 
 | threads por worker | 1 | 2 | 3 (default hoje) | 4 (março) | 16 |
 |---|---|---|---|---|---|
@@ -65,32 +102,25 @@ Para n ≥ 2, cada DCV de outubro (3 threads) foi re-rodado com 4 threads e comp
 - **WILCAR-C (M2):** com o reaproveitamento de pesos, diferenças de arredondamento se propagam pelo SLSQP.
   - Algerian, breast e Pima: diferenças na 8ª–9ª casa do J_T a partir de n = 3 (Pima: n = 7). n\* e métricas finais
     iguais.
-  - HF: trajetória diverge a partir de n = 5, com n\* = 1 igual. A versão com 4 threads teve um passo descartado
-    (n = 16, 3,7 h) e ainda roda, por isso **este commit usa a do HF com 3 threads** (`vcd_20261026_122110`). A
-    de 4 threads entra num commit posterior.
+  - HF: trajetória diverge a partir de n = 5. Com 4 threads, o passo n = 16 foi descartado (3,7 h) e o n = 17 foi
+    aceito (4,5 h), encerrando pela paciência (17 passos contra 16). n\* = 1, J_T\*, métricas em n\* e retreino
+    final são idênticos à versão com 3 threads.
   - Regressão: os 11 datasets diferem a partir de n = 4 a 11, na 8ª–10ª casa do J_T. n\* é igual e as métricas
     coincidem até a 6ª casa, exceto no aquatic_toxicity: n\* 40 → 33, R² 0,3859 → 0,3868, 48 passos (não chega
     mais a n = 50). synchronous_machine: n\* = 30, R² = 0,5073 ± 0,9485 nas duas versões, com o fold 0 preso.
   - BCD: n\* 4 → 1, MCC 0,936 → 0,868.
 
-Para manter as condições de março, os DCVs do WILCAR-C passaram a valer na versão com 4 threads. Essas runs saíram
-de cópias `git archive` do commit `a30890a` no scratchpad da sessão, com o mesmo comando e `nice -n 10`, e foram
-copiadas para `results/dynamic_cv/` com o rótulo do dataset no nome (ex.: `vcd_20261027_004851_bcd`).
+Os DCVs do WILCAR-C valem na versão com 4 threads. Essas runs saíram de cópias `git archive` do commit `a30890a`
+no scratchpad da sessão, com o mesmo comando e `nice -n 10`, e foram copiadas para `results/dynamic_cv/` com o
+rótulo do dataset no nome (ex.: `vcd_20261027_004851_bcd`).
+
+**Processo pai.** O pai dessas runs também ficou com 4 threads (em março, 20). Ele faz o retreino final com
+`--retrain`. Com o pai em 20 e os workers em 4, pelo wrapper, deram idêntico: o DCV do Algerian (WILCAR-C), o DCV
+do HF (WILCAR) e o retreino do HF (WILCAR-C, n\* = 1). As demais verificações do pai (breast, Pima, Pima M1, BCD)
+foram interrompidas para dar prioridade às rodadas oficiais.
 
 A proveniência está em `logs/rerun_2026-10/promoted.tsv` e no manifest: `supersedes`/`superseded_by`, comando,
-diretório de origem e threads por job. As runs com o default continuam em `results/`, marcadas como substituídas.
-O processo pai também fica com 4 threads (em março, 20), mas no BCD 4 e 16 threads dão o mesmo resultado.
-
-### Pendente: 20 threads no K-fold e no processo pai do DCV
-
-Em março, o default do OpenBLAS era 20 threads, nos processos do K-fold e no processo pai do DCV, que faz o retreino
-final com `--retrain`. Hoje o K-fold usa 16 (o default), e o pai do DCV usa 4. Com 16 threads, os folds de HF,
-Pima (métodos 1, 2, 3, 5 e 6, com os CSVs antigos) e breast verificados são idênticos a março. O computer_hardware
-mostra, porém, que há casos sensíveis (ver abaixo), e o RIXM-C não foi verificado.
-
-Próximo passo, sem mudar código: re-rodar o K-fold de HF e Pima e os DCVs de classificação com 20 threads no
-processo principal, por um wrapper com `threadpoolctl`, e comparar bit a bit. Os que diferirem serão promovidos
-num commit posterior, junto com o K-fold do Algerian e o DCV do HF com 4 threads.
+diretório de origem, commit e threads por job.
 
 ## Configuração (igual à de março)
 
@@ -117,3 +147,13 @@ num commit posterior, junto com o K-fold do Algerian e o DCV do HF com 4 threads
 - **Re-semeadura por passo no worker do DCV (não alterada):** o worker recria o modelo a cada n com semente
   `seed + 100·k`. Por isso, o neurônio novo do WILCAR (M1) recebe a mesma inicialização aleatória a cada n no mesmo
   fold. Mudar isso alteraria o M1 de março, então foi mantido e apenas registrado aqui.
+
+## Pendências
+
+Para commits posteriores (estado em 27/10, 10h15):
+
+- **K-fold com 20 threads:** Algerian M2 (`cv_20261027_092850`) e Pima M4 (`cv_20261027_092317`) em execução. Na
+  fila `queue_t20.sh`: Pima M3 (em execução), HF M1/M2, HF M3, Pima M1/M2. Até terminarem, o relatório usa as
+  versões com 16 threads desses grupos.
+- **K-fold Algerian WILCAR-C com 16 threads** (`cv_20261026_113259`): encerrado por decisão em 27/10 às 09h40,
+  depois de 22 h no fold 1. Pela política, não entra nas tabelas.

@@ -12,6 +12,8 @@ import run_cross_validation as rcv
 if os.environ.get("BLAS_THREADS"):  # e.g. 20 = March K-fold default (WSL then exposed 20 CPUs); the env var
     from threadpoolctl import threadpool_limits  # OPENBLAS_NUM_THREADS is capped at the 16 visible CPUs
     _blas_limit = threadpool_limits(int(os.environ["BLAS_THREADS"]))
+from threadpoolctl import threadpool_info  # noqa: E402
+print("THREADPOOL " + json.dumps(threadpool_info()), flush=True)
 
 ds, mid, fold = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
 task = sys.argv[4] if len(sys.argv) > 4 else "classification"

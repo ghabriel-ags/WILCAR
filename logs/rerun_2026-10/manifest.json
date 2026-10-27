@@ -1,8 +1,8 @@
 {
   "branch": "dissertation/rerun-hf-pima",
-  "commit": "a30890ad91093f47b4e844041da148ce35a2000c",
-  "commit_date": "2026-10-26 12:07:05 -0300",
-  "worktree_clean_for_code": true,
+  "commit": "4f858fe3579a936cbe6662fb94392f4540683d0f",
+  "commit_date": "2026-10-27 08:32:50 -0300",
+  "worktree_clean_for_code": false,
   "environment": {
     "micromamba_env": "mestrado_ghabriel_pei",
     "python_executable": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python",
@@ -30,7 +30,7 @@
       "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39"
     },
     "host": "DESKTOP-OGHBLT5",
-    "thread_env_vars_at_launch": "per job, see jobs[].blas_threads: K-fold and DCV M1 with no thread variable set (as in March); DCV M2 with OMP/OPENBLAS/MKL_NUM_THREADS=4",
+    "thread_env_vars_at_launch": "per job, see jobs[].blas_threads. Policy: K-fold with 20 threads in the main process (March default, via with_blas_threads.py); DCV of WILCAR-C with OMP/OPENBLAS/MKL_NUM_THREADS=4 (4 per worker, as in March); DCV of WILCAR with the default (identical to 4 per worker)",
     "thread_env_vars_in_this_process": {
       "OMP_NUM_THREADS": null,
       "MKL_NUM_THREADS": null,
@@ -71,7 +71,7 @@
       "start": "2026-10-26T11:32:43-03:00",
       "end": "2026-10-27T05:49:39-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
     },
     {
       "label": "cv_pima_m3",
@@ -84,7 +84,7 @@
       "start": "2026-10-26T11:32:46-03:00",
       "end": "2026-10-26T19:30:09-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
     },
     {
       "label": "cv_pima_m12",
@@ -97,7 +97,7 @@
       "start": "2026-10-26T11:32:49-03:00",
       "end": "2026-10-26T15:50:45-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
     },
     {
       "label": "cv_hf_m12",
@@ -110,7 +110,7 @@
       "start": "2026-10-26T11:32:52-03:00",
       "end": "2026-10-26T14:01:46-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
     },
     {
       "label": "cv_hf_m3",
@@ -123,7 +123,7 @@
       "start": "2026-10-26T11:32:55-03:00",
       "end": "2026-10-26T14:41:42-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
     },
     {
       "label": "cv_alg_m2",
@@ -134,9 +134,11 @@
       "log": "logs/rerun_2026-10/cv_Algerian_forest_fires__binary__m2.log",
       "results_dir": "results/cross_validation/cv_20261026_113259",
       "start": "2026-10-26T11:32:58-03:00",
-      "end": null,
-      "exit_code": null,
-      "blas_threads": "default (no thread variable set)"
+      "end": "2026-10-27T09:40:32-03:00",
+      "exit_code": 143,
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
+      "superseded_by": "cv_alg_m2_t20",
+      "role": "comparison only (16 threads), stopped by decision; the official run is cv_alg_m2_t20"
     },
     {
       "label": "cv_hf_m4",
@@ -149,7 +151,8 @@
       "start": "2026-10-26T11:33:01-03:00",
       "end": "2026-10-26T12:29:44-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
+      "superseded_by": "cv_hf_m4_t20"
     },
     {
       "label": "cv_pima_m56",
@@ -162,7 +165,8 @@
       "start": "2026-10-26T11:33:04-03:00",
       "end": "2026-10-26T12:04:07-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
+      "superseded_by": "cv_pima_m56_t20"
     },
     {
       "label": "cv_hf_m56",
@@ -175,7 +179,8 @@
       "start": "2026-10-26T11:33:07-03:00",
       "end": "2026-10-26T12:20:45-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
+      "superseded_by": "cv_hf_m56_t20"
     },
     {
       "label": "dcv_hf_m1",
@@ -188,7 +193,7 @@
       "start": "2026-10-26T11:33:10-03:00",
       "end": "2026-10-26T11:43:35-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
     },
     {
       "label": "dcv_pima_m1",
@@ -201,7 +206,7 @@
       "start": "2026-10-26T11:44:28-03:00",
       "end": "2026-10-26T12:21:51-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
     },
     {
       "label": "dcvm2_alg",
@@ -214,7 +219,7 @@
       "start": "2026-10-26T12:07:29-03:00",
       "end": "2026-10-26T12:19:28-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)",
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
       "superseded_by": "dcvm2_alg_t4"
     },
     {
@@ -228,7 +233,7 @@
       "start": "2026-10-26T12:20:24-03:00",
       "end": "2026-10-26T13:43:22-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)",
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
       "superseded_by": "dcvm2_reg_t4"
     },
     {
@@ -242,7 +247,7 @@
       "start": "2026-10-26T12:20:27-03:00",
       "end": "2026-10-26T13:32:01-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)",
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
       "superseded_by": "dcvm2_bco_t4"
     },
     {
@@ -256,7 +261,8 @@
       "start": "2026-10-26T12:21:08-03:00",
       "end": "2026-10-26T13:32:09-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
+      "superseded_by": "dcvm2_hf_t4"
     },
     {
       "label": "dcvm2_pima",
@@ -269,7 +275,7 @@
       "start": "2026-10-26T12:22:05-03:00",
       "end": "2026-10-26T13:08:13-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)",
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
       "superseded_by": "dcvm2_pima_t4"
     },
     {
@@ -283,8 +289,110 @@
       "start": "2026-10-26T12:30:07-03:00",
       "end": "2026-10-27T00:25:46-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set)",
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
       "superseded_by": "dcvm2_bcd_t4"
+    },
+    {
+      "label": "cv_pima_m4_t20",
+      "commit": "4f858fe3579a936cbe6662fb94392f4540683d0f",
+      "command": "nice -n 15 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python logs/rerun_2026-10/with_blas_threads.py 20 run_cross_validation.py --task classification -y --dataset pima__binary_ --methods 4",
+      "cwd": "/home/ghabr/projects/WILCAR-dissertacao",
+      "pid": 1898027,
+      "log": "logs/rerun_2026-10/cv_pima__binary__m4_t20.log",
+      "results_dir": "results/cross_validation/cv_20261027_092317",
+      "start": "2026-10-27T09:23:17-03:00",
+      "end": null,
+      "exit_code": null,
+      "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
+      "supersedes": "cv_pima_m4"
+    },
+    {
+      "label": "cv_pima_m3_t20",
+      "commit": "4f858fe3579a936cbe6662fb94392f4540683d0f",
+      "command": "nice -n 15 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python logs/rerun_2026-10/with_blas_threads.py 20 run_cross_validation.py --task classification -y --dataset pima__binary_ --methods 3",
+      "cwd": "/home/ghabr/projects/WILCAR-dissertacao",
+      "pid": 1898165,
+      "log": "logs/rerun_2026-10/cv_pima__binary__m3_t20.log",
+      "results_dir": "results/cross_validation/cv_20261027_092320",
+      "start": "2026-10-27T09:23:20-03:00",
+      "end": "2026-10-27T09:40:32-03:00",
+      "exit_code": 143,
+      "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
+      "supersedes": "cv_pima_m3",
+      "role": "stopped by decision (exit 143) to reduce CPU contention; relaunched as cv_pima_m3_t20_r2"
+    },
+    {
+      "label": "cv_pima_m12_t20",
+      "commit": "4f858fe3579a936cbe6662fb94392f4540683d0f",
+      "command": "nice -n 15 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python logs/rerun_2026-10/with_blas_threads.py 20 run_cross_validation.py --task classification -y --dataset pima__binary_ --methods 1 2",
+      "cwd": "/home/ghabr/projects/WILCAR-dissertacao",
+      "pid": 1898205,
+      "log": "logs/rerun_2026-10/cv_pima__binary__m12_t20.log",
+      "results_dir": "results/cross_validation/cv_20261027_092323",
+      "start": "2026-10-27T09:23:23-03:00",
+      "end": "2026-10-27T09:40:32-03:00",
+      "exit_code": 143,
+      "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
+      "supersedes": "cv_pima_m12",
+      "role": "stopped by decision (exit 143) to reduce CPU contention; waiting in queue_t20.sh"
+    },
+    {
+      "label": "cv_hf_m12_t20",
+      "commit": "4f858fe3579a936cbe6662fb94392f4540683d0f",
+      "command": "nice -n 15 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python logs/rerun_2026-10/with_blas_threads.py 20 run_cross_validation.py --task classification -y --dataset heart_failure_clinical_records_dataset__binary_ --methods 1 2",
+      "cwd": "/home/ghabr/projects/WILCAR-dissertacao",
+      "pid": 1898338,
+      "log": "logs/rerun_2026-10/cv_heart_failure_clinical_records_dataset__binary__m12_t20.log",
+      "results_dir": "results/cross_validation/cv_20261027_092326",
+      "start": "2026-10-27T09:23:26-03:00",
+      "end": "2026-10-27T09:40:32-03:00",
+      "exit_code": 143,
+      "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
+      "supersedes": "cv_hf_m12",
+      "role": "stopped by decision (exit 143) to reduce CPU contention; waiting in queue_t20.sh"
+    },
+    {
+      "label": "cv_hf_m3_t20",
+      "commit": "4f858fe3579a936cbe6662fb94392f4540683d0f",
+      "command": "nice -n 15 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python logs/rerun_2026-10/with_blas_threads.py 20 run_cross_validation.py --task classification -y --dataset heart_failure_clinical_records_dataset__binary_ --methods 3",
+      "cwd": "/home/ghabr/projects/WILCAR-dissertacao",
+      "pid": 1898437,
+      "log": "logs/rerun_2026-10/cv_heart_failure_clinical_records_dataset__binary__m3_t20.log",
+      "results_dir": "results/cross_validation/cv_20261027_092329",
+      "start": "2026-10-27T09:23:29-03:00",
+      "end": "2026-10-27T09:40:32-03:00",
+      "exit_code": 143,
+      "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
+      "supersedes": "cv_hf_m3",
+      "role": "stopped by decision (exit 143) to reduce CPU contention; waiting in queue_t20.sh"
+    },
+    {
+      "label": "cv_alg_m2_t20",
+      "commit": "4f858fe3579a936cbe6662fb94392f4540683d0f",
+      "command": "nice -n 15 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python logs/rerun_2026-10/with_blas_threads.py 20 run_cross_validation.py --task classification -y --dataset Algerian_forest_fires__binary_ --methods 2",
+      "cwd": "/home/ghabr/projects/WILCAR-dissertacao",
+      "pid": 1902472,
+      "log": "logs/rerun_2026-10/cv_Algerian_forest_fires__binary__m2_t20.log",
+      "results_dir": "results/cross_validation/cv_20261027_092850",
+      "start": "2026-10-27T09:28:49-03:00",
+      "end": null,
+      "exit_code": null,
+      "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
+      "supersedes": "cv_alg_m2"
+    },
+    {
+      "label": "cv_pima_m3_t20_r2",
+      "commit": "4f858fe3579a936cbe6662fb94392f4540683d0f",
+      "command": "nice -n 15 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python logs/rerun_2026-10/with_blas_threads.py 20 run_cross_validation.py --task classification -y --dataset pima__binary_ --methods 3",
+      "cwd": "/home/ghabr/projects/WILCAR-dissertacao",
+      "pid": 1918760,
+      "log": "logs/rerun_2026-10/cv_pima__binary__m3_t20_r2.log",
+      "results_dir": "results/cross_validation/cv_20261027_094521",
+      "start": "2026-10-27T09:45:20-03:00",
+      "end": null,
+      "exit_code": null,
+      "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
+      "supersedes": "cv_pima_m3"
     },
     {
       "label": "dcvm2_alg_t4",
@@ -360,6 +468,66 @@
       "exit_code": 0,
       "blas_threads": "OMP/OPENBLAS/MKL_NUM_THREADS=4 (4 per DCV worker, as in March; parent process also 4)",
       "supersedes": "dcvm2_reg"
+    },
+    {
+      "label": "cv_hf_m56_t20",
+      "commit": "42b31cbaf16ea22a523fae11e31ac1b3c53655e9",
+      "command": "nice -n 10 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python /home/ghabr/projects/WILCAR-dissertacao/logs/rerun_2026-10/with_blas_threads.py 20 run_cross_validation.py --task classification -y --dataset heart_failure_clinical_records_dataset__binary_ --methods 5 6",
+      "cwd": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/t20q/cv_hf_m56",
+      "pid": null,
+      "log": "logs/rerun_2026-10/cv_hf_m56_t20.log",
+      "results_dir": "results/cross_validation/cv_20261027_083525_hf_m56",
+      "source_results_dir": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/t20q/cv_hf_m56/results/cross_validation/cv_20261027_083525",
+      "start": "2026-10-27T08:35:25-03:00",
+      "end": "2026-10-27T09:15:57-03:00",
+      "exit_code": 0,
+      "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
+      "supersedes": "cv_hf_m56"
+    },
+    {
+      "label": "cv_pima_m56_t20",
+      "commit": "42b31cbaf16ea22a523fae11e31ac1b3c53655e9",
+      "command": "nice -n 10 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python /home/ghabr/projects/WILCAR-dissertacao/logs/rerun_2026-10/with_blas_threads.py 20 run_cross_validation.py --task classification -y --dataset pima__binary_ --methods 5 6",
+      "cwd": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/t20q/cv_pima_m56",
+      "pid": null,
+      "log": "logs/rerun_2026-10/cv_pima_m56_t20.log",
+      "results_dir": "results/cross_validation/cv_20261027_083525_pima_m56",
+      "source_results_dir": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/t20q/cv_pima_m56/results/cross_validation/cv_20261027_083525",
+      "start": "2026-10-27T08:35:25-03:00",
+      "end": "2026-10-27T09:07:33-03:00",
+      "exit_code": 0,
+      "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
+      "supersedes": "cv_pima_m56"
+    },
+    {
+      "label": "cv_hf_m4_t20",
+      "commit": "42b31cbaf16ea22a523fae11e31ac1b3c53655e9",
+      "command": "nice -n 10 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python /home/ghabr/projects/WILCAR-dissertacao/logs/rerun_2026-10/with_blas_threads.py 20 run_cross_validation.py --task classification -y --dataset heart_failure_clinical_records_dataset__binary_ --methods 4 --max-neurons 5 --patience 5",
+      "cwd": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/t20q/cv_hf_m4",
+      "pid": null,
+      "log": "logs/rerun_2026-10/cv_hf_m4_t20.log",
+      "results_dir": "results/cross_validation/cv_20261027_083525_hf_m4",
+      "source_results_dir": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/t20q/cv_hf_m4/results/cross_validation/cv_20261027_083525",
+      "start": "2026-10-27T08:35:25-03:00",
+      "end": "2026-10-27T09:19:30-03:00",
+      "exit_code": 0,
+      "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
+      "supersedes": "cv_hf_m4"
+    },
+    {
+      "label": "dcvm2_hf_t4",
+      "commit": "a30890ad91093f47b4e844041da148ce35a2000c",
+      "command": "OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MKL_NUM_THREADS=4 nice -n 10 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python src/run_dynamic_cv.py --task classification -y --dataset heart_failure_clinical_records_dataset__binary_ --methods 2 --retrain",
+      "cwd": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/t4q/hf",
+      "pid": null,
+      "log": "logs/rerun_2026-10/dcvm2_hf_t4.log",
+      "results_dir": "results/dynamic_cv/vcd_20261027_011812_hf",
+      "source_results_dir": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/t4q/hf/results/dynamic_cv/vcd_20261027_011812",
+      "start": "2026-10-27T01:18:12-03:00",
+      "end": "2026-10-27T10:13:04-03:00",
+      "exit_code": 0,
+      "blas_threads": "OMP/OPENBLAS/MKL_NUM_THREADS=4 (4 per DCV worker, as in March; parent process also 4)",
+      "supersedes": "dcvm2_hf"
     }
   ]
 }

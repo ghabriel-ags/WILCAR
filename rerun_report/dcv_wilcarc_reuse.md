@@ -44,7 +44,7 @@ Em março, o worker paralelo do DCV recriava o modelo a cada n e não restaurava
 | Breast (diagnostic) | mar | 3 | 0.545349 | 0.968 ± 0.007 | 0.957 | 0.932 | 100.0 | 2 | 5 | 0 | **sim** | 0.50 | 257.0 |  |
 | Breast (diagnostic) | out | 1 | 1.199640 | 0.933 ± 0.036 | 0.920 | 0.868 | 100.0 | 1 | 5 | 0 | **sim** | 0.00 | 103.8 | sim |
 | Heart Failure | mar | 1 | 2.343980 | 0.799 ± 0.033 | 0.677 | 0.555 | 100.0 | 1 | 16 | 0 | não | 0.27 | 242.4 |  |
-| Heart Failure | out | 1 | 2.185649 | 0.819 ± 0.024 | 0.708 | 0.596 | 100.0 | 1 | 16 | 0 | não | 0.27 | 70.4 | n/a (dados corrigidos) |
+| Heart Failure | out | 1 | 2.185649 | 0.819 ± 0.024 | 0.708 | 0.596 | 100.0 | 1 | 17 | 1 | não | 0.33 | 534.6 | n/a (dados corrigidos) |
 | Pima | mar | 3 | 2.471744 | 0.756 ± 0.012 | 0.620 | 0.449 | 100.0 | 3 | 18 | 0 | não | 0.35 | 213.2 |  |
 | Pima | out | 2 | 2.429426 | 0.767 ± 0.022 | 0.644 | 0.476 | 100.0 | 1 | 17 | 0 | não | 0.31 | 23.7 | n/a (dados corrigidos) |
 
@@ -66,7 +66,7 @@ Em março, o worker paralelo do DCV recriava o modelo a cada n e não restaurava
 | Algerian | 730.1 | 5.2 | 23/31 |
 | Breast (original) | 283.8 | 10.1 | 17/18 |
 | Breast (diagnostic) | 257.0 | 103.8 | 5/5 |
-| Heart Failure | 242.4 | 70.4 | 16/16 |
+| Heart Failure | 242.4 | 534.6 | 16/17 |
 | Pima | 213.2 | 23.7 | 18/17 |
 
 Notas:
@@ -74,7 +74,6 @@ Notas:
 - Breast (diagnostic): `--max-neurons 5`, como em março (`vcd_20260328_200827`); com n_max = 5 o laço sempre chega ao limite.
 - Heart Failure e Pima: a versão de outubro usa os CSVs corrigidos, então a comparação mistura a correção dos dados e o reaproveitamento.
 - Tempos: as runs de outubro rodaram com `nice -n 10` e dividiram a máquina com outras re-rodadas; não são comparáveis com março.
-- **Ainda com 3 threads por worker** (default; versão com 4 threads pendente): Heart Failure.
 
 ## Curvas J_T(n)
 
