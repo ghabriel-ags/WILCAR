@@ -1,7 +1,7 @@
 {
   "branch": "dissertation/rerun-hf-pima",
-  "commit": "4f858fe3579a936cbe6662fb94392f4540683d0f",
-  "commit_date": "2026-10-27 08:32:50 -0300",
+  "commit": "4b4849f17957f0c3bf56d5b709aca1d285169214",
+  "commit_date": "2026-10-27 10:14:36 -0300",
   "worktree_clean_for_code": false,
   "environment": {
     "micromamba_env": "mestrado_ghabriel_pei",
@@ -193,7 +193,29 @@
       "start": "2026-10-26T11:33:10-03:00",
       "end": "2026-10-26T11:43:35-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
+      "verifications": [
+        {
+          "variant": "4 threads per DCV worker (parent 4)",
+          "commit": "a30890ad91093f47b4e844041da148ce35a2000c",
+          "start": "2026-10-27T00:48:30-03:00",
+          "end": "2026-10-27T00:52:59-03:00",
+          "result": "identical",
+          "command": "OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MKL_NUM_THREADS=4 nice -n 10 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python src/run_dynamic_cv.py --task classification -y --dataset heart_failure_clinical_records_dataset__binary_ --methods 1 --retrain",
+          "cwd": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/t4q/hf_m1",
+          "note": "vcd_history, fold_details_at_optimal and vcd_summary equal except timing (scripts/compare_dcv_runs.py)"
+        },
+        {
+          "variant": "parent 20 (with_blas_threads.py) + 4 per DCV worker",
+          "commit": "42b31cbaf16ea22a523fae11e31ac1b3c53655e9",
+          "start": "2026-10-27T08:36:37-03:00",
+          "end": "2026-10-27T08:47:02-03:00",
+          "result": "identical",
+          "command": "OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MKL_NUM_THREADS=4 nice -n 10 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python /home/ghabr/projects/WILCAR-dissertacao/logs/rerun_2026-10/with_blas_threads.py 20 src/run_dynamic_cv.py --task classification -y --dataset heart_failure_clinical_records_dataset__binary_ --methods 1 --retrain",
+          "cwd": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/t20q/dcv_hf_m1",
+          "note": "equal except timing"
+        }
+      ]
     },
     {
       "label": "dcv_pima_m1",
@@ -206,7 +228,29 @@
       "start": "2026-10-26T11:44:28-03:00",
       "end": "2026-10-26T12:21:51-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
+      "verifications": [
+        {
+          "variant": "4 threads per DCV worker (parent 4)",
+          "commit": "a30890ad91093f47b4e844041da148ce35a2000c",
+          "start": "2026-10-27T00:54:21-03:00",
+          "end": "2026-10-27T01:08:18-03:00",
+          "result": "identical",
+          "command": "OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MKL_NUM_THREADS=4 nice -n 10 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python src/run_dynamic_cv.py --task classification -y --dataset pima__binary_ --methods 1 --retrain",
+          "cwd": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/t4q/pima_m1",
+          "note": "vcd_history, fold_details_at_optimal and vcd_summary (n* = 4, final_n = 3) equal except timing"
+        },
+        {
+          "variant": "parent 20 (with_blas_threads.py) + 4 per DCV worker",
+          "commit": "42b31cbaf16ea22a523fae11e31ac1b3c53655e9",
+          "start": "2026-10-27T10:53:49-03:00",
+          "end": "2026-10-27T11:07:31-03:00",
+          "result": "identical",
+          "command": "OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MKL_NUM_THREADS=4 nice -n 16 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python /home/ghabr/projects/WILCAR-dissertacao/logs/rerun_2026-10/with_blas_threads.py 20 src/run_dynamic_cv.py --task classification -y --dataset pima__binary_ --methods 1 --retrain",
+          "cwd": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/pima_m1_t4p20",
+          "note": "vcd_history, fold_details_at_optimal and vcd_summary (n* = 4, final_n = 3, Acc 0.7760, MCC 0.4913) equal except timing"
+        }
+      ]
     },
     {
       "label": "dcvm2_alg",
@@ -407,7 +451,19 @@
       "end": "2026-10-27T00:54:20-03:00",
       "exit_code": 0,
       "blas_threads": "OMP/OPENBLAS/MKL_NUM_THREADS=4 (4 per DCV worker, as in March; parent process also 4)",
-      "supersedes": "dcvm2_alg"
+      "supersedes": "dcvm2_alg",
+      "verifications": [
+        {
+          "variant": "parent 20 (with_blas_threads.py) + 4 per DCV worker",
+          "commit": "a30890ad91093f47b4e844041da148ce35a2000c",
+          "start": "2026-10-27T08:47:04-03:00",
+          "end": "2026-10-27T08:59:36-03:00",
+          "result": "identical",
+          "command": "OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MKL_NUM_THREADS=4 nice -n 10 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python /home/ghabr/projects/WILCAR-dissertacao/logs/rerun_2026-10/with_blas_threads.py 20 src/run_dynamic_cv.py --task classification -y --dataset Algerian_forest_fires__binary_ --methods 2 --retrain",
+          "cwd": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/t20q/dcvm2_alg",
+          "note": "equal except timing"
+        }
+      ]
     },
     {
       "label": "dcvm2_bcd_t4",
@@ -527,7 +583,19 @@
       "end": "2026-10-27T10:13:04-03:00",
       "exit_code": 0,
       "blas_threads": "OMP/OPENBLAS/MKL_NUM_THREADS=4 (4 per DCV worker, as in March; parent process also 4)",
-      "supersedes": "dcvm2_hf"
+      "supersedes": "dcvm2_hf",
+      "verifications": [
+        {
+          "variant": "parent 20 (with_blas_threads.py) + 4 per DCV worker, final retrain only",
+          "commit": "a30890ad91093f47b4e844041da148ce35a2000c",
+          "start": "2026-10-27T08:35:25-03:00",
+          "end": "2026-10-27T08:36:35-03:00",
+          "result": "identical",
+          "command": "OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MKL_NUM_THREADS=4 nice -n 10 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python /home/ghabr/projects/WILCAR-dissertacao/logs/rerun_2026-10/with_blas_threads.py 20 src/run_dynamic_cv.py --task classification -y --dataset heart_failure_clinical_records_dataset__binary_ --methods 2 --retrain --max-neurons 1",
+          "cwd": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/t20q/dcv_hf_m2_retrain",
+          "note": "n* = 1, so --max-neurons 1 reproduces the final retrain: final_n = 1, final_scr = 1, Acc 0.8294, MCC 0.6121 as in the official run"
+        }
+      ]
     }
   ]
 }

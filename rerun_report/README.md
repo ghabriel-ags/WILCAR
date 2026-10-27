@@ -98,7 +98,9 @@ threads por worker:
 Os outros datasets dão o mesmo J_T(1) com 3 ou 4 threads, porque o BCD tem 30 atributos e os demais têm até 13.
 Para n ≥ 2, cada DCV de outubro (3 threads) foi re-rodado com 4 threads e comparado bit a bit:
 
-- **WILCAR (M1), HF e Pima:** idênticos. Ficam as runs com o default.
+- **WILCAR (M1), HF e Pima:** idênticos com 4 threads por worker, e também com o pai em 20 threads e os workers em
+  4 (condição de março), inclusive o retreino final. Ficam as runs com o default. As verificações estão em
+  `logs/rerun_2026-10/verifications.tsv` e no manifest (`jobs[].verifications`).
 - **WILCAR-C (M2):** com o reaproveitamento de pesos, diferenças de arredondamento se propagam pelo SLSQP.
   - Algerian, breast e Pima: diferenças na 8ª–9ª casa do J_T a partir de n = 3 (Pima: n = 7). n\* e métricas finais
     iguais.
@@ -115,9 +117,9 @@ no scratchpad da sessão, com o mesmo comando e `nice -n 10`, e foram copiadas p
 rótulo do dataset no nome (ex.: `vcd_20261027_004851_bcd`).
 
 **Processo pai.** O pai dessas runs também ficou com 4 threads (em março, 20). Ele faz o retreino final com
-`--retrain`. Com o pai em 20 e os workers em 4, pelo wrapper, deram idêntico: o DCV do Algerian (WILCAR-C), o DCV
-do HF (WILCAR) e o retreino do HF (WILCAR-C, n\* = 1). As demais verificações do pai (breast, Pima, Pima M1, BCD)
-foram interrompidas para dar prioridade às rodadas oficiais.
+`--retrain`. Com o pai em 20 e os workers em 4, pelo wrapper, deram idêntico: o DCV do Algerian (WILCAR-C), os
+DCVs do HF e do Pima (WILCAR) e o retreino do HF (WILCAR-C, n\* = 1). As verificações do pai para breast, Pima e
+BCD (WILCAR-C) foram interrompidas para dar prioridade às rodadas oficiais.
 
 A proveniência está em `logs/rerun_2026-10/promoted.tsv` e no manifest: `supersedes`/`superseded_by`, comando,
 diretório de origem, commit e threads por job.

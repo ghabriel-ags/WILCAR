@@ -118,6 +118,14 @@ for p in (dict(zip(rows[0], r)) for r in rows[1:]):
     })
     next(j for j in jobs if j["label"] == p["supersedes"])["superseded_by"] = p["label"]
 
+# Re-runs of official jobs under other BLAS thread settings, compared bit for bit (results kept in the scratchpad)
+rows = [line.split("\t") for line in (L / "verifications.tsv").read_text().splitlines()]
+for v in (dict(zip(rows[0], r)) for r in rows[1:]):
+    label = v.pop("verified_label")
+    job = next(j for j in jobs if j["label"] == label)
+    v["commit"] = next(h for h, _ in commits if h.startswith(v["commit"]))
+    job.setdefault("verifications", []).append(v)
+
 thread_vars = {v: os.environ.get(v) for v in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS")}
 manifest = {
     "branch": git("rev-parse", "--abbrev-ref", "HEAD"),
