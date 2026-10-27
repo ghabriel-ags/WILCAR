@@ -1,8 +1,8 @@
 {
   "branch": "dissertation/rerun-hf-pima",
-  "commit": "4b4849f17957f0c3bf56d5b709aca1d285169214",
-  "commit_date": "2026-10-27 10:14:36 -0300",
-  "worktree_clean_for_code": false,
+  "commit": "eae69a1ce97ca420d438b35e5002cb63c7ae63ed",
+  "commit_date": "2026-10-27 11:08:02 -0300",
+  "worktree_clean_for_code": true,
   "environment": {
     "micromamba_env": "mestrado_ghabriel_pei",
     "python_executable": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python",
@@ -84,7 +84,8 @@
       "start": "2026-10-26T11:32:46-03:00",
       "end": "2026-10-26T19:30:09-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
+      "superseded_by": "cv_pima_m3_t20_r2"
     },
     {
       "label": "cv_pima_m12",
@@ -393,7 +394,7 @@
       "exit_code": 143,
       "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
       "supersedes": "cv_hf_m12",
-      "role": "stopped by decision (exit 143) to reduce CPU contention; waiting in queue_t20.sh"
+      "role": "stopped by decision (exit 143) to reduce CPU contention; relaunched as cv_hf_m12_t20_r2"
     },
     {
       "label": "cv_hf_m3_t20",
@@ -433,10 +434,24 @@
       "log": "logs/rerun_2026-10/cv_pima__binary__m3_t20_r2.log",
       "results_dir": "results/cross_validation/cv_20261027_094521",
       "start": "2026-10-27T09:45:20-03:00",
+      "end": "2026-10-27T15:10:06-03:00",
+      "exit_code": 0,
+      "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
+      "supersedes": "cv_pima_m3"
+    },
+    {
+      "label": "cv_hf_m12_t20_r2",
+      "commit": "eae69a1ce97ca420d438b35e5002cb63c7ae63ed",
+      "command": "nice -n 15 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python logs/rerun_2026-10/with_blas_threads.py 20 run_cross_validation.py --task classification -y --dataset heart_failure_clinical_records_dataset__binary_ --methods 1 2",
+      "cwd": "/home/ghabr/projects/WILCAR-dissertacao",
+      "pid": 2085272,
+      "log": "logs/rerun_2026-10/cv_heart_failure_clinical_records_dataset__binary__m12_t20_r2.log",
+      "results_dir": "results/cross_validation/cv_20261027_151025",
+      "start": "2026-10-27T15:10:24-03:00",
       "end": null,
       "exit_code": null,
       "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
-      "supersedes": "cv_pima_m3"
+      "supersedes": "cv_hf_m12"
     },
     {
       "label": "dcvm2_alg_t4",

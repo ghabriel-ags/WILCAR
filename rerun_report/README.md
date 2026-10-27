@@ -84,6 +84,13 @@ com 20 threads:
 As runs com 16 threads continuam em `results/` e ficam marcadas como substituídas (`superseded_by`) quando a de 20
 termina sem erro. Até lá, o relatório usa a de 16, e a lista de pendências está no fim deste arquivo.
 
+Runs `*_t20` do worktree já terminadas, comparadas bit a bit com as de 16 threads (`scripts/compare_kfold_runs.py`:
+todas as colunas de `fold_results.csv`, menos o tempo de treino):
+
+| Run | Término | 20 vs. 16 threads |
+|---|---|---|
+| Pima, RIXM (M3), `cv_20261027_094521` (`cv_pima_m3_t20_r2`) | 27/10 15h10, exit 0, 324,7 min | idêntico nos 5 folds |
+
 ### DCV: 4 threads por worker no WILCAR-C
 
 A diferença de threads apareceu primeiro no BCD: o J_T(1) do WILCAR-C não batia com março. Em n = 1 não há
@@ -152,10 +159,10 @@ diretório de origem, commit e threads por job.
 
 ## Pendências
 
-Para commits posteriores (estado em 27/10, 10h15):
+Para commits posteriores (estado em 27/10, 15h10):
 
 - **K-fold com 20 threads:** Algerian M2 (`cv_20261027_092850`) e Pima M4 (`cv_20261027_092317`) em execução. Na
-  fila `queue_t20.sh`: Pima M3 (em execução), HF M1/M2, HF M3, Pima M1/M2. Até terminarem, o relatório usa as
-  versões com 16 threads desses grupos.
+  fila `queue_t20.sh`: HF M1/M2 (em execução desde 15h10), HF M3, Pima M1/M2; o Pima M3 já terminou. Até
+  terminarem, o relatório usa as versões com 16 threads desses grupos.
 - **K-fold Algerian WILCAR-C com 16 threads** (`cv_20261026_113259`): encerrado por decisão em 27/10 às 09h40,
   depois de 22 h no fold 1. Pela política, não entra nas tabelas.
