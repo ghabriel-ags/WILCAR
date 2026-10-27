@@ -1,0 +1,242 @@
+dataset,versao,n,J_T
+Algerian,março,1,0.8322204155992721
+Algerian,março,2,0.7041971471240107
+Algerian,março,3,2.5878117412204538
+Algerian,março,4,6.692074128450822
+Algerian,março,5,3.1873229806536756
+Algerian,março,6,2.9181426391353726
+Algerian,março,8,6.293132815222399
+Algerian,março,9,3.040133581642517
+Algerian,março,11,6.225784377093313
+Algerian,março,13,4.0232727334185086
+Algerian,março,14,4.551870085184506
+Algerian,março,16,4.0472125577811395
+Algerian,março,17,3.6302658551623814
+Algerian,março,18,4.161910792149557
+Algerian,março,21,4.193792687451379
+Algerian,março,22,6.078647737575695
+Algerian,março,23,5.071681796743337
+Algerian,outubro,1,0.8322204155992721
+Algerian,outubro,2,0.6538035969262328
+Algerian,outubro,3,0.6607692890604429
+Algerian,outubro,4,0.6548863909467929
+Algerian,outubro,5,0.6565005358596908
+Algerian,outubro,6,0.6602853104669648
+Algerian,outubro,7,0.6581905608575287
+Algerian,outubro,8,0.6619998068640504
+Algerian,outubro,9,0.6601628121221516
+Algerian,outubro,10,0.6545171277288886
+Algerian,outubro,11,0.6569448378626621
+Algerian,outubro,12,0.6609937328488118
+Algerian,outubro,13,0.6558733427746923
+Algerian,outubro,14,0.6593388693647092
+Algerian,outubro,15,0.6612862973823854
+Algerian,outubro,16,0.650511005806675
+Algerian,outubro,17,0.652791053991215
+Algerian,outubro,18,0.6558300272413895
+Algerian,outubro,19,0.6508858234838885
+Algerian,outubro,20,0.6537259072920583
+Algerian,outubro,21,0.6553377335638372
+Algerian,outubro,22,0.6546957825817826
+Algerian,outubro,23,0.6526057566797294
+Algerian,outubro,24,0.6553679456856362
+Algerian,outubro,25,0.650951484651918
+Algerian,outubro,26,0.652931245688737
+Algerian,outubro,27,0.6549385013287644
+Algerian,outubro,28,0.6546170843704086
+Algerian,outubro,29,0.6561286524826526
+Algerian,outubro,30,0.6558052935643146
+Algerian,outubro,31,0.6538505680260561
+Breast (original),março,1,0.7278130048907231
+Breast (original),março,2,0.4127112152286974
+Breast (original),março,3,1.2975185177684325
+Breast (original),março,4,1.5244508663068745
+Breast (original),março,5,1.1950877226407748
+Breast (original),março,6,2.097232393777567
+Breast (original),março,7,4.225219864621053
+Breast (original),março,8,2.9033216209690984
+Breast (original),março,9,2.800290225052571
+Breast (original),março,10,3.564466228129817
+Breast (original),março,11,3.833313570461129
+Breast (original),março,12,4.2361741909915285
+Breast (original),março,13,5.460459270756941
+Breast (original),março,14,4.944892075298608
+Breast (original),março,15,3.706317113653241
+Breast (original),março,16,4.146229028206751
+Breast (original),março,17,1.8445018923190282
+Breast (original),outubro,1,0.7278130048907231
+Breast (original),outubro,2,0.4524088395147594
+Breast (original),outubro,3,0.45054233204901584
+Breast (original),outubro,4,2.069792103856393
+Breast (original),outubro,5,2.1896733020157293
+Breast (original),outubro,6,2.188789003277863
+Breast (original),outubro,7,2.0610560665392286
+Breast (original),outubro,8,2.060576152120893
+Breast (original),outubro,9,2.0577753012647144
+Breast (original),outubro,10,2.0591351615539146
+Breast (original),outubro,11,2.0564541720609864
+Breast (original),outubro,12,2.065864952378652
+Breast (original),outubro,13,2.063336129230431
+Breast (original),outubro,14,2.0651698397833136
+Breast (original),outubro,15,2.0620393463507694
+Breast (original),outubro,16,2.065705349632522
+Breast (original),outubro,17,2.0653064415796654
+Breast (original),outubro,18,2.062958186795715
+computer_hardware,março,1,0.04316438180582287
+computer_hardware,março,2,0.01925295352100481
+computer_hardware,março,3,0.017352690189890555
+computer_hardware,março,4,0.0170879562685894
+computer_hardware,março,5,0.018165677379626557
+computer_hardware,março,6,0.018473701170117228
+computer_hardware,março,7,0.01210579166245124
+computer_hardware,março,8,0.014519554863510354
+computer_hardware,março,9,0.01443948750874749
+computer_hardware,março,10,0.014648717199598668
+computer_hardware,março,11,0.013437092827140219
+computer_hardware,março,12,0.013031804100920436
+computer_hardware,março,13,0.01659009170592324
+computer_hardware,março,14,0.010362836051111072
+computer_hardware,março,15,0.016779669379551197
+computer_hardware,março,16,0.014104990768917525
+computer_hardware,março,17,0.013092653861429195
+computer_hardware,março,18,0.013895021528436653
+computer_hardware,março,19,0.013451704068665797
+computer_hardware,março,20,0.013636728036280278
+computer_hardware,março,21,0.01531546255207792
+computer_hardware,março,22,0.014441227758553943
+computer_hardware,março,23,0.013328910518941852
+computer_hardware,março,24,0.01547384708117263
+computer_hardware,março,25,0.01446433147298402
+computer_hardware,março,26,0.014406719954268558
+computer_hardware,março,27,0.012865503895117437
+computer_hardware,março,28,0.013364593162031296
+computer_hardware,março,29,0.015315643394531467
+computer_hardware,outubro,1,0.04316438180582287
+computer_hardware,outubro,2,0.022727073599404977
+computer_hardware,outubro,3,0.021489988773744983
+computer_hardware,outubro,4,0.02096702270800091
+computer_hardware,outubro,5,0.020950525135119503
+computer_hardware,outubro,6,0.0207345907369337
+computer_hardware,outubro,7,0.02014916825786323
+computer_hardware,outubro,8,0.02003576034849323
+computer_hardware,outubro,9,0.019944647585004242
+computer_hardware,outubro,10,0.01982425828994299
+computer_hardware,outubro,11,0.019710246590651313
+computer_hardware,outubro,12,0.01962205247302858
+computer_hardware,outubro,13,0.019560190929291336
+computer_hardware,outubro,14,0.01960020190303054
+computer_hardware,outubro,15,0.01928556181977525
+computer_hardware,outubro,16,0.019190601046788713
+computer_hardware,outubro,17,0.019267144115662358
+computer_hardware,outubro,18,0.01919715667860187
+computer_hardware,outubro,19,0.019140304205580584
+computer_hardware,outubro,20,0.019195530993425358
+computer_hardware,outubro,21,0.019142055857964486
+computer_hardware,outubro,22,0.01910294156706571
+computer_hardware,outubro,23,0.015832538505106186
+computer_hardware,outubro,24,0.01587633730948339
+computer_hardware,outubro,25,0.015924583226098216
+computer_hardware,outubro,26,0.016042396449563245
+computer_hardware,outubro,27,0.016086097294883448
+computer_hardware,outubro,28,0.01614584707090138
+computer_hardware,outubro,29,0.01618982787430752
+computer_hardware,outubro,30,0.01623370165184392
+computer_hardware,outubro,31,0.01572359217037606
+computer_hardware,outubro,32,0.015739520247245987
+computer_hardware,outubro,33,0.01577003006652517
+computer_hardware,outubro,34,0.015802338551001903
+computer_hardware,outubro,35,0.015835276690803826
+computer_hardware,outubro,36,0.015868566560907373
+computer_hardware,outubro,37,0.01590199141200354
+computer_hardware,outubro,38,0.01593536346912622
+computer_hardware,outubro,39,0.015968516805621336
+computer_hardware,outubro,40,0.016001304767910986
+computer_hardware,outubro,41,0.016042563491958574
+computer_hardware,outubro,42,0.016071547711507015
+computer_hardware,outubro,43,0.015578920474104582
+computer_hardware,outubro,44,0.015277634279322116
+computer_hardware,outubro,45,0.015308386987002057
+computer_hardware,outubro,46,0.015338168550123689
+computer_hardware,outubro,47,0.01536651393668171
+computer_hardware,outubro,48,0.01539507496364163
+computer_hardware,outubro,49,0.015422592786591065
+computer_hardware,outubro,50,0.015450350805810871
+aquatic_toxicity,março,1,0.10786082735757688
+aquatic_toxicity,março,2,0.08181818790484945
+aquatic_toxicity,março,3,0.08179217966297989
+aquatic_toxicity,março,4,0.08143042361027929
+aquatic_toxicity,março,5,0.08214998339703036
+aquatic_toxicity,março,6,0.08248598963223402
+aquatic_toxicity,março,7,0.08206306191491394
+aquatic_toxicity,março,8,0.0812237324597795
+aquatic_toxicity,março,9,0.08177506958954545
+aquatic_toxicity,março,10,0.08105577819841267
+aquatic_toxicity,março,11,0.08161732895898524
+aquatic_toxicity,março,12,0.08227559630276261
+aquatic_toxicity,março,13,0.08237418820478644
+aquatic_toxicity,março,14,0.08105533500156321
+aquatic_toxicity,março,15,0.08204825754113576
+aquatic_toxicity,março,16,0.08102202342792089
+aquatic_toxicity,março,17,0.08216980792359475
+aquatic_toxicity,março,18,0.08154800303002237
+aquatic_toxicity,março,19,0.08184962307879161
+aquatic_toxicity,março,20,0.08230374382503618
+aquatic_toxicity,março,21,0.0821748395694842
+aquatic_toxicity,março,22,0.08165856657125409
+aquatic_toxicity,março,23,0.08258899535876017
+aquatic_toxicity,março,24,0.08441606300916948
+aquatic_toxicity,março,25,0.08202319283627607
+aquatic_toxicity,março,26,0.0822272628080987
+aquatic_toxicity,março,27,0.08148302277369115
+aquatic_toxicity,março,28,0.08229591397807448
+aquatic_toxicity,março,29,0.08214040637614446
+aquatic_toxicity,março,30,0.08150996152570594
+aquatic_toxicity,março,31,0.08212830097105306
+aquatic_toxicity,outubro,1,0.10786082735757688
+aquatic_toxicity,outubro,2,0.08920920296433182
+aquatic_toxicity,outubro,3,0.0893701769598798
+aquatic_toxicity,outubro,4,0.08816166546536351
+aquatic_toxicity,outubro,5,0.0880248422894498
+aquatic_toxicity,outubro,6,0.08828540023142606
+aquatic_toxicity,outubro,7,0.0886729459993062
+aquatic_toxicity,outubro,8,0.08830155628369993
+aquatic_toxicity,outubro,9,0.08838829736816235
+aquatic_toxicity,outubro,10,0.08861259312120177
+aquatic_toxicity,outubro,11,0.08759338841407484
+aquatic_toxicity,outubro,12,0.08742858866114586
+aquatic_toxicity,outubro,13,0.08757073791304906
+aquatic_toxicity,outubro,14,0.08768287700360025
+aquatic_toxicity,outubro,15,0.08708694328847288
+aquatic_toxicity,outubro,16,0.08720757496344261
+aquatic_toxicity,outubro,17,0.08730641082154973
+aquatic_toxicity,outubro,18,0.08739410814650792
+aquatic_toxicity,outubro,19,0.08702205306812158
+aquatic_toxicity,outubro,20,0.08718458760597722
+aquatic_toxicity,outubro,21,0.08703983275833052
+aquatic_toxicity,outubro,22,0.08712654326373638
+aquatic_toxicity,outubro,23,0.0871965739007154
+aquatic_toxicity,outubro,24,0.0872716875200861
+aquatic_toxicity,outubro,25,0.08712038952480246
+aquatic_toxicity,outubro,26,0.08699374730465118
+aquatic_toxicity,outubro,27,0.08707976583166785
+aquatic_toxicity,outubro,28,0.08712784871013507
+aquatic_toxicity,outubro,29,0.08717929201149616
+aquatic_toxicity,outubro,30,0.08722856434221513
+aquatic_toxicity,outubro,31,0.08727819616511967
+aquatic_toxicity,outubro,32,0.08688666901382355
+aquatic_toxicity,outubro,33,0.08687234430192153
+aquatic_toxicity,outubro,34,0.08690728460582245
+aquatic_toxicity,outubro,35,0.0869361412147527
+aquatic_toxicity,outubro,36,0.08697113689522942
+aquatic_toxicity,outubro,37,0.08700430634827112
+aquatic_toxicity,outubro,38,0.08705264461215059
+aquatic_toxicity,outubro,39,0.08697430104374129
+aquatic_toxicity,outubro,40,0.086991847948291
+aquatic_toxicity,outubro,41,0.08688003828850063
+aquatic_toxicity,outubro,42,0.08693424955338655
+aquatic_toxicity,outubro,43,0.08696202278800541
+aquatic_toxicity,outubro,44,0.08701525054725079
+aquatic_toxicity,outubro,45,0.08702008965246011
+aquatic_toxicity,outubro,46,0.08707469904411604
+aquatic_toxicity,outubro,47,0.08705952005550804
+aquatic_toxicity,outubro,48,0.0869055810254081

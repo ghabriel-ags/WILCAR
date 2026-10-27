@@ -1,0 +1,5 @@
+dataset,method,n_star,accuracy,f1_mean,mcc_mean,scr_pct,total_time_min,final_n,final_scr_pct,J_T_metric,run
+Heart Failure,M1 WILCAR,3,0.829 ± 0.020,0.715,0.624,80.00,10.2,1,100.00,bce,vcd_20261026_113311
+Heart Failure,M2 WILCAR-C,1,0.819 ± 0.024,0.708,0.596,100.00,70.5,1,100.00,bce,vcd_20261026_122110
+Pima,M1 WILCAR,4,0.768 ± 0.025,0.635,0.475,90.00,37.2,3,100.00,bce,vcd_20261026_114430
+Pima,M2 WILCAR-C,2,0.767 ± 0.022,0.644,0.476,100.00,23.7,1,100.00,bce,vcd_20261027_005421_pima

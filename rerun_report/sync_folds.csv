@@ -1,0 +1,596 @@
+versao,fold,n,mse_train,mse_test,r2_train,r2_test,n_attempts,accepted_success,accepted_nit,accepted_message
+"março: paralelo, sem reaproveitamento",0,1,0.1476717888268026,0.1523508003791802,-1.4629285644479926,-1.3900802704126094,1,True,9,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,1,0.001863793152638,0.0017392785830639,0.9707674102391856,0.9675912703422026,1,True,50,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,1,0.001965864189274,0.001805536215148,0.9682418636395378,0.9675072640892572,1,True,51,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,1,0.0019124262278769,0.0019983375389806,0.9679602461846885,0.969095509852162,1,True,51,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,1,0.0177446352629385,0.0230598215185115,0.7024563617044763,0.6452700064959076,1,True,40,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,2,0.0007303955980656,0.0009667465740268,0.9878181730165608,0.9848336739464454,1,True,79,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,2,0.0016151685494932,0.0017856439206287,0.9746669529635964,0.9667273249655022,1,True,65,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,2,0.0026445264814157,0.00240769813664,0.9572782122672132,0.9566706560354314,1,True,19,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,2,0.0009111565977547,0.0008290929127104,0.9847349755751528,0.9871779950820654,1,True,58,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,2,0.0009273566279405,0.0008848780113747,0.9844500007474828,0.986387892422546,1,True,38,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,3,0.0007674982977125,0.0010227246132281,0.9871993595010988,0.9839554901316024,1,True,47,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,3,0.0011770057590134,0.0011599773492435,0.9815392998677684,0.978385640640398,1,True,58,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,3,0.0011063348129287,0.000980785539185,0.9821273859908444,0.9823496171151552,1,True,59,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,3,0.0012054275206024,0.001199165899972,0.9798049198241862,0.9814547792760708,1,True,38,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,3,0.0010239901315991,0.0009082037998327,0.9828296414764254,0.9860290710508556,1,True,62,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,4,0.0010619457803646,0.0016420088647159,0.9822884477994464,0.974240155078722,1,True,42,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,4,0.000840838220918,0.0008745911514743,0.9868119062823466,0.9837033650243074,1,True,47,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,4,0.0013923522454568,0.0012464351377615,0.9775068325094516,0.9775689418902987,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,4,0.0009280590020163,0.0008521761947809,0.9844518018435164,0.9868210098133549,1,True,29,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,4,0.0007922220148524,0.0009251074118165,0.986715950080454,0.9857690422312756,1,True,46,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,5,0.0008924245875119,0.0011985830531698,0.985115789375473,0.9811966218706932,1,True,39,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,5,0.0012715258200617,0.0012730574986075,0.980056803720125,0.976278569337338,1,True,29,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,5,0.000870972943924,0.0007584791311059,0.9859296091406864,0.986350280933681,1,True,37,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,5,0.0007763492591712,0.0007561890815067,0.9869934647538487,0.9883054601320004,1,True,58,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,5,0.0010599703283956,0.0009202976803541,0.9822263223040222,0.985843030488688,1,True,41,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,6,0.0009152233451614,0.0012041833683318,0.984735542668264,0.9811087640928324,1,True,38,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,6,0.0009774268012458,0.0009539994574258,0.984669588113036,0.9822237157345244,1,True,37,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,6,0.0009317451302084,0.0008104640792528,0.98494784682492,0.9854147509912196,1,True,41,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,6,0.0008380586444775,0.0008486989510913,0.9859596191160468,0.986874785735216,1,True,39,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,6,0.0007656602541114,0.0007612765585686,0.9871613400709108,0.9882892576397836,1,True,35,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,7,0.0007128241614111,0.0009829329661383,0.9881112363944656,0.9845797417298876,1,True,48,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,7,0.0008565161851642,0.0008309648409906,0.986566005874115,0.984516272925434,1,True,47,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,7,0.001182274278045,0.0010581256928863,0.9809005993687248,0.9809577905937994,1,True,35,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,7,0.0010047173108303,0.0010580749011933,0.9831675100331994,0.9836367657006118,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,7,0.0009003354108774,0.0007704053400857,0.984903094942826,0.9881488292932034,1,True,37,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,8,0.0008570736497858,0.0011350442532229,0.9857053863120117,0.9821934189454768,1,True,29,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,8,0.0008717190212857,0.0009373361249418,0.986327557594105,0.98253421081158,1,True,30,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,8,0.0010204822141856,0.0009362689674409,0.9835143172715808,0.9831507448893848,1,True,29,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,8,0.0008585305787301,0.0009006417940055,0.9856166434111462,0.986071484468148,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,8,0.0009042409938544,0.0008780289354674,0.9848376057765832,0.9864932519826856,1,True,33,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,9,0.0007095629375149,0.0008818560559194,0.9881656283778828,0.986165436903836,1,True,53,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,9,0.0008356464246395,0.0008348559035133,0.9868933368051052,0.9844437690755,1,True,41,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,9,0.0009698472434401,0.0008662995639169,0.9843323149309908,0.9844099261406182,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,9,0.0005911170611552,0.0005327566384857,0.9900967447322288,0.9917608652371732,1,True,56,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,9,0.0008690332749737,0.0007503294175416,0.9854279719698924,0.9884576578705608,1,True,38,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,10,0.0005587715199638,0.0007489773358408,0.9906805873454072,0.9882500390616644,1,True,58,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,10,0.0008276501445503,0.000908099136083,0.9870187541429292,0.9830789962629513,1,True,40,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,10,0.0007889420716135,0.0007031698140416,0.9872548012077786,0.9873456367829274,1,True,33,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,10,0.0009384741388577,0.0009256662419426,0.9842773122786443,0.9856844788749272,1,True,28,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,10,0.0008486620648414,0.0007965105013305,0.9857695582515732,0.9877472527384435,1,True,27,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,11,0.0005885858129281,0.0007846189040349,0.9901833327624298,0.987690893925997,1,True,59,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,11,0.0009911788095847,0.0010225100578799,0.9844538952838232,0.9809471281019082,1,True,26,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,11,0.0007848832571803,0.0007092660822509,0.987320370529878,0.9872359273064276,1,True,24,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,11,0.0008138403997054,0.0008030691975791,0.9863653584794922,0.9875804544425072,1,True,28,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,11,0.0012851264411322,0.0011537193674807,0.9784508843772688,0.9822522969918284,1,True,28,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,12,0.0005889926076391,0.0008015869365017,0.9901765480791688,0.987424699330854,1,True,49,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,12,0.0007602229177338,0.000738846614064,0.988076313806912,0.9862327516667287,1,True,40,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,12,0.0008588315090815,0.0007574800981735,0.9861257515524788,0.9863682596997486,1,True,38,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,12,0.0008570140909297,0.0008632047952223,0.9856420498268704,0.9866504514031584,1,True,28,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,12,0.0010306120406004,0.0008464200080891,0.9827186047113684,0.9869794931530512,1,True,29,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,13,0.0009082526705463,0.0011926181796565,0.9848518023395224,0.9812901988421584,1,True,37,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,13,0.0008676149604266,0.0008926101042254,0.9863919275738312,0.9833676100888328,1,True,30,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,13,0.0009198507770609,0.0008228974605121,0.985139997682157,0.9851909977536224,1,True,37,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,13,0.0008030738279153,0.0008220240172004,0.9865457357952622,0.9872873162589852,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,13,0.0007817031616589,0.0006675332895615,0.986892331155834,0.9897313134327672,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,14,0.0008823589616837,0.0012008606126557,0.9852836678685024,0.9811608915038138,1,True,30,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,14,0.0007808324391683,0.0007952525279432,0.987753064585608,0.9851817158914292,1,True,39,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,14,0.0008133681986201,0.0007422768902807,0.9868602020912848,0.9866418592071482,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,14,0.0009111749316465,0.0009149750208055,0.9847346684190548,0.9858498196803998,1,True,30,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,14,0.000902570312596,0.0007203705303237,0.9848656199100204,0.988918516418822,1,True,31,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,15,0.0006674292817875,0.0008939468884527,0.9888683501708548,0.9859757558505104,1,True,47,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,15,0.0008654395901075,0.0008394426005728,0.986426047083298,0.9843583031665466,1,True,29,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,15,0.0008063362121638,0.0007204131399487,0.9869738024030374,0.987035322965779,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,15,0.0008382265755718,0.0008544240985923,0.9859568056893948,0.9867862457558128,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,15,0.0008062211961422,0.0006735141344648,0.9864812105508776,0.9896393098987408,1,True,35,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,16,0.0009715639497373,0.0012691785804039,0.983795871757181,0.9800891188158908,1,True,32,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,16,0.0007585342079919,0.0007449930040512,0.988102800307862,0.986118223325262,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,16,0.0009399605308897,0.0008477600951133,0.9848151286969258,0.9847435655651336,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,16,0.0008442244333139,0.0008600177952443,0.9858563208274558,0.9866997386769536,1,True,39,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,16,0.0008755137841771,0.0007321058718963,0.9853193062093504,0.9887379912731058,1,True,37,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,17,0.0012805100618769,0.0016204678968893,0.9786431461722264,0.9745780899112264,1,True,29,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,17,0.0007513737128613,0.0007266782113384,0.988215108809662,0.9864594907746222,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,17,0.0009036344853795,0.0008101307883768,0.9854019685778518,0.9854207489503424,1,True,39,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,17,0.0009322176774603,0.0009660140878035,0.984382129646241,0.9850604953983766,1,True,37,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,17,0.0008672969699016,0.0007352700293134,0.9854570864893338,0.9886893169354012,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,18,0.0008108824926835,0.0010165369904584,0.9864757807194742,0.9840525615947384,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,18,0.000919065585049,0.0008656345522115,0.9855849522931268,0.9838702572099453,1,True,35,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,18,0.001099184239858,0.0009814973197186,0.9822429020452452,0.9823368077919687,1,True,30,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,18,0.0009503934367579,0.0009453762336892,0.984077622813604,0.9853796618788676,1,True,28,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,18,0.0008375852009106,0.0006877513482761,0.985955296101128,0.9894202983700204,1,True,34,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,19,0.0007570307371762,0.0009461493578007,0.9873739416203376,0.9851568031981788,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,19,0.0007616687746496,0.0007605591976155,0.9880536363214776,0.9858281717119448,1,True,34,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,19,0.0008896824775554,0.0007887024859156,0.9856273604281108,0.9858063763152484,1,True,28,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,19,0.0008309276010118,0.0008473232866157,0.9860790887581996,0.9868960605240854,1,True,35,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,19,0.0008967575806515,0.0007437584230315,0.9849630883214908,0.9885587396954127,1,True,28,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,20,0.000792213450528,0.0010092813051083,0.9867871503965204,0.9841663888300426,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,20,0.000772567812707,0.0007409208790101,0.9878826907914596,0.9861941009913682,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,20,0.0009372732833745,0.0008346093618989,0.9848585406342752,0.9849802283901612,1,True,26,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,20,0.0009349143796979,0.0009368542536787,0.9843369505566912,0.9855114551530956,1,True,28,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,20,0.0009051291740029,0.0007494640574139,0.9848227126920578,0.98847096973389,1,True,35,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,21,0.0007836248870689,0.0010235556773219,0.9869303938585174,0.9839424523931136,1,True,40,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,21,0.0007195838021146,0.0007134325220992,0.9887137164035774,0.9867063034277894,1,True,37,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,21,0.0008609005415836,0.0007677399419988,0.986092326752996,0.9861836218104036,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,21,0.0008487716098912,0.0008697033312036,0.985780139892491,0.9865499508934626,1,True,38,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,21,0.0007877183917692,0.0006951114279383,0.9867914672369263,0.9893070780222976,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,22,0.0007899521020292,0.0010069714913739,0.9868248660621604,0.9842026252017666,1,True,34,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,22,0.0008662358652679,0.0008306687181908,0.986413557937134,0.9845217907095632,1,True,36,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,22,0.0008301053524535,0.0007408989372514,0.9865898167734032,0.986666657083537,1,True,34,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,22,0.0007924769482943,0.0008100005379617,0.9867232701802836,0.9874732605694068,1,True,32,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,22,0.0008762471631197,0.0007519942151173,0.9853070088453528,0.9884320482346518,1,True,27,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,23,0.000855442804989,0.0011109488231107,0.9857325861872638,0.982571428197643,1,True,26,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,23,0.0008262635136835,0.0008157925396493,0.9870405026997482,0.984798984974696,1,True,37,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,23,0.0008404530753133,0.0007534694522486,0.9864226514140696,0.9864404359639384,1,True,35,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,23,0.0008763103255832,0.0009091708015493,0.9853187711566403,0.9859395825124134,1,True,35,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,23,0.000814404448055,0.0007252097198422,0.986343993047608,0.9888440750071624,1,True,34,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",0,24,0.0009421140255717,0.0012399051519695,0.9842870492530622,0.9805483605368032,1,True,29,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",1,24,0.000806827414101,0.0007774868824583,0.9873453474325676,0.985512750843117,1,True,31,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",2,24,0.0007560159104014,0.0006801843326678,0.9877867166489904,0.98775928740361,1,True,35,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",3,24,0.001184135006359,0.0011773699110222,0.9801616430820682,0.981791856427764,1,True,26,Optimization terminated successfully
+"março: paralelo, sem reaproveitamento",4,24,0.0008715788914815,0.0007037290657798,0.9853852868435872,0.9891745126157064,1,True,37,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,1,0.1476717888268026,0.1523508003791802,-1.4629285644479926,-1.3900802704126094,1,True,9,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,1,0.001863793152638,0.0017392785830639,0.9707674102391856,0.9675912703422026,1,True,50,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,1,0.001965864189274,0.001805536215148,0.9682418636395378,0.9675072640892572,1,True,51,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,1,0.0019124262278769,0.0019983375389806,0.9679602461846885,0.969095509852162,1,True,51,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,1,0.0177446352629385,0.0230598215185115,0.7024563617044763,0.6452700064959076,1,True,40,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,2,0.147671669378439,0.1523478187699137,-1.4629265722408884,-1.390033494908547,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,2,0.000964655202121,0.0008908179718232,0.9848699037528243,0.9834010036665491,1,True,44,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,2,0.0009528291503074,0.0008448439642666,0.9846072387661416,0.9847960447503682,1,True,27,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,2,0.0019709013487073,0.0020975744282082,0.9669805856631912,0.9675608014229734,1,True,11,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,2,0.0010076075571278,0.0009174301388739,0.983104345956997,0.985887141973672,1,True,73,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,3,0.1476719329135696,0.1523452676264055,-1.4629309675841422,-1.3899934725538845,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,3,0.0010318853708977,0.0009887391445529,0.9838154348378496,0.9815763961277262,1,True,7,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,3,0.0009753453728284,0.0008548450554806,0.9842434937683716,0.9846160634168944,1,True,8,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,3,0.0017552536812933,0.0017694177563199,0.9705934299518106,0.9726357772143464,1,True,29,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,3,0.0010305947702003,0.0009996485285843,0.982718894302988,0.9846223737782857,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,4,0.1476724047268597,0.1523429698407066,-1.462938836673008,-1.3899574248780535,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,4,0.0010889906328082,0.0010673734617434,0.9829197696229351,0.9801111689050908,1,True,8,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,4,0.0010144809544529,0.0008821092530609,0.9836112664026372,0.9841254122937764,1,True,5,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,4,0.0017342441419832,0.0017798569424477,0.9709454124008358,0.9724743341555322,1,True,11,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,4,0.0010354273739585,0.001049587725172,0.9826378607690018,0.9838541574732752,1,True,10,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,5,0.1476730058777377,0.1523408425267642,-1.4629488629053764,-1.389924051564161,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,5,0.0011216866647072,0.0011065570103328,0.982406950007756,0.9793810449067676,1,True,9,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,5,0.0010142820322311,0.0008862007876081,0.9836144799506944,0.9840517803442206,1,True,8,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,5,0.0017378702791454,0.0018026807886629,0.9708846620616676,0.972121361088302,1,True,10,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,5,0.0010827531364679,0.0011490513884817,0.981844298131422,0.9823241046664312,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,6,0.1476736933851656,0.1523388391631163,-1.462960329426477,-1.3898926227832349,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,6,0.0011498636145963,0.0011363195817771,0.9819650097550768,0.9788264660478924,1,True,9,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,6,0.0010397335575658,0.000898678475423,0.9832033157326516,0.9838272297583378,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,6,0.0017464672410051,0.0018234420435166,0.9707406332162518,0.9718002862030208,1,True,10,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,6,0.0010371555864693,0.0010630444544759,0.982608881946356,0.983647152163424,1,True,15,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,7,0.1476744411055036,0.1523369306107462,-1.462972800202333,-1.3898626814022008,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,7,0.0011716092242931,0.0011538110304638,0.9816239416024942,0.97850054032367,1,True,9,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,7,0.0010264668457905,0.000896259248159,0.9834176367645484,0.9838707665824324,1,True,8,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,7,0.001752560956679,0.0018386214392156,0.9706385424024124,0.971565535328516,1,True,10,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,7,0.0010035232056957,0.0009645681161974,0.983172832728754,0.9851620169168128,1,True,21,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,8,0.1476752319199509,0.1523350972170227,-1.4629859897188062,-1.3898339191104665,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,8,0.0011880307836558,0.001164734158184,0.9813663783061582,0.9782970049632344,1,True,9,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,8,0.0010403220544995,0.0008992997209062,0.9831938086843156,0.9838160497192704,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,8,0.0016921323246686,0.0017620923684924,0.971650930992772,0.9727490650706412,1,True,17,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,8,0.0010187096566867,0.0010092682388962,0.9829181849541626,0.984474393457896,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,9,0.1476760540141418,0.1523333250000231,-1.4629997009312286,-1.3898061165595448,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,9,0.0010170890908193,0.0009160570978281,0.9840475065057304,0.98293071212185,1,True,17,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,9,0.0009928053006529,0.0008794957830781,0.9839614321835884,0.984172444742778,1,True,12,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,9,0.001683278256213,0.001761686506665,0.9717992672629224,0.9727553417644448,1,True,9,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,9,0.001037473481989,0.0010545218963787,0.9826035514457216,0.9837782549551792,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,10,0.1476768989080189,0.1523316036015198,-1.4630137924058455,-1.3897791112494966,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,10,0.001059014122656,0.0009625315714594,0.9833899350071676,0.9820647331656492,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,10,0.0010033441810998,0.0008787298213442,0.983791178712293,0.9841862291200336,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,10,0.0016830484082364,0.0017612240524163,0.971803118011506,0.9727624936657084,1,True,9,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,10,0.0010603578538743,0.0011037511185475,0.9822198242419792,0.9830209602100254,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,11,0.1476777603275172,0.1523299251003456,-1.4630281595013153,-1.3897527789130055,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,11,0.0011057381884656,0.001015909508225,0.9826570932506472,0.9810701189967794,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,11,0.0009805875183188,0.0008601351522414,0.9841588079735872,0.984520861938493,1,True,9,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,11,0.0016872453456488,0.0017639871999695,0.9717328047939224,0.9727197613121056,1,True,8,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,11,0.0010477906999995,0.001099705894045,0.9824305514072056,0.9830831880317088,1,True,9,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,12,0.1476786335181298,0.1523282832820369,-1.4630427229200906,-1.389727022057527,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,12,0.0010417782539429,0.0009231112008596,0.9836602703062042,0.9827992699708612,1,True,15,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,12,0.0009909979324724,0.0008638942936867,0.983990629849146,0.9844532117915676,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,12,0.0017025727134221,0.0017943843335705,0.9714760183710344,0.9722496665970884,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,12,0.0010261381564252,0.0010276916557171,0.9827936232031586,0.9841909854304776,1,True,15,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,13,0.1476795148067435,0.1523266731672927,-1.4630574214005343,-1.3897017625677606,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,13,0.0010679006557501,0.0009530982173058,0.983250554531406,0.9822405089312484,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,13,0.0010072861618286,0.0008734974215073,0.983727496814939,0.984280392274809,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,13,0.001629785518698,0.0016749832333026,0.9726954556313449,0.9740962165691984,1,True,16,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,13,0.0010338697183856,0.0010472754508774,0.9826639796775918,0.9838897272648648,1,True,6,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,14,0.1476804013107714,0.1523250906953992,-1.4630722068657214,-1.3896769367392006,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,14,0.0011003367505676,0.0009904187795043,0.9827418118890694,0.9815450987636384,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,14,0.0009746466882134,0.0008595466172407,0.9842547808763004,0.9845314533141684,1,True,11,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,14,0.0016219975696555,0.0016693136021487,0.9728259307139436,0.9741838979827336,1,True,5,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,14,0.0010435739780905,0.0010749150773191,0.9825012577790128,0.9834645459814688,1,True,6,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,15,0.147681290738674,0.1523235325046534,-1.4630870410964496,-1.389652491833432,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,15,0.0010662238954075,0.0009469876766057,0.9832768536124789,0.9823543692774536,1,True,14,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,15,0.0009844147786426,0.0008600838701478,0.9840969793610548,0.9845217848197446,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,15,0.0016177411002064,0.0016716105592643,0.9728972412990456,0.9741483753109296,1,True,5,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,15,0.0010555738100636,0.0011031456323735,0.9823000435184048,0.9830302744237728,1,True,6,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,16,0.1476821812493389,0.1523219957758075,-1.463101893385915,-1.3896283836220775,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,16,0.0011000257560941,0.0009856759267771,0.9827466896695508,0.9816334743886488,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,16,0.0009984079668806,0.0008688544181562,0.9838709222495794,0.9843639485504762,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,16,0.0016161712713734,0.0016711358011434,0.9729235413615556,0.9741557174928102,1,True,5,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,16,0.0010053879940133,0.0009552856237408,0.9831415637907102,0.9853048098038352,1,True,14,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,17,0.1476830713505892,0.1523204781177719,-1.4631167388470012,-1.3896045745937091,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,17,0.0011370966241493,0.0010241261002618,0.982165253110242,0.9809170156856584,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,17,0.0009763124541627,0.0008574892240894,0.9842278707660024,0.984568478510212,1,True,8,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,17,0.0016169528004742,0.0016823486984383,0.9729104480460468,0.9739823089133188,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,17,0.001005188546682,0.0009608733113061,0.9831449081414804,0.9852188542220824,1,True,6,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,18,0.147683959824427,0.1523189774824402,-1.463131557165457,-1.3895810326176226,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,18,0.0010743387045482,0.0009392643577172,0.9831495772104484,0.98249828121678,1,True,17,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,18,0.0009811863554709,0.0008574754111654,0.984149133881126,0.984568727089936,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,18,0.0016186307143586,0.0016824635227397,0.9728823371850912,0.9739805331440006,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,18,0.0010062916516886,0.0009748467465733,0.9831264111776244,0.985003900407389,1,True,6,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,19,0.147671815727694,0.1523426737427488,-1.46292901311171,-1.3899527796915143,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,19,0.0010953924644297,0.0009650069909438,0.9828193603488466,0.982018607604373,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,19,0.0009910749858551,0.0008631348654614,0.9839893850674116,0.9844668785906944,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,19,0.0016218550556434,0.0016923822204019,0.9728283183165594,0.9738271394914252,1,True,2,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,19,0.0010090359524277,0.0009894097700916,0.9830803944962784,0.9847798769372192,1,True,6,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,20,0.1476716369741232,0.1523416137876125,-1.4629260317888797,-1.3899361511089774,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,20,0.0011187069606075,0.0009900180195204,0.9824536850584944,0.9815525662976516,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,20,0.0009703079997076,0.0008495665055865,0.9843248715071498,0.984711057095925,1,True,8,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,20,0.0016253873688539,0.0016952154782214,0.9727691398530912,0.973783322875533,1,True,2,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,20,0.0010153689400959,0.0010147183677959,0.982974202390092,0.9843905539456244,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,21,0.1476715138895747,0.1523405626032914,-1.462923978936043,-1.389919660123042,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,21,0.0011461520343306,0.0010193119215222,0.9820232238885052,0.9810067203590872,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,21,0.0009755167279789,0.0008520218941268,0.9842407255607476,0.9846668695073688,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,21,0.0016294172648945,0.0016962479815397,0.9727016251562312,0.9737673551083232,1,True,2,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,21,0.0010228799072147,0.001032993730223,0.9828482578186466,0.9841094234438182,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,22,0.1476714414486398,0.1523395193336441,-1.4629227707374488,-1.389903293302554,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,22,0.0010966888012301,0.0009610290992958,0.982799028005729,0.9820927293789302,1,True,15,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,22,0.0009843766210285,0.0008576147861624,0.9840975957895548,0.9845662188738538,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,22,0.0016339936764251,0.0016973379627939,0.9726249544346832,0.9737504984390796,1,True,2,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,22,0.001031030125749,0.0010513913033787,0.9827115942220354,0.9838264129703512,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,23,0.1476714152055231,0.1523384832186611,-1.4629223330443568,-1.3898870387244855,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,23,0.0011201984258161,0.0009897177366128,0.9824302922316008,0.9815581615988692,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,23,0.0009665168269652,0.0008465584721726,0.9843861171321412,0.9847651901753448,1,True,9,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,23,0.0016384919844208,0.0017012054201231,0.9725495922174814,0.973690687824208,1,True,2,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,23,0.0010396830498447,0.0010697374306663,0.9825665012134064,0.983544193890368,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,24,0.1476714312076272,0.1523374535801251,-1.4629225999337856,-1.3898708857489552,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,24,0.0011465462621729,0.001014715905483,0.9820170406375536,0.9810923599126162,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,24,0.0009717926551321,0.0008491884594027,0.9843008872005656,0.9847178604791588,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,24,0.0016428715845505,0.0017054025882866,0.9724762187676088,0.9736257781982676,1,True,2,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,24,0.001048683577608,0.001087700853124,0.9824155795552486,0.9832678619713788,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,25,0.1476714859249208,0.152336429809895,-1.462923512530474,-1.3898548248354428,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,25,0.0010963630273948,0.0009491305870858,0.9828041375925252,0.9823144395001832,1,True,19,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,25,0.0009787484485318,0.0008530994624267,0.984188517772154,0.9846474774055096,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,25,0.0016473721784242,0.0017089295636428,0.972400818254045,0.9735712331712036,1,True,2,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,25,0.0010385195200125,0.0010833240108498,0.9825860113861652,0.98333519108016,1,True,8,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,26,0.1476715761917101,0.152335411360254,-1.4629250180357274,-1.3898388473913648,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,26,0.0011006380584794,0.0009599307395648,0.98273708603708,0.9821131955905748,1,True,7,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,26,0.0009866809334066,0.0008596069929038,0.9840603700915028,0.9845303667834976,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,26,0.0016519294456879,0.001712387964368,0.972324468265182,0.9735177486576756,1,True,2,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,26,0.0009913258216866,0.0009300121469967,0.9833773595596526,0.9856935925285444,1,True,20,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,27,0.1476716991582556,0.1523343977358934,-1.462927068920461,-1.3898229456463138,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,27,0.0011194379584596,0.0009818219650153,0.9824422197516836,0.981705286924068,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,27,0.0009661463227647,0.0008466345222678,0.9843921025521843,0.9847638215649354,1,True,9,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,27,0.0016534737696292,0.0017354621642842,0.9722985954978204,0.9731609038453904,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,27,0.0009928546883944,0.000939868014503,0.9833517233853404,0.985541979394258,1,True,2,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,28,0.1476718522502776,0.1523333884872061,-1.4629296222498214,-1.389807112546852,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,28,0.0011390311830252,0.0010010654890939,0.982134910598301,0.9813467140217156,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,28,0.000969713457505,0.0008472856508055,0.984334476215576,0.9847521037453516,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,28,0.0016583348760323,0.0017233049060966,0.9722171551524864,0.973348917060652,1,True,2,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,28,0.0009947977113469,0.0009479896474142,0.9833191426019088,0.9854170440478368,1,True,2,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,29,0.1476720331348374,0.1523323832046396,-1.46293263911413,-1.3897913416679173,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,29,0.0011586394723274,0.0010241543301339,0.9818273651626552,0.9809164896662474,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,29,0.0009763815884035,0.0008515497249508,0.9842267539163954,0.9846753667439316,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,29,0.0015984644354718,0.0016582327739549,0.9732201921054474,0.9743552641003512,1,True,12,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,29,0.0009971112597535,0.0009563754257556,0.983280348814374,0.9852880453435678,1,True,2,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,30,0.1476722396914104,0.1523313815139097,-1.46293608414644,-1.389775627137737,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,30,0.0011042446974858,0.0009565676641015,0.9826805178506705,0.9821758612294036,1,True,19,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,30,0.0009830669180154,0.0008559318351784,0.9841187537754976,0.9845965055451568,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,30,0.0015965346532063,0.0016574064323579,0.9732525226329216,0.9743680435558962,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,30,0.0009997549029598,0.0009650020178188,0.9832360199675813,0.9851553421938888,1,True,2,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,31,0.147672469987221,0.1523303830719215,-1.4629399251111534,-1.3897599635738356,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,31,0.0011065073600219,0.0009619606428907,0.9826450292098884,0.982075371524459,1,True,7,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,31,0.0009892461491053,0.0008618091422078,0.9840189295533428,0.9844907365311816,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,31,0.0015951062693841,0.0016563601477059,0.973276453002286,0.9743842244528116,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,31,0.0010026932587227,0.0009738301399475,0.9831867493541616,0.9850195389005784,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,32,0.1476727222560975,0.1523293875632734,-1.462944132551362,-1.3897443460281922,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,32,0.0011207599598158,0.0009788316051631,0.98242148487386,0.981761007591804,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,32,0.0009656993059284,0.0008462485496958,0.9843993240183064,0.9847707675927933,1,True,7,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,32,0.0015941646954509,0.0016557061889431,0.9732922276222856,0.9743943379905634,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,32,0.0010058947930779,0.0009828241093873,0.9831330657384622,0.9848811843726216,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,33,0.1476729948802544,0.1523283946972464,-1.4629486794849955,-1.3897287699400036,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,33,0.0011357151688334,0.0009941547392681,0.9821869204913376,0.981475485010456,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,33,0.0009675992093575,0.0008457138749254,0.9843686314646184,0.9847803896906324,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,33,0.0015936380001319,0.0016555710148809,0.9733010515905564,0.9743964284709709,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,33,0.0010093308722753,0.0009919512934723,0.9830754492537788,0.9847407805993916,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,34,0.1476732863745223,0.1523274042051987,-1.4629535411418124,-1.389713231094816,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,34,0.0011033456541354,0.0009560948739863,0.982694618860431,0.9821846709319888,1,True,18,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,34,0.0009727680258952,0.0008483459736006,0.9842851302841586,0.9847330219965218,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,34,0.0015934502788937,0.0016560376163052,0.973304196570566,0.9743892124332196,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,34,0.0010129751151219,0.001001181582461,0.9830143422623208,0.984598790760036,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,35,0.1476735953726379,0.1523264158383012,-1.462958694734731,-1.3896977255889982,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,35,0.001103387793317,0.0009594560803718,0.9826939579301096,0.9821220401204936,1,True,7,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,35,0.0009785379577853,0.0008530829503389,0.9841919182073752,0.9846477745598426,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,35,0.001593605940831,0.0016568168581357,0.9733015886947304,0.9743771613802804,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,35,0.0010168132776966,0.0010105386051009,0.982949983607442,0.984454851372751,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,36,0.1476739206152747,0.1523254293655609,-1.462964119260208,-1.3896822497987302,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,36,0.0011133064382453,0.0009737725155399,0.9825383893372308,0.9818552757955918,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,36,0.0009832565537201,0.0008554307326712,0.9841156902492362,0.9846055234708538,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,36,0.0015940250321874,0.0016568931509516,0.9732945674650008,0.9743759815042428,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,36,0.001020869184123,0.0010202253044572,0.9828819738040953,0.9843058405576856,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,37,0.1476742609395537,0.1523244445720893,-1.4629697953232834,-1.3896668003528383,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,37,0.0011239065906407,0.0009851218905429,0.982372131667523,0.9816437979852872,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,37,0.0009870989190207,0.0008593378539097,0.984053617618874,0.984535210254476,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,37,0.0015946456916726,0.0016569231130238,0.973284169271952,0.974375518137796,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,37,0.001025070427315,0.0010299036051577,0.982811526980806,0.9841569589394192,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,38,0.1476746152698161,0.152323461257579,-1.4629757049836956,-1.3896513741089014,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,38,0.0011225014841457,0.0009835250498869,0.9823941700045996,0.9816735526074808,1,True,9,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,38,0.0009636282873217,0.000845146450921,0.9844327809029052,0.9847906011492396,1,True,7,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,38,0.0015954212167928,0.0016571520884066,0.9732711765438846,0.9743719770105724,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,38,0.0010293867932245,0.0010395614052336,0.9827391497694457,0.984008392682936,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,39,0.1476749826094801,0.1523224792349599,-1.4629818316200596,-1.3896359681321615,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,39,0.0011063245672594,0.000957591453455,0.982647896215719,0.982156784519838,1,True,14,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,39,0.0009659486580349,0.0008448330569211,0.9843952957857144,0.9847962410408064,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,39,0.0015954362311127,0.0016630272678383,0.9732709250020956,0.9742811167723382,1,True,4,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,39,0.0010337970480415,0.0010491806933422,0.9826651982204504,0.9838604188573118,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,40,0.147675362033829,0.1523214983292091,-1.462988159809584,-1.389620579676857,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,40,0.0011058799690681,0.0009605081722524,0.9826548694984136,0.982102436037706,1,True,7,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,40,0.0009701443440403,0.0008465931793063,0.9843275153311882,0.9847645655798808,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,40,0.001594267821047,0.0016689074576973,0.9732904999118692,0.9741901790473448,1,True,6,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,40,0.0010382826369616,0.0010587433358789,0.9825899834624456,0.9837133164123864,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,41,0.1476757526836061,0.152320518376293,-1.462994675221243,-1.3896052061696302,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,41,0.0011090777397394,0.0009644374457442,0.9826047141911832,0.9820292201862686,1,True,7,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,41,0.0009743981852898,0.0008497070377347,0.9842587953905152,0.9847085280555548,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,41,0.0015944998909631,0.0016661695276711,0.9732866119381164,0.974232521409368,1,True,5,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,41,0.0010428264329282,0.0010682323067697,0.982513792683455,0.9835673472608149,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,42,0.1476761537593074,0.1523195392222266,-1.4630013645205953,-1.3895898451947617,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,42,0.0011136755346554,0.0009701342194065,0.9825326002592304,0.9819230697401344,1,True,8,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,42,0.0009791081220343,0.0008524635654406,0.9841827073198358,0.984658921115508,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,42,0.0015944659255366,0.001666993233583,0.973287180976486,0.9742197827149566,1,True,5,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,42,0.0010474124489187,0.0010776318623866,0.9824368939553116,0.983422753587344,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,43,0.1476765645160845,0.1523185607222314,-1.4630082152847614,-1.389574494480966,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,43,0.0011178411910602,0.0009752139504646,0.982467264186612,0.981828416915566,1,True,8,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,43,0.0009817399982897,0.0008551880430029,0.9841401898939324,0.9846098909552804,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,43,0.0015950940659155,0.0016668380187702,0.9732766574525936,0.9742221831275796,1,True,5,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,43,0.0010520257518238,0.0010869275453536,0.9823595376777314,0.9832797577902676,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,44,0.1476769842591778,0.1523175827399819,-1.4630152159262677,-1.3895591518895678,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,44,0.0011200202409918,0.0009763909919637,0.9824330869644082,0.9818064845925276,1,True,8,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,44,0.0009607562140982,0.0008430030736353,0.9844791786620012,0.9848291737303472,1,True,8,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,44,0.0015970585755934,0.0016589738103108,0.9732437451208504,0.9743438038989016,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,44,0.0010566524235606,0.0010961061429668,0.9822819572303824,0.9831385631210412,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",0,45,0.1476774123398165,0.1523166051469289,-1.4630223556246582,-1.3895438154038882,1,True,1,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",1,45,0.0011212684835694,0.0009775954321398,0.982413508953221,0.9817840417380944,1,True,8,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",2,45,0.000963085985033,0.0008424214286461,0.9844415416861408,0.9848396411122082,1,True,3,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",3,45,0.0015958897340488,0.0016741181811594,0.9732633272593878,0.9741095946872166,1,True,6,Optimization terminated successfully
+"outubro: paralelo, com reaproveitamento",4,45,0.0010612795249562,0.0011051556351985,0.9822043695784748,0.9829993544841502,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,0,1,0.0309220071500998,0.0329307274091384,0.4842705212342968,0.4833825508298843,1,True,20,Optimization terminated successfully
+outubro: --no-parallel,1,1,0.1469491189882536,0.1554876597750615,-1.3048176269005571,-1.8972687755957485,1,True,49,Optimization terminated successfully
+outubro: --no-parallel,2,1,0.0318206682105338,0.0295907925216127,0.4859435735057938,0.4674790797726996,1,True,19,Optimization terminated successfully
+outubro: --no-parallel,3,1,0.0018488269410861,0.001929217591282,0.9690257542089478,0.9701644567647834,1,True,50,Optimization terminated successfully
+outubro: --no-parallel,4,1,0.0016631254737306,0.0015696993368539,0.9721125626386172,0.975853263429703,1,True,43,Optimization terminated successfully
+outubro: --no-parallel,0,2,0.0005434632077829,0.0006693831531904,0.9909359054372592,0.9894987130766278,1,True,61,Optimization terminated successfully
+outubro: --no-parallel,1,2,0.1469671770282024,0.1555271647915826,-1.3051008575117224,-1.8980048896450012,1,True,7,Optimization terminated successfully
+outubro: --no-parallel,2,2,0.0039497383015184,0.0037097812583406,0.9361927806345136,0.9332381473699742,1,True,43,Optimization terminated successfully
+outubro: --no-parallel,3,2,0.0018484779801485,0.0019168986010773,0.9690316005116008,0.970354971181886,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,4,2,0.0016385482576238,0.0015190777840611,0.9725246756063528,0.9766319764426784,1,True,9,Optimization terminated successfully
+outubro: --no-parallel,0,3,0.0005537853927721,0.0006721498606856,0.9907637479489572,0.989455308952844,1,True,8,Optimization terminated successfully
+outubro: --no-parallel,1,3,0.1468900973323957,0.1554972092620605,-1.3038919040808024,-1.8974467153148569,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,2,3,0.0038051113908641,0.0034573036818358,0.938529198976642,0.9377817766519182,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,3,3,0.0018163190540917,0.0019246012918221,0.969570373750958,0.970235848298194,1,True,12,Optimization terminated successfully
+outubro: --no-parallel,4,3,0.001637016950622,0.0015150319139443,0.9725503526997342,0.9766942141958664,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,0,4,0.0005518576318386,0.0006718281482312,0.9907958999091,0.9894603559797592,1,True,17,Optimization terminated successfully
+outubro: --no-parallel,1,4,0.1469844711699636,0.155541218298427,-1.30537210679207,-1.8982667547127936,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,2,4,0.0037741988804741,0.0034500889315872,0.9390285842981548,0.9379116145208696,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,3,4,0.000988724502696,0.001008915416277,0.9834354448836884,0.9843970220575248,1,True,37,Optimization terminated successfully
+outubro: --no-parallel,4,4,0.0016155969107307,0.0015072163909147,0.9729095258530424,0.9768144406439032,1,True,8,Optimization terminated successfully
+outubro: --no-parallel,0,5,0.0005533114607947,0.0006810105058887,0.99077165237413,0.989316303097736,1,True,7,Optimization terminated successfully
+outubro: --no-parallel,1,5,0.1471070038769989,0.1556605065677814,-1.3072939661743597,-1.9004895045991548,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,2,5,0.0009457460582791,0.000837441200774,0.9847216646780212,0.9849292661375416,1,True,44,Optimization terminated successfully
+outubro: --no-parallel,3,5,0.0009903265997601,0.0010084886502454,0.9834086042166992,0.9844036220369384,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,4,5,0.0015990588750605,0.0014835030659865,0.9731868371209628,0.9771792235018706,1,True,14,Optimization terminated successfully
+outubro: --no-parallel,0,6,0.0005463361808838,0.0006755360473385,0.9908879888543336,0.9894021864363168,1,True,9,Optimization terminated successfully
+outubro: --no-parallel,1,6,0.1470052464375514,0.1556046696988398,-1.3056979556523398,-1.8994490720841528,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,2,6,0.0009228796097579,0.0008193422650406,0.9850910675056312,0.9852549776542192,1,True,12,Optimization terminated successfully
+outubro: --no-parallel,3,6,0.0009941156871562,0.0010095056906219,0.9833451238975184,0.9843878934056716,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,6,0.0015989955145636,0.0014942858287164,0.9731878995554686,0.9770133519078482,1,True,11,Optimization terminated successfully
+outubro: --no-parallel,0,7,0.0005478402299897,0.0006774124793323,0.9908629037278208,0.98937274895994,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,1,7,0.1469815015748862,0.1555677082422337,-1.3053255302958906,-1.898760353286272,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,2,7,0.0009270516619809,0.000809148588382,0.985023668850056,0.9854384247880114,1,True,9,Optimization terminated successfully
+outubro: --no-parallel,3,7,0.0009957068245448,0.0010117265975113,0.9833184668430008,0.984353546858232,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,7,0.0007087895476043,0.0006252805467684,0.988114953186977,0.9903812887660312,1,True,41,Optimization terminated successfully
+outubro: --no-parallel,0,8,0.0005422886901103,0.0006667842313939,0.990955494508051,0.989539484977364,1,True,8,Optimization terminated successfully
+outubro: --no-parallel,1,8,0.1470196382799173,0.1555858943463967,-1.3059236839329649,-1.899099222826256,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,2,8,0.0009119661481153,0.0007996055194197,0.98526737226,0.9856101634753708,1,True,15,Optimization terminated successfully
+outubro: --no-parallel,3,8,0.000965217307644,0.0010171919892215,0.9838292717050192,0.984269024028146,1,True,23,Optimization terminated successfully
+outubro: --no-parallel,4,8,0.0007089934791376,0.0006321965835714,0.9881115336447052,0.990274899144228,1,True,7,Optimization terminated successfully
+outubro: --no-parallel,0,9,0.0005414817191569,0.00066652950536,0.9909689534891304,0.9895434811209132,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,1,9,0.1469755006813749,0.1555494399715433,-1.3052314095196844,-1.8984199527018677,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,2,9,0.0009191307704639,0.0008061475280015,0.9851516292423697,0.985492432379539,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,3,9,0.0009785192794831,0.0010137367026881,0.9836064176692552,0.984322460380388,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,4,9,0.000710170771396,0.0006320093378626,0.9880917927023476,0.9902777795511308,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,0,10,0.000542052994991,0.0006717838947308,0.9909594255245752,0.9894610502289392,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,1,10,0.1469800768453923,0.1555854337081354,-1.3053031841826668,-1.899090639554419,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,2,10,0.0009302430389207,0.0007873015250589,0.9849721128043306,0.9858315882443988,1,True,10,Optimization terminated successfully
+outubro: --no-parallel,3,10,0.0009633599087961,0.0010088438440242,0.9838603895598962,0.9843981289295805,1,True,12,Optimization terminated successfully
+outubro: --no-parallel,4,10,0.0007083434194673,0.0006306529246571,0.9881224339036586,0.990298645300122,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,0,11,0.0005493312440418,0.0006833781465247,0.9908380360050956,0.9892791595372332,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,1,11,0.1469674391362359,0.1555572532793252,-1.305104968534775,-1.8985655414431428,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,2,11,0.000901727562018,0.0007682623232605,0.9854327745371204,0.9861742209486328,1,True,9,Optimization terminated successfully
+outubro: --no-parallel,3,11,0.0009884173316424,0.0010275839446579,0.983440591061246,0.9841083113967038,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,4,11,0.0007267048459618,0.0006419273445237,0.9878145478545788,0.9901252105281816,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,0,12,0.0005411814786005,0.0006652366196108,0.9909739610200108,0.9895637639203037,1,True,13,Optimization terminated successfully
+outubro: --no-parallel,1,12,0.1461760935774231,0.1553734066613371,-1.2926931405124042,-1.8951398479407369,1,True,16,Optimization terminated successfully
+outubro: --no-parallel,2,12,0.0008983892983077,0.0007692093592048,0.9854867035087644,0.9861571779291805,1,True,9,Optimization terminated successfully
+outubro: --no-parallel,3,12,0.0009995098411567,0.0010343843987144,0.9832547531612794,0.9840031416937424,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,12,0.0007157410995657,0.0006377654100761,0.9879983889391496,0.990189233702792,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,0,13,0.0005422873676042,0.0006674788764131,0.9909555165653312,0.989528587382136,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,1,13,0.1461673693570709,0.1553089206230379,-1.2925563058244045,-1.8939382517144088,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,13,0.0008985351895252,0.0007721833411158,0.9854843466658014,0.9861036576463826,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,3,13,0.0009712703766574,0.0010108244695332,0.9837278618633276,0.9843674983577508,1,True,13,Optimization terminated successfully
+outubro: --no-parallel,4,13,0.0007117457228988,0.0006287506499361,0.9880653837740508,0.9903279080547744,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,0,14,0.0005427958073366,0.0006669153450357,0.9909470366061583,0.989537428065766,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,1,14,0.1461693321989721,0.1552649606935515,-1.2925870919403324,-1.8931191273461956,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,2,14,0.0009038174894538,0.0008057103908141,0.9853990121842322,0.9855002991744932,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,14,0.000972506624713,0.0010198058457168,0.9837071504325908,0.9842286004757036,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,4,14,0.0007128869062375,0.0006316112776774,0.988046248309302,0.9902839029240637,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,0,15,0.0005426178600554,0.0006670722505702,0.9909500044813724,0.9895349665307984,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,1,15,0.1461682463167007,0.1552817141371944,-1.2925700604629262,-1.8934313015034272,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,2,15,0.0009018188719493,0.0008059032304429,0.9854312994437422,0.985496828799831,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,15,0.0009745099417123,0.00101386100902,0.9836735879439912,0.9843205379705176,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,15,0.0007133872942411,0.0006304392864031,0.9880378577583022,0.9903019317044152,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,0,16,0.000544025883816,0.000665579344188,0.9909265209035883,0.9895583872550804,1,True,7,Optimization terminated successfully
+outubro: --no-parallel,1,16,0.1461715200726924,0.1553623081354606,-1.2926214075588986,-1.894933044310637,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,2,16,0.0009017553160146,0.0008002343114792,0.9854323261769464,0.9855988476268368,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,3,16,0.0009846005393339,0.0010233904556912,0.9835045355335336,0.9841731641234964,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,16,0.0007123624990511,0.0006317998165975,0.9880550416161168,0.9902810026236492,1,True,8,Optimization terminated successfully
+outubro: --no-parallel,0,17,0.0005429916872052,0.0006670894000313,0.9909437696441518,0.9895346974899506,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,1,17,0.1461547482651288,0.1552908963371508,-1.2923583508085512,-1.8936023974043072,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,17,0.0008775731839051,0.0007600888533966,0.9858229836054774,0.9863213120983616,1,True,8,Optimization terminated successfully
+outubro: --no-parallel,3,17,0.0009822200518,0.0010166387805921,0.9835444169331048,0.9842775794549976,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,17,0.0007107323809725,0.0006344335664892,0.9880823755825114,0.9902404875623664,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,0,18,0.0005461105399481,0.0006729491258808,0.9908917521832012,0.9894427700756664,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,1,18,0.1461535026220758,0.1552629854776415,-1.2923388135695038,-1.8930823222943396,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,18,0.0008787077483665,0.0007556682597129,0.9858046549472342,0.986400865851937,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,18,0.0010088472143918,0.0010457043736131,0.9830983198644684,0.9838280771483856,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,18,0.0007235380400981,0.0006422138371089,0.9878676491398136,0.9901208034033132,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,0,19,0.0005440318835163,0.0006704649721676,0.990926420838212,0.9894817414940228,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,1,19,0.1461448998460365,0.1552331516705358,-1.2922038836700105,-1.8925264160705924,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,19,0.0008785695388887,0.0007551105368947,0.9858068876932544,0.9864109027263523,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,19,0.0009738298184406,0.0009973920921399,0.9836849823611312,0.9845752314192155,1,True,9,Optimization terminated successfully
+outubro: --no-parallel,4,19,0.0007291947820532,0.0006490370061907,0.9877727963824998,0.990015842368722,1,True,9,Optimization terminated successfully
+outubro: --no-parallel,0,20,0.0005439520602976,0.0006667659318135,0.9909277521614596,0.9895397720612924,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,1,20,0.1461429139206276,0.1552123125035834,-1.2921727355017216,-1.8921381108648423,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,20,0.0008920778953891,0.0007739212770547,0.9855886629399442,0.9860723814565068,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,20,0.0009738496321954,0.0009927753103456,0.983684650412209,0.9846466304119756,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,4,20,0.0007287317164037,0.0006537892745648,0.987780561108912,0.9899427380678872,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,0,21,0.0005426317068625,0.0006662030440898,0.9909497735388416,0.9895486026472788,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,1,21,0.1461443192461267,0.1552096506943173,-1.2921947772737594,-1.892088512222196,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,21,0.0008932400075202,0.0007698441509712,0.9855698892546982,0.9861457541089048,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,21,0.0009806586013949,0.0010043604347628,0.9835705766279714,0.9844674653027627,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,21,0.0007276788624885,0.0006507087893782,0.9877982154579532,0.9899901252729169,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,0,22,0.0005419808870108,0.0006653960563166,0.9909606281700192,0.9895612626763068,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,1,22,0.1461429043845358,0.1551895877042107,-1.2921725859332684,-1.891714669855122,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,22,0.0008928052257933,0.0007743962643017,0.9855769130651136,0.9860638335054605,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,22,0.0009821882179296,0.0010060706866757,0.9835449502605376,0.9844410160856716,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,22,0.0007288353117771,0.0006505718200791,0.9877788240123844,0.9899922322761536,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,0,23,0.0005422135139792,0.0006658343355753,0.9909567483253318,0.9895543869486662,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,1,23,0.1461315385022857,0.1551700114563489,-1.291994318204032,-1.891349897166695,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,2,23,0.000887319862014,0.0007648782391652,0.985665528001915,0.9862351214998856,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,23,0.0009678594946107,0.000986102284351,0.9837850059348088,0.9847498294271978,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,4,23,0.0007280769166747,0.0006491749884021,0.987791540849596,0.990013719783821,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,0,24,0.0005422696334247,0.0006676099317393,0.9909558123429998,0.9895265313853924,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,1,24,0.1461359172841161,0.1551137247947244,-1.2920629970339328,-1.8903010834702056,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,2,24,0.0009000463116666,0.0007847744586004,0.9854599347947858,0.9858770657609268,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,24,0.0009853365656309,0.0010066135150558,0.9834922045473684,0.984432621190416,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,24,0.0007345018226699,0.0006552501846474,0.987683807448646,0.9899202648399962,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,0,25,0.0005416155801171,0.0006684528318832,0.9909667209030356,0.9895133079628776,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,1,25,0.1461416135428205,0.1551607488633178,-1.292152339777596,-1.8911773032669044,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,25,0.0008952269800583,0.0007870731438688,0.9855377901172528,0.9858356982310263,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,25,0.0009842436859697,0.0010063271926905,0.9835105140616308,0.9844370491944668,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,4,25,0.0007202910000036,0.0006459838800166,0.9879220957998364,0.9900628087091616,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,0,26,0.0005409275008042,0.0006673995236644,0.9909781969622586,0.9895298322685332,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,1,26,0.1461437170217582,0.1552052442309363,-1.2921853317095442,-1.8920064046852816,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,2,26,0.0009117860962666,0.0007848744916641,0.9852702809610142,0.9858752655489498,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,3,26,0.0009812777453595,0.0010104294267152,0.983560203825134,0.9843736077344892,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,26,0.000720837443075,0.0006443541504366,0.9879129329933216,0.9900878788929371,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,0,27,0.0005410867693958,0.0006675065238592,0.990975540617626,0.9895281536488356,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,1,27,0.146141702950253,0.1551488344814218,-1.2921537420849245,-1.8909552974389312,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,27,0.0009215946419058,0.0007981578777599,0.9851118259000768,0.9856362154801722,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,27,0.0009911356350505,0.0010157596662083,0.9833950500773788,0.9842911750469742,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,27,0.0007121674009723,0.0006311567149394,0.98805831303823,0.9902908954776252,1,True,7,Optimization terminated successfully
+outubro: --no-parallel,0,28,0.0005385622038385,0.0006620359769716,0.9910176463215884,0.9896139756212294,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,1,28,0.146144793644538,0.1551577238115546,-1.292202217956821,-1.8911209361697927,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,28,0.0009230677742272,0.0007892681574841,0.98508802774688,0.9857961963937744,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,28,0.0009999944165933,0.0010230611225446,0.9832466348467178,0.984178257293587,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,28,0.0007167692374431,0.0006362391781127,0.987981149030852,0.9902127117793258,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,0,29,0.0005384517478471,0.0006616781262118,0.991019488550348,0.9896195895860974,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,1,29,0.1461374180391183,0.1551523236416432,-1.2920865355662268,-1.89102031246956,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,29,0.0009572295037076,0.000819771280639,0.984536151951457,0.9852472570167564,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,3,29,0.0010034189969415,0.001029153844903,0.9831892612813068,0.9840840327322078,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,29,0.0007170047657001,0.0006290981964501,0.9879771996718782,0.990322561735308,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,0,30,0.000539998143719,0.0006674820408958,0.9909936971477042,0.9895285377377117,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,1,30,0.1461338048448901,0.1551493148732298,-1.2920298645646993,-1.890964248787144,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,30,0.0009179130720944,0.0007805224910835,0.9851713009119965,0.9859535848894102,1,True,12,Optimization terminated successfully
+outubro: --no-parallel,3,30,0.0010153406924325,0.0010343913749289,0.982989531648328,0.9840030338058868,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,30,0.0007096515067544,0.0006283607079576,0.9881004997785086,0.9903339065450654,1,True,10,Optimization terminated successfully
+outubro: --no-parallel,0,31,0.0005414950280844,0.0006723011671008,0.9909687315175684,0.9894529352568948,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,1,31,0.146132156060904,0.1551471949313723,-1.2920040042776808,-1.8909247469941488,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,31,0.0008420427512248,0.000753840762653,0.986396970522866,0.9864337537989348,1,True,27,Optimization terminated successfully
+outubro: --no-parallel,3,31,0.0010096204101175,0.0010260639725989,0.9830853661618154,0.9841318179168016,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,31,0.0007261832492909,0.0006444733237599,0.987823294034418,0.9900860456457824,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,0,32,0.0005413481134677,0.0006716699496125,0.9909711818177162,0.989462837800638,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,1,32,0.146132864532226,0.155120645304343,-1.2920151162680231,-1.8904300363173852,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,32,0.0008440089434056,0.0007513961640721,0.9863652070878692,0.9864777472095504,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,3,32,0.0010061318973072,0.0010230309341409,0.9831438108170886,0.9841787241602732,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,4,32,0.000727553820917,0.0006476840640908,0.987800312166258,0.9900366547215816,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,0,33,0.0005439930360495,0.0006766907799831,0.9909270687516446,0.9893840709836608,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,1,33,0.1461316436574353,0.1551150841166586,-1.291995967505804,-1.8903264123033847,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,33,0.0008452451323958,0.0007580523933217,0.9863452367060224,0.9863579605792115,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,33,0.0010037190240516,0.0010245443030044,0.9831842347895106,0.984155319759256,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,4,33,0.0007156839902826,0.0006364187189684,0.9879993465527404,0.9902099498964329,1,True,8,Optimization terminated successfully
+outubro: --no-parallel,0,34,0.0005461760198382,0.0006743544711561,0.9908906600836688,0.9894207230105556,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,1,34,0.146138338097792,0.1551058546011282,-1.292100966189992,-1.890154434750963,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,34,0.0008682752213697,0.0008127716276596,0.985973190300164,0.9853732239587756,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,34,0.0010007683993981,0.0010274026567467,0.9832336679577662,0.9841111150324034,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,34,0.0007156553194016,0.0006368405433762,0.9879998273086475,0.9902034609576816,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,0,35,0.0005409808469202,0.0006703933726151,0.9909773072346136,0.9894828647482332,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,1,35,0.1461265404512063,0.1551066826245523,-1.2919159264701636,-1.8901698636693447,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,35,0.0008338152261116,0.0007311390666726,0.9865298845185928,0.9868422973695522,1,True,9,Optimization terminated successfully
+outubro: --no-parallel,3,35,0.0010029458016435,0.0010359537058552,0.9831971889391868,0.983978872201664,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,4,35,0.000717305793382,0.0006370088531568,0.987972152012664,0.9902008718427852,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,0,36,0.0005404155227432,0.00067017641181,0.9909867359350776,0.989486268430644,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,1,36,0.1461331912007248,0.155119036649437,-1.2920202398871332,-1.890400061555164,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,36,0.0008362167514558,0.0007380956714726,0.9864910883648362,0.9867171051298698,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,3,36,0.0009893209433483,0.001020235774964,0.9834254524398568,0.9842219515768436,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,4,36,0.0007178273227514,0.0006385232029353,0.987963406961342,0.9901775765502936,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,0,37,0.0005403493699393,0.0006696662697366,0.9909878392577348,0.9894942715425528,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,1,37,0.1461293545580057,0.1551164468230101,-1.2919600642166147,-1.890351804199875,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,37,0.0008531621340339,0.0007523412584934,0.986217339153912,0.9864607391300764,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,3,37,0.0009931704454035,0.0010210621826621,0.983360959966179,0.9842091710990376,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,4,37,0.0007180721923337,0.0006382469073354,0.987959300966187,0.9901818268146017,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,0,38,0.0005434896206964,0.0006758563547086,0.9909354649122296,0.989397161452374,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,1,38,0.1461397668320372,0.1551074561923229,-1.29212337511558,-1.8901842778919968,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,38,0.000854086983796,0.0007512229552481,0.9862023983940084,0.98648086430492,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,3,38,0.0009868446263284,0.0010138148008167,0.9834669393147644,0.984321252585008,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,4,38,0.0007243853716665,0.0006449344376786,0.9878534410079493,0.9900789523151928,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,0,39,0.000542270514397,0.0006746348379831,0.9909557976497956,0.9894163246140923,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,1,39,0.1461356733288342,0.155080776100799,-1.2920591707269922,-1.8896871362139096,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,39,0.0008548404463814,0.0007558092027604,0.9861902263591024,0.986398329416954,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,39,0.0009835162439496,0.0010095672473976,0.9835227012314676,0.9843869414239722,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,4,39,0.0007278264563541,0.0006500061173035,0.9877957405907538,0.9900009345005724,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,0,40,0.000540209038635,0.0006708101655883,0.9909901797587912,0.9894763260975692,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,1,40,0.1461369231337825,0.1550651632869356,-1.2920787732431216,-1.8893962159044075,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,40,0.0008478315167448,0.0007479315388365,0.98630345419262,0.986540097192823,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,3,40,0.0009851492898808,0.0010127084169327,0.9834953420639112,0.9843383629225646,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,4,40,0.0007318139026391,0.0006541324587343,0.9877288787332086,0.9899374588545108,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,0,41,0.0005392333249017,0.0006697676350634,0.9910064530987672,0.9894926813226976,1,True,5,Optimization terminated successfully
+outubro: --no-parallel,1,41,0.1461383566151942,0.1550198924535528,-1.2921012566254515,-1.8885526648972424,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,2,41,0.0008472405723999,0.0007554556807807,0.9863130007783858,0.9864046914584494,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,41,0.0009809196156666,0.0009925575824176,0.9835662037361508,0.9846499975961848,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,41,0.0007128084340893,0.0006355584076628,0.9880475641373332,0.9902231840935654,1,True,7,Optimization terminated successfully
+outubro: --no-parallel,0,42,0.0005394643927291,0.0006681723370318,0.9910025992580505,0.9895177083677892,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,1,42,0.1461375435646558,0.1550265486746336,-1.2920885043665389,-1.888676693141854,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,2,42,0.0008623513052264,0.000768399496602,0.9860688899612547,0.9861717523539164,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,42,0.0009771761151594,0.0009937508899925,0.9836289203172716,0.984631542975044,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,42,0.0007122724640563,0.0006302116338265,0.9880565513309992,0.9903054336914948,1,True,8,Optimization terminated successfully
+outubro: --no-parallel,0,43,0.0005436630318882,0.0006784293078116,0.990932572691712,0.9893567969486566,1,True,7,Optimization terminated successfully
+outubro: --no-parallel,1,43,0.1461367436684168,0.1550875188763954,-1.2920759584257118,-1.8898127772662277,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,2,43,0.0008596408338908,0.0007650476088613,0.9861126770747028,0.9862320734941128,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,3,43,0.0009698450009682,0.0010005943237406,0.9837517418360596,0.9845257085868492,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,43,0.0007107378311126,0.0006305660206161,0.9880822841940728,0.9902999821478446,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,0,44,0.0005402744124018,0.0006714292908902,0.990989089429224,0.9894666132561182,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,1,44,0.1461365303943241,0.1550805607064842,-1.292072613336667,-1.8896831226785369,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,2,44,0.0008522519159979,0.0007685079613998,0.9862320435412562,0.9861698004030228,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,44,0.000984996329219,0.001029055437125,0.9834979046840422,0.9840855546183488,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,44,0.000709974320882,0.000628816901683,0.9880950868022156,0.9903268889019712,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,0,45,0.0005402530107869,0.0006689864044349,0.9909894463738302,0.9895049372734852,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,1,45,0.1461252437434012,0.155048802191694,-1.2918955883080383,-1.889091352544534,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,45,0.000860539896522,0.0007758623088225,0.9860981529006548,0.986037450319652,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,45,0.0009840243607008,0.0010239484269722,0.9835141885184642,0.9841645350417628,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,4,45,0.000711664702728,0.0006306518520011,0.9880667423275552,0.9902986618008236,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,0,46,0.0005428002906653,0.0006646824642733,0.9909469618314272,0.989572457512562,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,1,46,0.1461236067222059,0.155057804590464,-1.2918699125140454,-1.8892590981321875,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,2,46,0.000857277896078,0.000758208150618,0.986150849854734,0.9863551575444934,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,46,0.0009839002967059,0.0010207522144431,0.983516267019478,0.9842139647885846,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,4,46,0.0007119202431143,0.0006311241736021,0.9880624574033992,0.9902913960620888,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,0,47,0.0005399922923347,0.0006694321084267,0.9909937947394072,0.9894979450665878,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,1,47,0.1461244541270075,0.1550801279593346,-1.2918832036010373,-1.8896750591138392,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,2,47,0.0008580410252612,0.0007746478931192,0.9861385216579084,0.9860593051505904,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,47,0.0009892468064847,0.001023837782266,0.983426694488738,0.984166246173224,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,47,0.0007108925944681,0.0006291466811586,0.9880796891082236,0.9903218158934424,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,0,48,0.0005398955824968,0.0006681361048109,0.9909954077043768,0.9895182767790875,1,True,6,Optimization terminated successfully
+outubro: --no-parallel,1,48,0.1461241000532044,0.1550735156877601,-1.29187765014452,-1.889551849799374,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,2,48,0.0008566925854916,0.0007756295066831,0.9861603054282776,0.9860416398664322,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,3,48,0.0009888375478751,0.0010227808566564,0.9834335509859486,0.9841825916336128,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,48,0.0007121300345863,0.000634155428007,0.9880589396011488,0.9902447661757952,1,True,4,Optimization terminated successfully
+outubro: --no-parallel,0,49,0.0005398161614909,0.0006682630832061,0.99099673231936,0.9895162847412622,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,1,49,0.1461219513838906,0.1550271281332049,-1.2918439494259115,-1.888687490443889,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,2,49,0.0008597936156259,0.000783632796277,0.986110208916829,0.9858976113097024,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,49,0.0009972521255723,0.0010156827393567,0.9832925777060658,0.9842923647284372,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,49,0.0007112310135462,0.0006298448565482,0.9880740144667176,0.9903110758384414,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,0,50,0.0005584328298795,0.0006702344615306,0.9906862361527357,0.98948535774628,1,True,2,Optimization terminated successfully
+outubro: --no-parallel,1,50,0.1461219748814906,0.1550316904112953,-1.2918443179730867,-1.888772501343636,1,True,1,Optimization terminated successfully
+outubro: --no-parallel,2,50,0.0008536174763781,0.0007708169414788,0.9862099831909026,0.9861282476059632,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,3,50,0.0010033295948167,0.0010155719070649,0.9831907590761124,0.9842940787609292,1,True,3,Optimization terminated successfully
+outubro: --no-parallel,4,50,0.0007113316466333,0.0006278406505941,0.9880723270420722,0.9903419066046072,1,True,3,Optimization terminated successfully

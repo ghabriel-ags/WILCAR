@@ -1,0 +1,21 @@
+dataset,variable,expected_signal,r_pb,r_pb_before_fix,changed,n,n_class0,n_class1
+Heart Failure,age,1,0.254,0.032,yes,299,203,96
+Heart Failure,anaemia,1,0.066,0.066,,299,203,96
+Heart Failure,creatinine_phosphokinase,0,0.063,0.063,,299,203,96
+Heart Failure,diabetes,0,-0.002,-0.002,,299,203,96
+Heart Failure,ejection_fraction,-1,-0.269,-0.269,,299,203,96
+Heart Failure,high_blood_pressure,1,0.079,0.079,,299,203,96
+Heart Failure,platelets,0,-0.049,-0.049,,299,203,96
+Heart Failure,serum_creatinine,1,0.294,0.294,,299,203,96
+Heart Failure,serum_sodium,-1,-0.195,-0.195,,299,203,96
+Heart Failure,sex,0,-0.004,-0.004,,299,203,96
+Heart Failure,smoking,0,-0.013,-0.013,,299,203,96
+Heart Failure,time,-1,-0.527,-0.527,,299,203,96
+Pima,Pregnancies,1,0.222,0.222,,768,500,268
+Pima,Glucose,1,0.467,0.467,,768,500,268
+Pima,BloodPressure,0,0.065,0.065,,768,500,268
+Pima,SkinThickness,1,0.075,0.075,,768,500,268
+Pima,Insulin,0,0.131,0.131,,768,500,268
+Pima,BMI,1,0.293,0.293,,768,500,268
+Pima,DiabetesPedigreeFunction,1,0.174,0.112,yes,768,500,268
+Pima,Age,1,0.238,0.238,,768,500,268
