@@ -118,6 +118,48 @@ for p in (dict(zip(rows[0], r)) for r in rows[1:]):
     })
     next(j for j in jobs if j["label"] == p["supersedes"])["superseded_by"] = p["label"]
 
+# K-fold runs composed per fold (scripts/compose_kfold_run.py: run_cross_validation.main() with run_method replaced by a
+# lookup of the fold records, so that the aggregation is the runner's own): the first folds of an official run stopped
+# by decision and the last folds run in parallel, each in its own process (scripts/run_fold_record.py), from a
+# `git archive` copy of the same code. The official run was stopped only after a fold present in both was found
+# identical (scripts/compare_fold_record.py, every field except training_time)
+rows = [line.split("\t") for line in (L / "parallel_folds.tsv").read_text().splitlines()]
+parallel = [dict(zip(rows[0], r)) for r in rows[1:]]
+rows = [line.split("\t") for line in (L / "composed.tsv").read_text().splitlines()]
+for c in (dict(zip(rows[0], r)) for r in rows[1:]):
+    src = next(j for j in jobs if j["label"] == c["folds_from"])
+    folds_src = [int(f) for f in c["folds_from_folds"].split(",")]
+    parts = [{"label": p["label"], "fold": int(p["fold"]),
+              "commit": next(h for h, _ in commits if h.startswith(p["commit"])), "command": p["command"],
+              "cwd": p["cwd"], "pid": int(p["pid"]), "log": p["log"], "record": p["record"], "start": p["start"],
+              "end": p["end"], "exit_code": int(p["exit"]), "blas_threads": blas_threads(p["command"])}
+             for p in parallel if p["part_of"] == c["label"]]
+    jobs.append({
+        "label": c["label"],
+        "commit": next(h for h, _ in commits if h.startswith(c["commit"])),
+        "command": c["command"],
+        "cwd": c["cwd"],
+        "pid": None,
+        "log": c["log"],
+        "results_dir": c["results_dir"],
+        "source_results_dir": c["source_results_dir"],
+        "start": c["start"],
+        "end": c["end"],
+        "exit_code": int(c["exit"]),
+        "blas_threads": (f"20 in the main process of every fold (with_blas_threads.py, threadpoolctl; March default): "
+                         f"folds {', '.join(map(str, folds_src))} in {src['label']}, folds "
+                         f"{', '.join(str(p['fold']) for p in parts)} in their own processes; the composition trains "
+                         f"nothing"),
+        "supersedes": c["supersedes"],
+        "composition": {"folds_from_run": {"label": src["label"], "folds": folds_src, "file": c["folds_from_file"]},
+                        "parallel_folds": parts, "validation": c["validation"]},
+    })
+    next(j for j in jobs if j["label"] == c["supersedes"])["superseded_by"] = c["label"]
+    src.pop("supersedes", None)
+    src["role"] = (f"stopped by decision (exit {src['exit_code']}) after fold {c['compared_fold']}, found identical to "
+                   f"the parallel fold {c['compared_fold']}; folds {', '.join(map(str, folds_src))} used in "
+                   f"{c['label']}")
+
 # Re-runs of official jobs under other BLAS thread settings, compared bit for bit (results kept in the scratchpad)
 rows = [line.split("\t") for line in (L / "verifications.tsv").read_text().splitlines()]
 for v in (dict(zip(rows[0], r)) for r in rows[1:]):

@@ -14,5 +14,11 @@ dentro deles apontam para esse scratchpad, que é temporário; ficam aqui como r
   principal (`../with_blas_threads.py`) do K-fold de HF e Pima e dos DCVs de classificação, comparada bit a bit com
   as runs oficiais. HF M5/M6, Pima M5/M6 e HF M4 terminaram e foram promovidos. Os demais foram encerrados e
   re-rodados oficialmente (`../queue_t20.sh`).
+- `run_fold_record.py` + `pima_m4_parallel_fold.sh`: um fold do K-fold em processo próprio, treinado pela própria
+  `run_method` do runner e salvo como registro completo (pickle). Usados nos folds 4 e 5 do Pima M4 com 20 threads.
+  `compare_fold_record.py` compara esse registro com a linha do mesmo fold no `fold_results_partial.csv` de uma run,
+  em todos os campos menos o tempo. `compose_kfold_run.py` monta a run a partir dos registros: roda
+  `run_cross_validation.main()` com `run_method` trocada por uma busca nos registros, de modo que a agregação é a do
+  runner. Validação em `../validation_pima_m4_parallel.txt`.
 - `../validation_t20_hf_m6_f3.txt`: validação da emulação de 20 threads (`threadpool_info()` e resultado do fold 3
   do ELM-C no HF com o CSV antigo, nas variantes `OPENBLAS_NUM_THREADS=20`, wrapper e default).
