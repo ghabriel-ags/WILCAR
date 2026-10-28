@@ -1,12 +1,11 @@
 # Re-run Heart Failure / Pima (out/2026) vs. março/2026
 
-Código: branch `dissertation/rerun-hf-pima`, commit `ad0a724540bce0c7ccfdc5cef50c024dd2a301da`. Única mudança de entrada vs. março: os dois CSVs corrigidos (HF idade, 2 células; Pima DPF, 47 células).
+Código: branch `dissertation/rerun-hf-pima`, commit `bedbf220011c9eff62e7328d288a83f6bf752614`. Única mudança de entrada vs. março: os dois CSVs corrigidos (HF idade, 2 células; Pima DPF, 47 células).
 
 Runs de março: cv_20260322_092703, cv_20260329_233245, cv_20260330_090253, cv_20260323_194416, cv_20260322_112130, cv_20260329_095115, cv_20260323_195252, vcd_20260328_200812, vcd_20260329_001412.  
-Runs novas: cv_20261026_113244, vcd_20261026_113311, vcd_20261026_114430, cv_20261027_092850, cv_20261027_094521, cv_20261027_151025, cv_20261027_171128, cv_20261027_181331, vcd_20261027_004830_alg, vcd_20261027_004851_bcd, vcd_20261027_005421_pima, vcd_20261027_011812_bco, vcd_20261027_073947_reg, cv_20261027_083525_hf_m56, cv_20261027_083525_pima_m56, cv_20261027_083525_hf_m4, vcd_20261027_011812_hf.
+Runs novas: vcd_20261026_113311, vcd_20261026_114430, cv_20261027_092850, cv_20261027_094521, cv_20261027_151025, cv_20261027_171128, cv_20261027_181331, vcd_20261027_004830_alg, vcd_20261027_004851_bcd, vcd_20261027_005421_pima, vcd_20261027_011812_bco, vcd_20261027_073947_reg, cv_20261027_083525_hf_m56, cv_20261027_083525_pima_m56, cv_20261027_083525_hf_m4, vcd_20261027_011812_hf, cv_20261027_092317_composed.
 
 Threads do BLAS por run (política: K-fold com 20, DCV do WILCAR-C com 4 por worker):  
-- `cv_20261026_113244` (cv_pima_m4): default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)  
 - `vcd_20261026_113311` (dcv_hf_m1): default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)  
 - `vcd_20261026_114430` (dcv_pima_m1): default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)  
 - `cv_20261027_092850` (cv_alg_m2_t20): 20 in the main process (with_blas_threads.py, threadpoolctl; March default)  
@@ -22,7 +21,8 @@ Threads do BLAS por run (política: K-fold com 20, DCV do WILCAR-C com 4 por wor
 - `cv_20261027_083525_hf_m56` (cv_hf_m56_t20): 20 in the main process (with_blas_threads.py, threadpoolctl; March default)  
 - `cv_20261027_083525_pima_m56` (cv_pima_m56_t20): 20 in the main process (with_blas_threads.py, threadpoolctl; March default)  
 - `cv_20261027_083525_hf_m4` (cv_hf_m4_t20): 20 in the main process (with_blas_threads.py, threadpoolctl; March default)  
-- `vcd_20261027_011812_hf` (dcvm2_hf_t4): OMP/OPENBLAS/MKL_NUM_THREADS=4 (4 per DCV worker, as in March; parent process also 4)
+- `vcd_20261027_011812_hf` (dcvm2_hf_t4): OMP/OPENBLAS/MKL_NUM_THREADS=4 (4 per DCV worker, as in March; parent process also 4)  
+- `cv_20261027_092317_composed` (cv_pima_m4_t20_composed): 20 in the main process of every fold (with_blas_threads.py, threadpoolctl; March default): folds 1, 2, 3 in cv_pima_m4_t20, folds 4, 5 in their own processes; the composition trains nothing
 
 ## Checagens de sanidade
 
@@ -75,13 +75,13 @@ Threads do BLAS por run (política: K-fold com 20, DCV do WILCAR-C com 4 por wor
 | M1 WILCAR | 0.786 ± 0.020 | 0.786 ± 0.024 | +0.000 | 0.518 ± 0.030 | 0.516 ± 0.032 | -0.002 | 0.672 ± 0.026 | 0.656 ± 0.025 | -0.015 | 47.6 ± 51.3 | 49.0 ± 47.4 | 96.67 | 93.33 | 801 | 646 |
 | M2 WILCAR-C | 0.771 ± 0.030 | 0.776 ± 0.020 | +0.005 | 0.496 ± 0.036 | 0.512 ± 0.048 | +0.015 | 0.654 ± 0.048 | 0.666 ± 0.046 | +0.012 | 3.0 ± 2.0 | 5.8 ± 4.9 | 100.00 | 100.00 | 2456 | 1324 |
 | M3 RIXM | 0.776 ± 0.026 | 0.784 ± 0.028 | +0.008 | 0.488 ± 0.059 | 0.508 ± 0.061 | +0.020 | 0.605 ± 0.070 | 0.625 ± 0.074 | +0.021 | 236.0 ± 150.3 | 311.2 ± 180.0 | 100.00 | 96.67 | 2544 | 3896 |
-| M4 RIXM-C | 0.776 ± 0.010 | 0.782 ± 0.031 | +0.006 | 0.503 ± 0.026 | 0.521 ± 0.042 | +0.018 | 0.663 ± 0.038 | 0.679 ± 0.031 | +0.016 | 4.4 ± 4.0 | 6.6 ± 4.8 | 100.00 | 100.00 | 8181 | 13162 |
+| M4 RIXM-C | 0.776 ± 0.010 | 0.781 ± 0.031 | +0.005 | 0.503 ± 0.026 | 0.515 ± 0.050 | +0.012 | 0.663 ± 0.038 | 0.672 ± 0.043 | +0.009 | 4.4 ± 4.0 | 7.0 ± 7.2 | 100.00 | 100.00 | 8181 | 15619 |
 | M5 ELM | 0.786 ± 0.021 | 0.786 ± 0.013 | +0.000 | 0.510 ± 0.066 | 0.515 ± 0.047 | +0.006 | 0.648 ± 0.069 | 0.655 ± 0.052 | +0.007 | 68.4 ± 48.5 | 73.6 ± 55.7 | 66.67 | 83.33 | 36 | 266 |
 | M6 ELM-C | 0.771 ± 0.020 | 0.772 ± 0.022 | +0.001 | 0.475 ± 0.055 | 0.477 ± 0.056 | +0.003 | 0.598 ± 0.086 | 0.605 ± 0.069 | +0.008 | 18.0 ± 17.7 | 22.6 ± 11.8 | 100.00 | 100.00 | 23 | 119 |
 
-- Ordenação por MCC (**mudou**):
+- Ordenação por MCC (igual):
   - março:   WILCAR > ELM > RIXM-C > WILCAR-C > RIXM > ELM-C
-  - outubro: RIXM-C > WILCAR > ELM > WILCAR-C > RIXM > ELM-C
+  - outubro: WILCAR > ELM > RIXM-C > WILCAR-C > RIXM > ELM-C
 - Ordenação por Accuracy (**mudou**):
   - março:   ELM > WILCAR > RIXM-C > RIXM > WILCAR-C > ELM-C
   - outubro: WILCAR > ELM > RIXM > RIXM-C > WILCAR-C > ELM-C

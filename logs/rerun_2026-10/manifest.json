@@ -1,7 +1,7 @@
 {
   "branch": "dissertation/rerun-hf-pima",
-  "commit": "ad0a724540bce0c7ccfdc5cef50c024dd2a301da",
-  "commit_date": "2026-10-27 22:09:19 -0300",
+  "commit": "bedbf220011c9eff62e7328d288a83f6bf752614",
+  "commit_date": "2026-10-28 05:56:30 -0300",
   "worktree_clean_for_code": true,
   "environment": {
     "micromamba_env": "mestrado_ghabriel_pei",
@@ -71,7 +71,8 @@
       "start": "2026-10-26T11:32:43-03:00",
       "end": "2026-10-27T05:49:39-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
+      "superseded_by": "cv_pima_m4_t20_composed"
     },
     {
       "label": "cv_pima_m3",
@@ -349,10 +350,10 @@
       "log": "logs/rerun_2026-10/cv_pima__binary__m4_t20.log",
       "results_dir": "results/cross_validation/cv_20261027_092317",
       "start": "2026-10-27T09:23:17-03:00",
-      "end": null,
-      "exit_code": null,
+      "end": "2026-10-28T05:54:18-03:00",
+      "exit_code": 143,
       "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
-      "supersedes": "cv_pima_m4"
+      "role": "stopped by decision (exit 143) after fold 4, found identical to the parallel fold 4; folds 1, 2, 3 used in cv_pima_m4_t20_composed"
     },
     {
       "label": "cv_pima_m3_t20",
@@ -642,6 +643,63 @@
           "note": "n* = 1, so --max-neurons 1 reproduces the final retrain: final_n = 1, final_scr = 1, Acc 0.8294, MCC 0.6121 as in the official run"
         }
       ]
+    },
+    {
+      "label": "cv_pima_m4_t20_composed",
+      "commit": "7ad83506067a39eb340335039556ade3cf612297",
+      "command": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python compose_kfold_run.py results/cross_validation/cv_20261027_092317_composed --partial /home/ghabr/projects/WILCAR-dissertacao/results/cross_validation/cv_20261027_092317/pima__binary_/fold_results_partial.csv:1,2,3 --pickle fold4.pkl --pickle fold5.pkl -- --task classification -y --dataset pima__binary_ --methods 4",
+      "cwd": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/pima_m4_par",
+      "pid": null,
+      "log": "logs/rerun_2026-10/cv_pima_m4_t20_composed.log",
+      "results_dir": "results/cross_validation/cv_20261027_092317_composed",
+      "source_results_dir": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/pima_m4_par/results/cross_validation/cv_20261027_092317_composed",
+      "start": "2026-10-28T05:54:31-03:00",
+      "end": "2026-10-28T05:54:34-03:00",
+      "exit_code": 0,
+      "blas_threads": "20 in the main process of every fold (with_blas_threads.py, threadpoolctl; March default): folds 1, 2, 3 in cv_pima_m4_t20, folds 4, 5 in their own processes; the composition trains nothing",
+      "supersedes": "cv_pima_m4",
+      "composition": {
+        "folds_from_run": {
+          "label": "cv_pima_m4_t20",
+          "folds": [
+            1,
+            2,
+            3
+          ],
+          "file": "results/cross_validation/cv_20261027_092317/pima__binary_/fold_results_partial.csv"
+        },
+        "parallel_folds": [
+          {
+            "label": "cv_pima_m4_t20_f4",
+            "fold": 4,
+            "commit": "7ad83506067a39eb340335039556ade3cf612297",
+            "command": "nice -n 17 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python logs/rerun_2026-10/with_blas_threads.py 20 run_fold_record.py pima__binary_ 4 4 fold4.pkl",
+            "cwd": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/pima_m4_par",
+            "pid": 2382017,
+            "log": "logs/rerun_2026-10/cv_pima_m4_t20_f4.log",
+            "record": "logs/rerun_2026-10/cv_pima_m4_t20_f4.pkl",
+            "start": "2026-10-28T00:08:39-03:00",
+            "end": "2026-10-28T01:11:14-03:00",
+            "exit_code": 0,
+            "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)"
+          },
+          {
+            "label": "cv_pima_m4_t20_f5",
+            "fold": 5,
+            "commit": "7ad83506067a39eb340335039556ade3cf612297",
+            "command": "nice -n 17 /home/ghabr/micromamba/envs/mestrado_ghabriel_pei/bin/python logs/rerun_2026-10/with_blas_threads.py 20 run_fold_record.py pima__binary_ 4 5 fold5.pkl",
+            "cwd": "/tmp/claude-1000/-home-ghabr-projects-thesis/1ec83233-8308-406b-842e-3e858b3e26f9/scratchpad/pima_m4_par",
+            "pid": 2382016,
+            "log": "logs/rerun_2026-10/cv_pima_m4_t20_f5.log",
+            "record": "logs/rerun_2026-10/cv_pima_m4_t20_f5.pkl",
+            "start": "2026-10-28T00:08:39-03:00",
+            "end": "2026-10-28T01:09:42-03:00",
+            "exit_code": 0,
+            "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)"
+          }
+        ],
+        "validation": "fold 4 of cv_pima_m4_t20 identical to cv_pima_m4_t20_f4 (scripts/compare_fold_record.py: every field but training_time, conformity_details included; 3146.7 s vs 3751.6 s); composition with folds 1-4 of cv_pima_m4_t20 + fold 5 equal except the fold-4 training_time; the procedure reproduces cv_20261026_113244 byte for byte (all files but the latex_tables.tex timestamp); details in validation_pima_m4_parallel.txt"
+      }
     }
   ]
 }
