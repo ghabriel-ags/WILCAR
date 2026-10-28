@@ -1,7 +1,7 @@
 {
   "branch": "dissertation/rerun-hf-pima",
-  "commit": "7911f40386d8e437f83be299175b133377a02cd1",
-  "commit_date": "2026-10-27 17:22:07 -0300",
+  "commit": "d07c479353d847469210e81165d5b7b71c134dd2",
+  "commit_date": "2026-10-27 18:13:49 -0300",
   "worktree_clean_for_code": true,
   "environment": {
     "micromamba_env": "mestrado_ghabriel_pei",
@@ -98,7 +98,8 @@
       "start": "2026-10-26T11:32:49-03:00",
       "end": "2026-10-26T15:50:45-03:00",
       "exit_code": 0,
-      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)"
+      "blas_threads": "default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)",
+      "superseded_by": "cv_pima_m12_t20_r2"
     },
     {
       "label": "cv_hf_m12",
@@ -478,8 +479,8 @@
       "log": "logs/rerun_2026-10/cv_pima__binary__m12_t20_r2.log",
       "results_dir": "results/cross_validation/cv_20261027_181331",
       "start": "2026-10-27T18:13:31-03:00",
-      "end": null,
-      "exit_code": null,
+      "end": "2026-10-27T20:57:45-03:00",
+      "exit_code": 0,
       "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
       "supersedes": "cv_pima_m12"
     },

@@ -1,0 +1,24 @@
+Validation of the 20-thread emulation (27/10/2026): Pima WILCAR-C (M2) folds 3 and 5, pre-fix CSV (md5 eb8968c00553e8dfae84b0d6fee616a4, as in March), code d07c479 (git archive), logs/rerun_2026-10/scripts/run_one_fold.py, nice 19; reference cv_20260322_112130 (March).
+Reason: with the corrected CSV, folds 3 and 5 of Pima M2 change between 16 threads (cv_20261026_113250: n*=5 and 4, MCC 0.4501 and 0.4539) and 20 threads (cv_20261027_181331: n*=11 and 11, MCC 0.4502 and 0.4881).
+
+March fold 3: best_neurons=1 test_r2=0.2503695271865807 test_mse=0.17716641930001747 train_r2=0.24946107066633227 test_mcc=0.5145117479124656
+
+== t20 fold 3 (BLAS_THREADS=20: threadpool_limits(20))
+THREADPOOL [{"user_api": "blas", "internal_api": "openblas", "num_threads": 20, "prefix": "libopenblas", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libopenblasp-r0.3.30.so", "version": "0.3.30", "threading_layer": "pthreads", "architecture": "Haswell"}, {"user_api": "openmp", "internal_api": "openmp", "num_threads": 20, "prefix": "libgomp", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libgomp.so.1.0.0", "version": null}]
+RESULT {"fold": 3, "best_neurons": 1, "test_r2": 0.2503695271865807, "test_mse": 0.17716641930001747, "train_r2": 0.24946107066633227, "scr": 1.0, "time": 567.1457340717316, "test_accuracy": 0.7402597402597403, "test_f1": 0.7183098591549295, "test_mcc": 0.5145117479124656}
+
+== t16 fold 3 (default, 16)
+THREADPOOL [{"user_api": "blas", "internal_api": "openblas", "num_threads": 16, "prefix": "libopenblas", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libopenblasp-r0.3.30.so", "version": "0.3.30", "threading_layer": "pthreads", "architecture": "Haswell"}, {"user_api": "openmp", "internal_api": "openmp", "num_threads": 16, "prefix": "libgomp", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libgomp.so.1.0.0", "version": null}]
+RESULT {"fold": 3, "best_neurons": 1, "test_r2": 0.2503695271865807, "test_mse": 0.17716641930001747, "train_r2": 0.24946107066633227, "scr": 1.0, "time": 506.12283849716187, "test_accuracy": 0.7402597402597403, "test_f1": 0.7183098591549295, "test_mcc": 0.5145117479124656}
+
+March fold 5: best_neurons=5 test_r2=0.1846462489773053 test_mse=0.1774976596698557 train_r2=0.45047326994506554 test_mcc=0.5099866098528464
+
+== t20 fold 5 (BLAS_THREADS=20: threadpool_limits(20))
+THREADPOOL [{"user_api": "blas", "internal_api": "openblas", "num_threads": 20, "prefix": "libopenblas", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libopenblasp-r0.3.30.so", "version": "0.3.30", "threading_layer": "pthreads", "architecture": "Haswell"}, {"user_api": "openmp", "internal_api": "openmp", "num_threads": 20, "prefix": "libgomp", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libgomp.so.1.0.0", "version": null}]
+RESULT {"fold": 5, "best_neurons": 5, "test_r2": 0.1846462489773053, "test_mse": 0.1774976596698557, "train_r2": 0.45047326994506554, "scr": 1.0, "time": 770.8520770072937, "test_accuracy": 0.7908496732026143, "test_f1": 0.6595744680851063, "test_mcc": 0.5099866098528464}
+
+== t16 fold 5 (default, 16)
+THREADPOOL [{"user_api": "blas", "internal_api": "openblas", "num_threads": 16, "prefix": "libopenblas", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libopenblasp-r0.3.30.so", "version": "0.3.30", "threading_layer": "pthreads", "architecture": "Haswell"}, {"user_api": "openmp", "internal_api": "openmp", "num_threads": 16, "prefix": "libgomp", "filepath": "/home/ghabr/micromamba/envs/mestrado_ghabriel_pei/lib/libgomp.so.1.0.0", "version": null}]
+RESULT {"fold": 5, "best_neurons": 5, "test_r2": 0.1846462489773053, "test_mse": 0.1774976596698557, "train_r2": 0.45047326994506554, "scr": 1.0, "time": 2108.850683450699, "test_accuracy": 0.7908496732026143, "test_f1": 0.6595744680851063, "test_mcc": 0.5099866098528464}
+
+All four RESULT lines equal March bit for bit (all columns except time): with the March data these folds do not distinguish 16 from 20 threads; with the corrected data they do.
