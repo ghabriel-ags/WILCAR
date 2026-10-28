@@ -1,7 +1,7 @@
 {
   "branch": "dissertation/rerun-hf-pima",
-  "commit": "d07c479353d847469210e81165d5b7b71c134dd2",
-  "commit_date": "2026-10-27 18:13:49 -0300",
+  "commit": "ad0a724540bce0c7ccfdc5cef50c024dd2a301da",
+  "commit_date": "2026-10-27 22:09:19 -0300",
   "worktree_clean_for_code": true,
   "environment": {
     "micromamba_env": "mestrado_ghabriel_pei",
@@ -423,8 +423,8 @@
       "log": "logs/rerun_2026-10/cv_Algerian_forest_fires__binary__m2_t20.log",
       "results_dir": "results/cross_validation/cv_20261027_092850",
       "start": "2026-10-27T09:28:49-03:00",
-      "end": null,
-      "exit_code": null,
+      "end": "2026-10-27T23:57:21-03:00",
+      "exit_code": 0,
       "blas_threads": "20 in the main process (with_blas_threads.py, threadpoolctl; March default)",
       "supersedes": "cv_alg_m2"
     },

@@ -1,14 +1,15 @@
 # Re-run Heart Failure / Pima (out/2026) vs. março/2026
 
-Código: branch `dissertation/rerun-hf-pima`, commit `d07c479353d847469210e81165d5b7b71c134dd2`. Única mudança de entrada vs. março: os dois CSVs corrigidos (HF idade, 2 células; Pima DPF, 47 células).
+Código: branch `dissertation/rerun-hf-pima`, commit `ad0a724540bce0c7ccfdc5cef50c024dd2a301da`. Única mudança de entrada vs. março: os dois CSVs corrigidos (HF idade, 2 células; Pima DPF, 47 células).
 
 Runs de março: cv_20260322_092703, cv_20260329_233245, cv_20260330_090253, cv_20260323_194416, cv_20260322_112130, cv_20260329_095115, cv_20260323_195252, vcd_20260328_200812, vcd_20260329_001412.  
-Runs novas: cv_20261026_113244, vcd_20261026_113311, vcd_20261026_114430, cv_20261027_094521, cv_20261027_151025, cv_20261027_171128, cv_20261027_181331, vcd_20261027_004830_alg, vcd_20261027_004851_bcd, vcd_20261027_005421_pima, vcd_20261027_011812_bco, vcd_20261027_073947_reg, cv_20261027_083525_hf_m56, cv_20261027_083525_pima_m56, cv_20261027_083525_hf_m4, vcd_20261027_011812_hf.
+Runs novas: cv_20261026_113244, vcd_20261026_113311, vcd_20261026_114430, cv_20261027_092850, cv_20261027_094521, cv_20261027_151025, cv_20261027_171128, cv_20261027_181331, vcd_20261027_004830_alg, vcd_20261027_004851_bcd, vcd_20261027_005421_pima, vcd_20261027_011812_bco, vcd_20261027_073947_reg, cv_20261027_083525_hf_m56, cv_20261027_083525_pima_m56, cv_20261027_083525_hf_m4, vcd_20261027_011812_hf.
 
 Threads do BLAS por run (política: K-fold com 20, DCV do WILCAR-C com 4 por worker):  
 - `cv_20261026_113244` (cv_pima_m4): default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)  
 - `vcd_20261026_113311` (dcv_hf_m1): default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)  
 - `vcd_20261026_114430` (dcv_pima_m1): default (no thread variable set: 16 in the main process, 16 // 5 = 3 per DCV worker)  
+- `cv_20261027_092850` (cv_alg_m2_t20): 20 in the main process (with_blas_threads.py, threadpoolctl; March default)  
 - `cv_20261027_094521` (cv_pima_m3_t20_r2): 20 in the main process (with_blas_threads.py, threadpoolctl; March default)  
 - `cv_20261027_151025` (cv_hf_m12_t20_r2): 20 in the main process (with_blas_threads.py, threadpoolctl; March default)  
 - `cv_20261027_171128` (cv_hf_m3_t20_r2): 20 in the main process (with_blas_threads.py, threadpoolctl; March default)  
@@ -39,6 +40,7 @@ Threads do BLAS por run (política: K-fold com 20, DCV do WILCAR-C com 4 por wor
 - ✅ Pima DCV M2 WILCAR-C: SCR por fold = ['100%', '100%', '100%', '100%', '100%'], final_SCR = 100%
 - ✅ Pima DCV M1 WILCAR: final_n = 3 ≤ n* = 4
 - ✅ Pima DCV M2 WILCAR-C: final_n = 1 ≤ n* = 2
+- ✅ Algerian M2 WILCAR-C (k-fold, re-run): 5 folds sem erro, SCR por fold = ['100%', '100%', '100%', '100%', '100%']
 - ✅ nenhum NaN nas tabelas de resultado
 
 ## K-fold (5 folds): março → outubro
@@ -115,4 +117,42 @@ As demais variáveis não mudam (tabela completa em `correlations.csv`).
 
 ## Algerian — WILCAR-C (5 folds)
 
-Pendente: o K-fold ainda está em execução; entra num commit posterior. Causa e correção do erro de março em `algerian_fix_note.md`.
+Re-run só do M2 com o código corrigido; o WILCAR (M1) não teve falha e não foi re-rodado.
+
+| Versão | folds | Acc | MCC | F1 | n* | SCR % | t/fold (s) |
+|---|---|---|---|---|---|---|---|
+| março (4 folds: 2-5) | 4 | 0.949 ± 0.026 | 0.894 ± 0.057 | 0.956 ± 0.022 | 1.25 ± 0.50 | 100.00 | 53 |
+| outubro (5 folds) | 5 | 0.947 ± 0.023 | 0.892 ± 0.049 | 0.954 ± 0.019 | 5.00 ± 8.40 | 100.00 | 10420 |
+
+Por fold (março → outubro):
+
+| Fold | n* mar | n* out | Acc mar | Acc out | MCC mar | MCC out | F1 mar | F1 out | SCR mar | SCR out | idêntico? |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | erro | 20 | erro | 0.939 | erro | 0.883 | erro | 0.945 | erro | 1.00 | — |
+| 2 | 1 | 1 | 0.918 | 0.918 | 0.833 | 0.833 | 0.929 | 0.929 | 1.00 | 1.00 | sim |
+| 3 | 1 | 1 | 0.959 | 0.959 | 0.921 | 0.921 | 0.957 | 0.957 | 1.00 | 1.00 | sim |
+| 4 | 1 | 1 | 0.979 | 0.979 | 0.958 | 0.958 | 0.982 | 0.982 | 1.00 | 1.00 | sim |
+| 5 | 2 | 2 | 0.938 | 0.938 | 0.862 | 0.862 | 0.955 | 0.955 | 1.00 | 1.00 | sim |
+
+Erro de março no fold 1: `cannot reshape array of size 2 into shape (1,13)`
+
+### Causa do erro e correção
+
+**Causa.** No WILCAR-C, quando nenhuma das até 100 reinicializações atinge 100% de SCR num tamanho `n`, o
+laço construtivo de `train()` pula esse tamanho (`continue`) e mantém em `previous_param` o último modelo viável,
+com `k < n` neurônios. No tamanho seguinte, `_expand_network(previous_param, n + 1)` acrescentava sempre **um**
+neurônio, produzindo uma rede de `k + 1` neurônios, enquanto `_vector_to_params(vec, n + 1)` desempacotava o vetor
+de parâmetros como se ele tivesse `n + 1`. No fold 1 do Algerian (p = 10), o tamanho 12 foi inviável depois de um
+modelo viável de 11 neurônios. No tamanho 13, o vetor tinha 12·(10 + 2) + 1 = 145 elementos e, ao desempacotá-lo
+com n = 13, sobraram só 2 elementos para `W2` (1 × 13): `cannot reshape array of size 2 into shape (1,13)`.
+Esse caminho sempre levava a erro, porque qualquer tamanho pulado (exceto o último) seguido de outro passo deixa
+o vetor curto. Nenhuma run que terminou passou por ele. O mesmo caminho existia no DCV
+(`constructive_step`, que também pula tamanhos inviáveis), mas nunca foi atingido nas runs de março.
+
+**Correção** (`src/wilcar/constrained.py`, `_expand_network`). A rede passa a ser completada até `n` neurônios
+a partir do último modelo viável, com um neurônio novo por tamanho pulado. Isso preserva o reaproveitamento de
+pesos e a semântica "pular o tamanho inviável e seguir". No caso regular (modelo anterior com `n − 1` neurônios),
+o laço executa exatamente uma vez, com as mesmas chamadas ao gerador aleatório e na mesma ordem. O comportamento
+é bit a bit idêntico ao de março em todos os casos que já funcionavam: teste
+`tests/test_wilcar_constrained.py` e comparação por fold, código corrigido vs. código sem correção, nas mesmas
+condições.

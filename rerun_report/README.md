@@ -93,6 +93,7 @@ todas as colunas de `fold_results.csv`, menos o tempo de treino):
 | HF, WILCAR (M1) e WILCAR-C (M2), `cv_20261027_151025` (`cv_hf_m12_t20_r2`) | 27/10 17h10, exit 0, 120,3 min | M1 idêntico nos 5 folds. M2: folds 1–4 idênticos; **fold 5: n\* 1 → 11, Acc 0,797 → 0,847, F1 0,647 → 0,769, MCC 0,568 → 0,670** (R² de treino 0,409 → 0,990; SCR 100 % nas duas). Média do M2: Acc 0,813 → 0,823, MCC 0,588 → 0,609, F1 0,678 → 0,703, n\* 1,4 → 3,4 |
 | HF, RIXM (M3), `cv_20261027_171128` (`cv_hf_m3_t20_r2`) | 27/10 18h13, exit 0, 61,4 min | idêntico nos 5 folds |
 | Pima, WILCAR (M1) e WILCAR-C (M2), `cv_20261027_181331` (`cv_pima_m12_t20_r2`) | 27/10 20h57, exit 0, 164,2 min | M1 idêntico nos 5 folds. M2: folds 1, 2 e 4 idênticos; **fold 3: n\* 5 → 11, Acc 0,727 → 0,747, F1 0,677 → 0,636, MCC 0,4501 → 0,4502; fold 5: n\* 4 → 11, Acc 0,765 → 0,784, F1 0,625 → 0,637, MCC 0,454 → 0,488** (R² de treino 0,410 → 0,517 e 0,454 → 0,656; SCR 100 % nas duas). Média do M2: Acc 0,768 → 0,776, MCC 0,505 → 0,512, F1 0,672 → 0,666, n\* 3,2 → 5,8 |
+| Algerian, WILCAR-C (M2), `cv_20261027_092850` (`cv_alg_m2_t20`) | 27/10 23h57, exit 0, 868,5 min | sem run completa com 16 threads para comparar (a de 16 foi encerrada no fold 1). Folds 2–5 idênticos bit a bit a março (`cv_20260320_225457`). Fold 1, que deu erro em março: n\* = 20, Acc 0,939, F1 0,945, MCC 0,883, SCR 100 % (51 911 s, cerca de 14,4 h). Tabela por fold em `comparison.md` |
 
 O fold 5 do WILCAR-C no HF foi conferido como o fold 3 do ELM-C: com o CSV de março e o código de `42b31cb`, dá
 idêntico a março (`cv_20260322_092703`: n\* = 1, MCC 0,6767) com 20 threads e com 16
@@ -170,10 +171,10 @@ diretório de origem, commit e threads por job.
 
 ## Pendências
 
-Para commits posteriores (estado em 27/10, 22h10):
+Para commits posteriores (estado em 27/10, 23h55):
 
-- **K-fold com 20 threads:** Algerian M2 (`cv_20261027_092850`) e Pima M4 (`cv_20261027_092317`) em execução. A
-  fila `queue_t20.sh` terminou (Pima M3, HF M1/M2, HF M3 e Pima M1/M2). Até o Pima M4 terminar, o relatório usa a
+- **K-fold com 20 threads:** Pima M4 (`cv_20261027_092317`) em execução. Os demais terminaram: a fila
+  `queue_t20.sh` (Pima M3, HF M1/M2, HF M3 e Pima M1/M2) e o Algerian M2. Até o Pima M4 terminar, o relatório usa a
   versão dele com 16 threads.
 - **K-fold Algerian WILCAR-C com 16 threads** (`cv_20261026_113259`): encerrado por decisão em 27/10 às 09h40,
   depois de 22 h no fold 1. Pela política, não entra nas tabelas.
