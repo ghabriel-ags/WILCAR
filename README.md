@@ -295,9 +295,9 @@ These hyperparameters are uniform across all datasets and both tasks (regression
 
 ## References
 
-- **WILCAR:** Sá, G.A.G., Fontes, C.H., & Embiruçu, M. (2022). A new method for building single feedforward neural network models for multivariate static regression problems. *Evolutionary Intelligence*, 15, 1221–1231.
-- **Gain Sign Constraints:** Sá, G.A.G., Fontes, C.H., & Embiruçu, M. (2026). Physics-informed neural networks without a phenomenological model available. *Neural Computing and Applications*. Under review.
+- **WILCAR:** de Sá, G.A.G., Fontes, C.H. & Embiruçu, M. A new method for building single feedforward neural network models for multivariate static regression problems: a combined weight initialization and constructive algorithm. Evol. Intel. 17, 1221–1233 (2024). https://doi.org/10.1007/s12065-022-00813-z
 - **Physical Consistency:** Fontes, C.H., Sá, G.A.G., & Embiruçu, M. (2024). Do properly validated networks ensure minimum physical consistency with reality? *Journal of Artificial Intelligence and Systems*, 6, 1–18.
+- **Gain Sign Constraints:** de Sá, G.A.G., Fontes, C.H. & Embiruçu, M. Physics-informed neural networks without a phenomenological model available – applications in regression problems. Neural Comput & Applic 38, 726 (2026). https://doi.org/10.1007/s00521-026-12462-9
 - **ELM:** Huang, G.B., Zhu, Q.Y., & Siew, C.K. (2006). Extreme learning machine: Theory and applications. *Neurocomputing*, 70, 489–501.
 - **Xavier Initialization:** Glorot, X. & Bengio, Y. (2010). Understanding the difficulty of training deep feedforward neural networks.
 
